@@ -1,4 +1,5 @@
 class ApplicationsController < ApplicationController
+  before_action :find_application, only: [:edit, :update, :destroy]
 
   def index
     @applications = Application.where(user_id: current_user.id )
@@ -17,8 +18,30 @@ def create
     end
   end
 
+  def edit
+  end
+
+  def update
+    if @application.update(application_params)
+      redirect_to applications_path
+    else
+      render :edit
+    end
+  end
+
+  def destroy
+    @application.destroy
+    redirect_to root_path
+  end
+
   private
   def application_params
     params.require(:application).permit(:name, :description).merge(user_id: current_user.id)
   end
+
+  def find_application
+    @application = Application.find(params[:id])
+    redirect_to root_path if current_user.id != @application.user_id
+  end
+
 end

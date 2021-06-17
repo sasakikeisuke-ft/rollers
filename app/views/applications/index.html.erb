@@ -16,6 +16,11 @@
       <div class="application-description">
       <%= application.description %>
       </div>
+      <%= link_to '編集画面へ', edit_application_path(application) %>
+      <br>
+      <%= link_to '削除', application_path(application), method: :delete %>
+      <br>
+      <%= link_to '詳細設定へ', application_path(application) %>
       <br>
     <% end %>
   </div>
