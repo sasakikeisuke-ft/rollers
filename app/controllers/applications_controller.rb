@@ -5,11 +5,15 @@ class ApplicationsController < ApplicationController
     @applications = Application.where(user_id: current_user.id )
   end
 
+  def show
+    @application = Application.find(params[:id])
+  end
+
   def new
     @application = Application.new
   end
 
-def create
+  def create
     @application = Application.new(application_params)
     if @application.save
       redirect_to root_path
