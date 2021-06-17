@@ -1,6 +1,6 @@
 <h1>アプリケーション一覧</h1>
 
-<% if @application.length != 0 %>
+<% if @application != nil %>
   <div>
     <% @application.each do |application| %>
       <div class="application-name">
@@ -11,7 +11,7 @@
       </div>
     <% end %>
   </div>
-<% elese %>
+<% else %>
   <div>
     <p>まだアプリケーションが作成されていません</p>
   </div>
