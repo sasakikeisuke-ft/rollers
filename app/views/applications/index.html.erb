@@ -6,6 +6,7 @@
 <br>
 <%= link_to 'アプリケーション作成へ', new_application_path %>
 
+
 <% if @applications != nil %>
   <div>
     <% @applications.each do |application| %>
@@ -15,6 +16,7 @@
       <div class="application-description">
       <%= application.description %>
       </div>
+      <br>
     <% end %>
   </div>
 <% else %>
