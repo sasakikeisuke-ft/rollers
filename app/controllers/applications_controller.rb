@@ -1,7 +1,7 @@
 class ApplicationsController < ApplicationController
 
   def index
-    @applications = Application.all
+    @applications = Application.where(user_id: current_user.id )
   end
 
   def new
