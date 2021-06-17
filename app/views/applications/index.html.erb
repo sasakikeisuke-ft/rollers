@@ -1,0 +1,19 @@
+<h1>アプリケーション一覧</h1>
+
+<% if @application.length != 0 %>
+  <div>
+    <% @application.each do |application| %>
+      <div class="application-name">
+      <%= application.name %>
+      </div>
+      <div class="application-description">
+      <%= application.description %>
+      </div>
+    <% end %>
+  </div>
+<% elese %>
+  <div>
+    <p>まだアプリケーションが作成されていません</p>
+  </div>
+
+<% end %>
