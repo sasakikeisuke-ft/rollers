@@ -19,6 +19,6 @@ def create
 
   private
   def application_params
-    params.require(:application).permit(:カラム名, :カラム名).merge(user_id: current_user.id)
+    params.require(:application).permit(:name, :description).merge(user_id: current_user.id)
   end
 end
