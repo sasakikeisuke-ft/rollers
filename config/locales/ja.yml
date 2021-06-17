@@ -1,0 +1,10 @@
+ja:
+  activerecord:
+    attributes:
+      user:
+        nickname: ニックネーム
+      application:
+        name: アプリケーション名
+        description: 概要
+      # model名:
+      #   カラム名: 翻訳＝表示文字列

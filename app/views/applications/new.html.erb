@@ -1,6 +1,9 @@
 <h1>アプリケーション作成</h1>
 
 <%= form_with model: @application, local: true do |f| %>
+
+  <%= render 'shared/error_messages', model: f.object %>
+
   <div class="field">
       <%= f.label :name %><br />
       <%= f.text_field :name, autofocus: true %>
@@ -15,3 +18,5 @@
     <%= f.submit "登録" %>
   </div>
 <% end %>
+
+<%= link_to 'アプリケーション一覧へ戻る', root_path %>
