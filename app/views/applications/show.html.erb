@@ -1,0 +1,30 @@
+<div>
+  <h1><%= @application.name %></h1>
+</div>
+
+<div class="gemfile-index">
+  <h3>使用Gem一覧</h3>
+  <% if @application.gemfile != nil %>
+    <% if @application.gemfile.devise %><p>devise</p><% end %>
+    <% if @application.gemfile.pry_rails %><p>pry_rails</p><% end %>
+    <% if @application.gemfile.image_magick %><p>image_magick</p><% end %>
+    <% if @application.gemfile.active_hash %><p>active_hash</p><% end %>
+    <% if @application.gemfile.rails_i18n %><p>rails_i18n</p><% end %>
+    <% if @application.gemfile.ransack %><p>ransack</p><% end %>
+    <% if @application.gemfile.rubocop %><p>rubocop</p><% end %>
+    <% if @application.gemfile.rspec %><p>rspec</p><% end %>
+    <% if @application.gemfile.payjp %><p>payjp</p><% end %>
+    <% if @application.gemfile.s3 %><p>s3</p><% end %>
+  <% else %>
+    <p>Gemfileが登録されていません。</p>
+    <p><%= link_to 'こちらから登録をお願いします。', new_application_gemfile_path(@application.id) %></p>
+  <% end %>
+
+  <div>
+  <h3>コード一覧</h3>
+  <%= link_to '事前準備', application_gemfiles_path(@application.id) %>
+  </div>
+</div>
+<%= link_to 'アプリケーション一覧へ戻る', root_path %>
+
+引き続き実装予定

@@ -1,0 +1,31 @@
+<h1>アプリケーション一覧</h1>
+
+<%= "#{current_user.id}番がログイン中" %>
+<%= link_to 'ログアウト', destroy_user_session_path, method: :delete %>
+<%= link_to 'ユーザー編集', edit_user_registration_path, method: :get %>
+<br>
+<%= link_to 'アプリケーション作成へ', new_application_path %>
+
+
+<% if @applications != nil %>
+  <div>
+    <% @applications.each do |application| %>
+      <div class="application-name">
+      <%= application.name %>
+      </div>
+      <div class="application-description">
+      <%= application.description %>
+      </div>
+      <%= link_to '編集画面へ', edit_application_path(application) %>
+      <br>
+      <%= link_to '削除', application_path(application), method: :delete %>
+      <br>
+      <%= link_to '詳細設定へ', application_path(application) %>
+      <br>
+    <% end %>
+  </div>
+<% else %>
+  <div>
+    <p>まだアプリケーションが作成されていません</p>
+  </div>
+<% end %>

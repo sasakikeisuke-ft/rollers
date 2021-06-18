@@ -10,7 +10,33 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_16_140730) do
+ActiveRecord::Schema.define(version: 2021_06_17_022634) do
+
+  create_table "applications", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.bigint "user_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_applications_on_user_id"
+  end
+
+  create_table "gemfiles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.boolean "devise", default: true, null: false
+    t.boolean "pry_rails", default: true, null: false
+    t.boolean "image_magick", default: false, null: false
+    t.boolean "active_hash", default: false, null: false
+    t.boolean "rails_i18n", default: false, null: false
+    t.boolean "ransack", default: false, null: false
+    t.boolean "rubocop", default: false, null: false
+    t.boolean "rspec", default: false, null: false
+    t.boolean "payjp", default: false, null: false
+    t.boolean "s3", default: false, null: false
+    t.bigint "application_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["application_id"], name: "index_gemfiles_on_application_id"
+  end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "nickname", null: false
@@ -25,4 +51,6 @@ ActiveRecord::Schema.define(version: 2021_06_16_140730) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "applications", "users"
+  add_foreign_key "gemfiles", "applications"
 end
