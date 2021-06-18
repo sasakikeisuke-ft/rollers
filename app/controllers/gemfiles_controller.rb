@@ -1,5 +1,8 @@
 class GemfilesController < ApplicationController
-  before_action :find_gemfile, only: [:edit, :update]
+  before_action :find_gemfile, only: [:index, :edit, :update]
+
+  def index
+  end
 
   def new
     @gemfile = Gemfile.new
