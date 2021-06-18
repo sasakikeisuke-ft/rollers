@@ -16,7 +16,7 @@ class ApplicationsController < ApplicationController
   def create
     @application = Application.new(application_params)
     if @application.save
-      redirect_to root_path
+      redirect_to new_application_gemfile_path(@application.id)
     else
       render :new
     end
@@ -27,7 +27,7 @@ class ApplicationsController < ApplicationController
 
   def update
     if @application.update(application_params)
-      redirect_to applications_path
+      redirect_to edit_application_gemfile_path(@application.id)
     else
       render :edit
     end
