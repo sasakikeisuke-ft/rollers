@@ -54,3 +54,45 @@
 ### Association
 
 - belongs_to :application
+
+
+## models テーブル
+
+| Column      | Type       | Options                   |
+| ----------- | ---------- | ------------------------- |
+| name        | string     | null: false, unique: true |
+| type        | integer    | null: false               |
+| application | references | foreign_key: true         |
+
+### Association
+
+- belongs_to :application
+- has_many :columns
+- has_many :associations
+
+
+## columns テーブル
+
+| Column         | Type       | Options           |
+| -------------- | ---------- | ----------------- |
+| name           | string     | null: false       |
+| data_option_id | integer    | null: false       |
+| model          | references | foreign_key: true |
+
+### Association
+
+- belongs_to :model
+
+
+## associations テーブル
+
+| Column         | Type       | Options     |
+| -------------- | ---------- | ----------- |
+| left           | string     | null: false |
+| right          | string     | null: false |
+| data_option_id | integer    | null: false |
+
+### Association
+
+- belongs_to :model
+
