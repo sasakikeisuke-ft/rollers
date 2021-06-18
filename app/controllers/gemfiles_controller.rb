@@ -34,6 +34,7 @@ class GemfilesController < ApplicationController
     @application = Application.find(params[:application_id])
     @gemfile = @application.gemfile
     redirect_to root_path if current_user.id != @application.user_id
+    redirect_to new_application_gemfile_path(@application.id) if @gemfile == nil
   end
 
 end
