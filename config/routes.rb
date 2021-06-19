@@ -3,9 +3,9 @@ Rails.application.routes.draw do
   devise_for :users
   resources :applications do
     resources :gemfiles, only: [:index, :new, :create, :edit, :update]
-    resources :models
-    resources :associations, only: [:new, :create]
-    
+    resources :models do
+      resources :associations, only: [:new, :create]
+      resources :columns, only: [:new, :create]
+    end
   end
-  
 end

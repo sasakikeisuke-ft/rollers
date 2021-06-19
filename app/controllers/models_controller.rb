@@ -12,7 +12,7 @@ class ModelsController < ApplicationController
   def create
     @model = Model.new(model_params)
     if @model.save
-      redirect_to application_models_path(params[:application_id])
+      redirect_to new_application_model_association_path(params[:application_id], @model.id)
     else
       render :new
     end
