@@ -37,7 +37,7 @@ class ModelsController < ApplicationController
 
   private
   def model_params
-    params.require(:model).permit(:name, :type).merge(application_id: params[:application_id])
+    params.require(:model).permit(:name, :model_type_id).merge(application_id: params[:application_id])
   end
 
   def find_model
