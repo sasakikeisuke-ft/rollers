@@ -59,11 +59,11 @@
 
 ## models テーブル
 
-| Column      | Type       | Options           |
-| ----------- | ---------- | ----------------- |
-| name        | string     | null: false       |
-| type        | integer    | null: false       |
-| application | references | foreign_key: true |
+| Column        | Type       | Options           |
+| ------------- | ---------- | ----------------- |
+| name          | string     | null: false       |
+| model_type_id | integer    | null: false       |
+| application   | references | foreign_key: true |
 
 ### Association
 
