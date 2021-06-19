@@ -1,5 +1,9 @@
 アソシエーション作成画面
 <br>
-現在テスト中
+<% @models.each do |model| %>
+  <p><%= model.name %></p>
+<% end %>
 <br>
+
+
 <%= link_to '次のカラム編集画面へ', new_application_model_column_path(params[:application_id], params[:model_id]) %>
