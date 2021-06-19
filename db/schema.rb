@@ -59,7 +59,7 @@ ActiveRecord::Schema.define(version: 2021_06_19_023754) do
 
   create_table "models", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
-    t.integer "type", null: false
+    t.integer "model_type_id", null: false
     t.bigint "application_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
