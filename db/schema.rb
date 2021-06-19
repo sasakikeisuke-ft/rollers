@@ -22,13 +22,12 @@ ActiveRecord::Schema.define(version: 2021_06_19_023754) do
   end
 
   create_table "associations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "left", null: false
-    t.integer "right", null: false
+    t.bigint "model_id"
+    t.integer "pair_id", null: false
     t.integer "relation_id", null: false
-    t.bigint "application_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["application_id"], name: "index_associations_on_application_id"
+    t.index ["model_id"], name: "index_associations_on_model_id"
   end
 
   create_table "columns", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -80,7 +79,7 @@ ActiveRecord::Schema.define(version: 2021_06_19_023754) do
   end
 
   add_foreign_key "applications", "users"
-  add_foreign_key "associations", "applications"
+  add_foreign_key "associations", "models"
   add_foreign_key "columns", "models"
   add_foreign_key "gemfiles", "applications"
   add_foreign_key "models", "applications"
