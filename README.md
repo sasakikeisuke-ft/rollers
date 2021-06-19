@@ -31,6 +31,7 @@
 
 - has_one :gemfile
 - has_many :models
+- has_many :association
 - has_many :controllers
 - has_many :views
 
@@ -58,17 +59,16 @@
 
 ## models テーブル
 
-| Column      | Type       | Options                   |
-| ----------- | ---------- | ------------------------- |
-| name        | string     | null: false, unique: true |
-| type        | integer    | null: false               |
-| application | references | foreign_key: true         |
+| Column      | Type       | Options           |
+| ----------- | ---------- | ----------------- |
+| name        | string     | null: false       |
+| type        | integer    | null: false       |
+| application | references | foreign_key: true |
 
 ### Association
 
 - belongs_to :application
 - has_many :columns
-- has_many :associations
 
 
 ## columns テーブル
@@ -86,13 +86,15 @@
 
 ## associations テーブル
 
-| Column         | Type       | Options     |
-| -------------- | ---------- | ----------- |
-| left           | string     | null: false |
-| right          | string     | null: false |
-| data_option_id | integer    | null: false |
+| Column      | Type       | Options           |
+| ----------- | ---------- | ----------------- |
+| left        | integer    | null: false       |
+| right       | integer    | null: false       |
+| relation_id | integer    | null: false       |
+| application | references | foreign_key: true |
+
 
 ### Association
 
-- belongs_to :model
+- belongs_to :application
 
