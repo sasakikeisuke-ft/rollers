@@ -2,12 +2,18 @@ modelsコントローラー<br>
 indexアクション
 <br>
 <% @models.each do |model| %>
-  <%= model.name %>
-
+  <%= model.name %><br>
+  <%= link_to '編集画面へ', edit_application_model_path(params[:application_id], model) %><br>
+  <%= link_to '削除', application_model_path(params[:application_id], model), method: :delete %><br>
+  <%= link_to 'コード表示', application_model_path(params[:application_id], model) %>
+  <br>
+<br>
 <% end %>
 <% if @models.length == 0 %>
   <br>
   モデルはまだ登録されていません
 <% end %>
 <br>
-<%= link_to 'モデル作成へ', new_application_model_path %>
+<%= link_to 'モデル作成へ', new_application_model_path %><br>
+<%= link_to 'アプリケーション内容へ戻る', application_path(params[:application_id]) %><br>
+<%= link_to 'トップページへ戻る', application_path(params[:application_id]) %>

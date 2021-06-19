@@ -2,8 +2,7 @@ class ModelsController < ApplicationController
   before_action :find_model, only: [:edit, :update, :destroy]
 
   def index
-    @application = Application.find(params[:application_id])
-    @models = @application.models
+    @models = Model.where(application_id: params[:application_id])
   end
 
   def new
@@ -41,9 +40,8 @@ class ModelsController < ApplicationController
   end
 
   def find_model
-    @application = Application.find(params[:application_id])
-    @model = @application.models
-    redirect_to root_path if current_user.id != @application.user_id
+    @model = Model.find(params[:id])
+    redirect_to root_path if current_user.id != @model.application.user_id
   end
 
 end

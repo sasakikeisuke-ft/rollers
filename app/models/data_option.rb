@@ -22,7 +22,7 @@ class DataOption < ActiveHash::Base
     {id: 61, type: 'datetime', option: ''},
     
 
-    {id: 101, type: 'boolean', option: ''} # integerはpresence: true を適応できないため別
+    {id: 101, type: 'boolean', option: ''}, # integerはpresence: true を適応できないため別
     {id: 102, type: 'integer', option: ''} # ActiveHash用
     
 
