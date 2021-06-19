@@ -3,6 +3,7 @@ class ModelType < ActiveHash::Base
     {id: 1, name: '通常モデル'},
     {id: 2, name: 'ActiveHash'},
     {id: 3, name: 'Formオブジェクト'},
+    {id: 4, name: 'テンプレート'}
               ]
   include ActiveHash::Associations
   has_many :models

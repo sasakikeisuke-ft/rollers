@@ -1,0 +1,12 @@
+modelsコントローラー<br>
+indexアクション
+
+<% @models.each do |model| %>
+  <%= model.name %>
+<% end %>
+<% if @models %>
+  <br>
+  モデルはまだ登録されていません
+<% end %>
+
+<%= link_to 'モデル作成へ（仮置き）', new_application_model_path %>
