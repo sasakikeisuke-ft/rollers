@@ -4,9 +4,6 @@ class Association < ApplicationRecord
     validates :right
   end
 
-  validates :relation_id, numericality: { other_than: 0, message: "を選択してください" }
-
-
   belongs_to :application
 
   extend ActiveHash::Associations::ActiveRecordExtensions
