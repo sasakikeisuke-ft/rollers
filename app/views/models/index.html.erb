@@ -1,16 +1,16 @@
 modelsコントローラー<br>
 indexアクション
 <br>
-<% @models.each do |model| %>
-  <%= model.name %><br>
-  <%= link_to '編集画面へ', edit_application_model_path(params[:application_id], model) %><br>
-  <%= link_to '削除', application_model_path(params[:application_id], model), method: :delete %><br>
-  <%= link_to 'コード表示', application_model_path(params[:application_id], model) %>
+<% if @models.length != 0 %>
+  <% @models.each do |model| %>
+    <%= model.name %><br>
+    <%= link_to '編集画面へ', edit_application_model_path(params[:application_id], model) %><br>
+    <%= link_to '削除', application_model_path(params[:application_id], model), method: :delete %><br>
+    <%= link_to 'コード表示', application_model_path(params[:application_id], model) %><br>
+    <br>
+  <% end %>
   <br>
-<br>
-<% end %>
-<% if @models.length == 0 %>
-  <br>
+<% else %>
   モデルはまだ登録されていません
 <% end %>
 <br>
