@@ -4,5 +4,4 @@ class Application < ApplicationRecord
   belongs_to :user
   has_one :gemfile, dependent: :destroy
   has_many :models, dependent: :destroy
-  has_many :associations, dependent: :destroy
 end
