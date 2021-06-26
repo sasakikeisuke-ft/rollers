@@ -1,5 +1,6 @@
 class Model < ApplicationRecord
-  validates :name, presence: true
+
+  validates :name, presence: true, uniqueness: { scope: :application_id }
   validates :model_type_id, numericality: { other_than: 0, message: "を選択してください" }
 
   belongs_to :application
