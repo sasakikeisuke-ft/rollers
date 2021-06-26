@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_19_023754) do
+ActiveRecord::Schema.define(version: 2021_06_24_020324) do
 
   create_table "applications", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -21,19 +21,12 @@ ActiveRecord::Schema.define(version: 2021_06_19_023754) do
     t.index ["user_id"], name: "index_applications_on_user_id"
   end
 
-  create_table "associations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "left", null: false
-    t.integer "right", null: false
-    t.integer "relation_id", null: false
-    t.bigint "application_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["application_id"], name: "index_associations_on_application_id"
-  end
-
   create_table "columns", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
-    t.integer "data_option_id", null: false
+    t.string "name_ja"
+    t.integer "data_type_id", null: false
+    t.boolean "must_exist", default: true, null: false
+    t.boolean "uniqe", default: false, null: false
     t.bigint "model_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -60,10 +53,21 @@ ActiveRecord::Schema.define(version: 2021_06_19_023754) do
   create_table "models", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.integer "model_type_id", null: false
+    t.boolean "not_only", default: true, null: false
     t.bigint "application_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["application_id"], name: "index_models_on_application_id"
+  end
+
+  create_table "options", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "option_type_id", null: false
+    t.string "input1"
+    t.string "input2"
+    t.bigint "column_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["column_id"], name: "index_options_on_column_id"
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -80,8 +84,8 @@ ActiveRecord::Schema.define(version: 2021_06_19_023754) do
   end
 
   add_foreign_key "applications", "users"
-  add_foreign_key "associations", "applications"
   add_foreign_key "columns", "models"
   add_foreign_key "gemfiles", "applications"
   add_foreign_key "models", "applications"
+  add_foreign_key "options", "columns"
 end
