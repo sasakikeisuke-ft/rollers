@@ -12,7 +12,7 @@ class ModelsController < ApplicationController
   def create
     @model = Model.new(model_params)
     if @model.save
-      redirect_to new_application_model_association_path(params[:application_id], @model.id)
+      redirect_to new_application_model_column_path(params[:application_id], @model)
     else
       render :new
     end
@@ -36,7 +36,7 @@ class ModelsController < ApplicationController
 
   private
   def model_params
-    params.require(:model).permit(:name, :model_type_id).merge(application_id: params[:application_id])
+    params.require(:model).permit(:name, :model_type_id, :not_only).merge(application_id: params[:application_id])
   end
 
   def find_model
