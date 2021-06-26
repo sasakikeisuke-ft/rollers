@@ -10,7 +10,7 @@ class DataType < ActiveHash::Base
     {id: 7, type: 'time      '},
     {id: 8, type: 'datetime  '},
     {id: 11, type: 'boolean   '},
-    {id: 12, type: 'references'}
+    {id: 12, type: 'references'},
     {id: 13, type: 'ActiveHash'}
     
     
@@ -44,3 +44,4 @@ class DataType < ActiveHash::Base
               ]
   include ActiveHash::Associations
   has_many :columns
+end
