@@ -13,6 +13,12 @@
       <%= f.collection_select(:model_type_id, ModelType.all, :id, :name, {}, {class:"model-type-select"}) %>
   </div>
 
+  <div class="field">
+    <%= f.check_box :not_only ,{}, false, true %>
+    <%= f.label :not_only, '親モデルに対して一対一の関係である has_one' %>
+    <p>親モデルに対して一対多、または親モデルが存在しない場合はチェックしないでください</p>
+  </div>
+
   <div class="actions">
     <%= f.submit "登録" %>
   </div>
