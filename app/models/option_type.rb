@@ -17,8 +17,8 @@ class OptionType < ActiveHash::Base
     {id: 25, type: 'numericality', display: '未選択状態での禁止', code: ', numericality: { other_than: 0, message: ', message_ja: '"を選択してください"', message_en: `"can't be blank"`},
     
     # {id: 31, type: 'length', display: 'length'},
-    {id: 41, type: 'uniqueness', display: '当テーブル内での重複禁止', code: ', uniqueness: true'}
-    {id: 42, type: 'uniqueness', display: '対象モデル内での重複禁止', code: ', uniqueness: { scope: :model名_id }'}
+    {id: 41, type: 'uniqueness', display: '当テーブル内での重複禁止', code: ', uniqueness: true'},
+    {id: 42, type: 'uniqueness', display: '対象モデル内での重複禁止', code: ', uniqueness: { scope: :model名_id }'},
     {id: 43, type: 'uniqueness', display: '複数のモデルでの重複禁止', code: ', uniqueness: { scope: [:model名_id, :model名_id] }'}
               ]
   include ActiveHash::Associations
