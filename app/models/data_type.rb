@@ -11,6 +11,8 @@ class DataType < ActiveHash::Base
     {id: 8, type: 'datetime  '},
     {id: 11, type: 'boolean   '},
     {id: 12, type: 'references'}
+    {id: 13, type: 'ActiveHash'}
+    
     
     # 上記は新バージョン。データ型のみ選択式にした。
     # 以下は旧バージョン。今後削除予定
