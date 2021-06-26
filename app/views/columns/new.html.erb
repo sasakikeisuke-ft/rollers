@@ -1,1 +1,48 @@
-目標地点
+<h1>新規カラム登録</h1>
+
+<p><%= @model.name %>のカラム一覧</p>
+<% @model.columns.each do |column| %>
+  <%= column.name %> -> <%= column.data_type.type %>
+<% end %>
+
+<%= form_with model: @column, url: application_model_columns_path ,local: true do |f| %>
+
+  <%= render 'shared/error_messages', model: f.object %>
+
+  <div class="field">
+      <%= f.label :name, 'カラム名' %><br />
+      <%= f.text_field :name, autofocus: true %>
+  </div>
+
+
+  <div class="field">
+      <%= f.label :name_ja, '読み方' %><br />
+      <%= f.text_field :name_ja %>
+  </div>
+
+
+  <div class="field">
+      <%= f.label :data_type_id, 'データ型選択' %><br />
+      <%= f.collection_select(:data_type_id, DataType.all, :id, :type, {}, {class:"data-type-select"}) %>
+  </div>
+
+  <div class="field">
+    <%= f.check_box :must_exist ,{}, true, false %>
+    <%= f.label :must_exist, '空欄を禁止する。' %>
+    <p>保存する際にnull: falseを適応する場合はチェックしてください</p>
+  </div>
+
+  <div class="field">
+    <%= f.check_box :unique ,{}, true, false %>
+    <%= f.label :unique, 'テーブル内での重複を禁止する' %>
+    <p>同じテーブル内で重複を禁止する場合にチェックを入れてください</p>
+    <p>範囲を定めて重複を禁止する場合は後で設定します。</p>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "登録" %>
+  </div>
+<% end %>
+
+<br>
+<%= link_to 'アプリケーション一覧へ戻る', root_path %>
