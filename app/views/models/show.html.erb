@@ -66,13 +66,13 @@
           <p>
             <%# カラムがActiveHashを参照しているかどうかで記載を場合分け %>
             <% if column.data_type_id != 13 %>
-              | <%= column.name %><%= column_space %> | <%= column.data_type_id.type %> | 
+              | <%= column.name %><%= column_space %> | <%= column.data_type.type %> | 
             <% else %>
               | <%= column.name %>_id<%= column_space %> | <%= 'integer   ' %> | 
             <% end %>
 
             <%# カラムのデータ型により、オプションを場合分け %>
-            <% if column.data_type_id.type == 'references' %>
+            <% if column.data_type_id == 12 %>
               foreign_key: true
             <% elsif column.must_exist && column.unique %>
               null: false, unique: true
@@ -92,7 +92,7 @@
 
         <%# referencesの対象=belongs_toの対象のため、抽出し記載 %>
         <% model.columns.each do |column| %>
-          <% if column.data_type_id.type == 'references' %>
+          <% if column.data_type_id == 12 %>
             <p>- belongs_to :<%= column.name %> </p>
           <% end %>
         <% end %>
@@ -147,8 +147,8 @@
         
         <% model.column.each do |column| %>
           <p>
-            <%= "      t." %><%= column.data_type_id.type %>
-            <% if column.data_type_id.type == 'references' %>
+            <%= "      t." %><%= column.data_type.type %>
+            <% if column.data_type_id == 12 %>
               , foreign_key: true
             <% elsif column.must_exist && column.unique %>
               , null: false, unique: true
@@ -189,15 +189,15 @@
               <%# オプションを付け足していく %>
               <% column.options.each do |option| %>
                 <% if column.data_type_id == 1 %>
-                  <%= option.option_type_id.code %>
+                  <%= option.option_type.code %>
                 <% elsif column.data_type_id == 3 %>
                   <%= '              format: { with: /\A[0-9]+\z/, message: "is invalid. Input half-width characters"},' %><br>
-                  <%= '    ' %><%= column.data_type_id.code %>
+                  <%= '    ' %><%= column.data_type.code %>
                 <% end %>
                 <% if @application.gemfile.rails_i18n %>
-                  <% option.option_type_id.message_ja %>
+                  <% option.option_type.message_ja %>
                 <% else %>
-                  <% option.option_type_id.message_en %>
+                  <% option.option_type.message_en %>
                 <% end %> }
               <% end %>
             </p>
@@ -207,11 +207,11 @@
         <% model.columns.each do |column| %>
           <p>
             <%= '  validates :' %><%= column.name %>
-            <%= column.option_type_id.code %>
+            <%= column.option_type.code %>
             <% if @application.gemfile.rails_i18n %>
-              <% option.option_type_id.message_ja %>
+              <% option.option_type.message_ja %>
             <% else %>
-              <% option.option_type_id.message_en %>
+              <% option.option_type.message_en %>
             <% end %> }
           </p>
         <% end %>
@@ -237,7 +237,7 @@
     <div class="association">
       <%# referencesの対象=belongs_toの対象のため、抽出し記載 %>
       <% model.columns.each do |column| %>
-        <% if column.data_type_id.type == 'references' %>
+        <% if column.data_type_id == 12 %>
           <p><%= '  belongs_to :' %><%= column.name %> </p>
         <% end %>
       <% end %>
