@@ -11,7 +11,7 @@ class GemfilesController < ApplicationController
   def create
     @gemfile = Gemfile.new(gemfile_params)
     if @gemfile.save
-      redirect_to root_path
+      redirect_to new_application_model_path(params[:application_id])
     else
       render :new
     end

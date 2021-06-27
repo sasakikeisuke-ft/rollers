@@ -6,7 +6,7 @@ class ModelsController < ApplicationController
   end
 
   def new
-    @gemfiles = Gemfile.find_by(application_id: params[:application_id])
+    @gemfile = Gemfile.find_by(application_id: params[:application_id])
     @models = Model.where(application_id: params[:application_id])
     @model = Model.new
   end

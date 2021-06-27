@@ -1,4 +1,5 @@
 class ColumnsController < ApplicationController
+  before_action :set_application
   before_action :find_column, only: [:edit, :update, :destroy]
 
   def new
@@ -30,6 +31,11 @@ class ColumnsController < ApplicationController
   end
 
   private
+  def set_application
+    @application = Application.find(params[:application_id])
+    redirect_to new_user_session_path if @application.user_id != current_user.id
+  end
+
   def column_params
     params.require(:column).permit(:name, :name_ja, :data_type_id, :must_exsit, :unique).merge(model_id: params[:model_id])
   end
