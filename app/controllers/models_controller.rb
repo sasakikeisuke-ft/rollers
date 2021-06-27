@@ -2,10 +2,12 @@ class ModelsController < ApplicationController
   before_action :find_model, only: [:edit, :update, :destroy]
 
   def index
-    @models = Model.where(application_id: params[:application_id])
+    @models = Model.where(application_id: params[:application_id]).includes(:columns)
   end
 
   def new
+    @gemfiles = Gemfile.find_by(application_id: params[:application_id])
+    @models = Model.where(application_id: params[:application_id])
     @model = Model.new
   end
 
