@@ -28,6 +28,12 @@ class GemfilesController < ApplicationController
     end
   end
 
+  def show
+    @application = Application.find(params[:id])
+    @models = Model.where(application_id: params[:id]).includes(columns: :options)
+    @columns = @models.columns
+  end
+
   private
   def gemfile_params
     params.require(:gemfile).permit(:devise, :pry_rails,:image_magick, :active_hash, :rails_i18n, :ransack, :rubocop, :rspec, :payjp, :s3).merge(application_id: params[:application_id])

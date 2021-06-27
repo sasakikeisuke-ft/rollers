@@ -1,0 +1,139 @@
+
+<%# READMEのDB設計に関するコード %>
+<%# 半角スペースを指定した回数だけ挿入するメソッド。 %>
+<%# おそらく専用のページに記載するべき内容。いずれ移動する %>
+<% def insert_space(roops) %>  
+  <% space = '' %>
+  <% if roops >= 1 %>
+    <% roops.times do  %>
+      <% space += '&nbsp;' %>
+    <% end %>
+  <% end %>
+  <% return space.html_safe %>
+<% end %>
+
+<% def insert_bar(roops) %>
+  <% bar = '' %>
+  <% roops.times do  %>
+    <% bar += '-' %>
+  <% end %>
+  <% return bar %>
+<% end %>
+
+<%# 比較検証用のlongest算出メソッド
+元々記載したものはモデルごとの算出だったが、
+こちらは全てのカラム名から算出する %>
+<%# longest = 6 %>
+  <%# @columns.each do |column| %>
+  <%# long = column.name.length if column.data_type_id != 13 %>
+  <%# long = column.name.length + 3 if column.data_type_id == 13 %>
+  <%# longest = long if long > longest   %>
+<%# end %>
+
+
+
+<%#/メソッド%>
+
+<div class="read_me">
+
+  <h1>README</h1>
+  <h2><%= @application.name  %></h2>
+  <p>READMEに関するの記載内容です。</p>
+  <p>念の為、ご自身でも記載内容を確認するようお願いします。</p>
+  また、現在の仕様では枠がずれているように見えますが、
+  ペーストすれとちょうど良い位置になるように調整されています
+  <br>
+  <%= link_to 'アプリケーション詳細ページへ戻る', application_path(@application) %><br>
+
+  <div class="terminal-field">
+    <p>ターミナル<p>
+    <p>code README.md</p>
+  </div>
+
+  <p>コード内容</p>
+  <div class="code-field">
+    # README
+    <br><br>
+    # テーブル設計
+    <br><br>
+
+    <%# モデルごとのテーブル表記。対象は通常モデルのみ %>
+    <% @models.each do |model| %>
+      <% if model.model_type_id == 1 %>
+        # <%= model.name.pluralize %>テーブル<br>
+        <br>
+         <%# 最も長いカラム名の文字数＝longestを決定する%>
+        <% longest = 6 %>
+        <% model.columns.each do |column| %>
+          <% long = column.name.length if column.data_type_id != 13 %>
+          <% long = column.name.length + 3 if column.data_type_id == 13 %>
+          <% longest = long if long > longest   %>
+        <% end %>
+
+        <%# マークダウン方式の表のタイトルと間仕切りを作成 %>
+        | Column<%= insert_space(longest - 6) %> | Type<%= insert_space(6) %>  | Options<%= insert_space(18) %> |<br>
+        | <%= insert_bar(longest) %> | ---------- | ------------------------- |<br>
+
+        <%# 各カラムの名前とデータ型とオプションの項目 %>
+        <% model.columns.each do |column| %>
+
+          <%# カラムがActiveHash関連ならば_idを付属するよう場合分け %>
+          <% if column.data_type_id != 13 %>
+            | <%= column.name %><%= insert_space(longest - column.name.length) %> | <%= column.data_type.type %><%= insert_space(column.data_type.space) %> | 
+          <% else %>
+            | <%= column.name %>_id<%= insert_space(longest - column.name.length - 3) %> | integer<%= insert_space(3) %> | 
+          <% end %>
+
+          <%# カラムのデータ型により、オプションを場合分け %>
+          <% if column.data_type_id == 12 %>
+            foreign_key: true
+          <% elsif column.must_exist && column.unique %>
+            null: false, unique: true
+          <% elsif column.must_exist %>
+            null: false <%= insert_space(13) %>
+          <% elsif column.unique %>
+            unique: true <%= insert_space(12) %>
+          <% else %>
+            <%= insert_space(25) %>
+          <% end %> |<br>
+          
+        <% end %><%#/テーブル表記 %>
+
+        <br>
+
+
+        <p># Association </p>
+        <br>
+
+        <%# referencesの対象=belongs_toの対象のため、抽出し記載 %>
+        <% model.columns.each do |column| %>
+          <% if column.data_type_id == 12 %>
+            <p>- belongs_to :<%= column.name %> </p>
+          <% end %>
+        <% end %>
+
+        <%# has_many/oneの記述を行う。%>
+        <%# 当モデルと同名のカラムを持つ=アソシエーションを組んでいるモデルを探し出す %>
+        <%# ただし、AvtiveHashは書かないため除外する。 %>
+        <% @columns.each do |column| %>
+          <% if column.name == model.name && not_only && column.data_type_id != 13 %>
+            <p>- has_many :<%= column.model.name %></p>
+          <% elsif column.name == model.name && column.data_type_id !=13 %>
+            <p>- has_one :<%= column.model.name %></p>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+<%# README実装における現在の課題 %>
+<%# ActiveHashに関するカラム_idをどのように登録し使用するか%>
+<%# modelsテーブルに置いてnot_onlyを設定し、has_oneの対象か設定する必要がある %>
+<%# 半角スペースが期待通りの数が挿入できるのか %>
+<%# 半角スペースを決めるメソッドは外部に保存できないか %>
+<%# 半角スペースを決めるには、columnに文字数のカラムが必要 %>
+<%# ActiveHashのカラム名文字数を保存する際には＋3する必要がある。 %>
+</div> <%# /read_me %>
+
+<%= link_to 'アプリケーション詳細ページへ戻る', application_path(@application) %><br>
+<%= link_to 'トップページに戻る', root_path %>
