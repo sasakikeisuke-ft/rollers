@@ -3,10 +3,10 @@
 <%= @column.name %>のオプション設定
 <p>現在のオプション</p>
 <p><%= 'presence: true' if @column.must_exist %></p>
+<% format_count = 0 %>
+<% numericality_count = 0 %>
+<% uniqueness_count = 0 %>
 <% if @options.length != 0 %>
-  <% format_count = 0 %>
-  <% numericality_count = 0 %>
-  <% uniqueness_count = 0 %>
   <% @options.each do |option| %>
     <%= option.option_type.info %>
     <% format_count += 1 if option.option_type.type == 'format' %>
@@ -17,14 +17,15 @@
   <p>追加オプションは設定されていません</p>
 <% end %>
 <br>
+<br>
 
-<%= link_to 'オプションを追加しない', new_application_model_column_path(params[:application_id], params[:model_id]) %>
+<%= link_to 'カラム追加に戻る', new_application_model_column_path(params[:application_id], params[:model_id]) %>
 
-<%# 対象カラムのデータ型がstringまたはtextの場合 %>
 <%= form_with model: @option, url: application_model_column_options_path ,local: true do |f| %>
   <%= render 'shared/error_messages', model: f.object %>
 
-  <% if @column.data_type_id <= 2 && format_count == 0 %>
+  <%# 対象カラムのデータ型がstringまたはtextの場合 %>
+  <% if [1, 2].include?(@column.data_type_id) && format_count == 0 %>
     <div class="field">
       <p>正規表現による制限(:format)</p>
         <%= f.radio_button :option_type_id, 11 %>
@@ -84,6 +85,6 @@
   </div>
 <% end %>
 
-<%= link_to 'オプションを追加しない', new_application_model_column_path(params[:application_id], params[:model_id]) %>
+<%= link_to 'カラム追加戻る', new_application_model_column_path(params[:application_id], params[:model_id]) %>
 <br>
 <%= link_to 'アプリケーション一覧へ戻る', root_path %>

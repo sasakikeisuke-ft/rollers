@@ -1,27 +1,29 @@
 <h1>新規カラム登録</h1>
-一時保存
 <% if ![2, 3, 4].include?(@model.model_type_id) %>
   <div class="columns-index">
-  <%= @model.name %>のカラム一覧<br>
-  <% @model.columns.each do |column| %>
-    <%= column.name %> -> <%= column.data_type.type %><br>
-  <% end %>
-  </div>
-  <br>
-  <div class="models-index">
-    <%= @application.name %>のモデル一覧<br>
-    
-    <% @models.each do |model| %>
-      <%= model.name %> <%= '<- ActiveHash' if model.model_type_id == 2 %><br>
+    ＜<%= @model.name %>のカラム一覧＞<br>
+    <% @model.columns.each do |column| %>
+      <%= column.name %> -> <%= column.data_type.type %>型 -> option:
+      <%= '空欄禁止' if column.must_exist %> <%= '重複禁止' if column.unique %>
+      <% column.options.each do |option| %>
+        <%= option.option_type.info %>  
+      <% end %><br>
     <% end %>
+  <% if @model.model_type_id == 5 %>
+    email -> string -> option: 空欄禁止 重複禁止<br>
+    encrypted_password -> string -> 空欄禁止 
+  <% elsif @model.columns.length == 0 %>
+    まだカラムは登録されていません
+  <% end %><br>
   </div>
   <br>
   
+  
   <div>
-    先程作成した上記モデルのカラムを作成していきます。
-    保存する際にnull: falseを適応する場合は、空欄禁止にチェックしてください
-    同じテーブル内で重複を禁止する場合にチェックを入れてください
-    範囲を定めて重複を禁止する場合はオプション設定で設定します。
+    先程作成した上記モデルのカラムを作成していきます。<br>
+    保存する際にnull: falseを適応する場合は、空欄禁止にチェックしてください。<br>
+    同じテーブル内で重複を禁止する場合にチェックを入れてください<br>
+    範囲を定めて重複を禁止する場合はオプション設定で設定します。<br>
   </div>
 
   <br>
@@ -33,7 +35,6 @@
       <%= f.label :name, 'カラム名' %>
       <%= f.text_field :name, autofocus: true, placeholder: 'nickname' %><br>
       保存するカラムの名前を設定します。
-      references型、ActiveHashを仕様する場合、上記より対象のモデル名を入力してください。      
     </div>
     <br>
     <% if @application.gemfile.rails_i18n %>
@@ -84,8 +85,38 @@
       <%= f.submit "オプション設定へ" %>
     </div>
   <% end %>
-  <br>
+  <br><br>
 
+  <div>
+    他のモデル名を参照する場合はこちらから<br>
+    こちらを登録するとアソシエーションが自動で組まれます。
+    </div>
+  <div class="models-index">
+    ＜<%= @application.name %>のモデル一覧＞<br>
+    <% @models.each do |model| %>
+      <%= model.name %> <%= '<- ActiveHash' if model.model_type_id == 2 %><br>
+    <% end %>
+  </div>
+  <br>
+  <%# 他のモデル名を参照にするカラム %>
+  <%= form_with model: @column, url: application_model_columns_path ,local: true do |f| %>
+    <%= render 'shared/error_messages', model: f.object %>
+
+      <div class="field">
+        <%= f.label :name, 'カラム名' %>
+        <%= f.collection_select(:name, @models, :name, :name,{},{}) %>
+        <%= f.hidden_field :name_ja, value: '' %>
+      </div>
+
+      <div class="references-field">
+        <p><%= f.radio_button :data_type_id, 12 %><%= DataType.find(12)[:type] %>型 -> モデルが対象</p>  
+        <p><%= f.radio_button :data_type_id, 13 %><%= DataType.find(13)[:type] %>を対象とする</p>
+      </div>
+
+    <div class="actions">
+      <%= f.submit "オプション設定へ" %>
+    </div>
+  <% end %>
 
 <% elsif @model.model_type_id == 2 %><%# ActiveHashを登録する場合 %>
   <%= form_with model: @column, url: application_model_columns_path ,local: true do |f| %>
