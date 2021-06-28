@@ -8,7 +8,7 @@
     <%= model.name %><br>
   <% end %><br>
   <p>
-    モデルの名前と、モデルのタイプを設定し作成します。
+    モデルの名前と、モデルのタイプを設定し作成します。<br>
     参照される事になる親モデルやActiveHashを優先すると、カラムの設定がスムーズになります。
   </p>
 
@@ -18,13 +18,13 @@
 
     <div class="field">
         <%= f.label :name %><br />
-        <%= f.text_field :name, autofocus: true %>
+        <%= f.text_field :name, autofocus: true, placeholder: 'itemなど単数形' %>
     </div>
 
      <div class="field">
       <p>作成するモデルの種類を選択してください</p>
       <p><%= f.radio_button :model_type_id, 1, checked: true %>一般的なモデルの登録</p>  
-      <% if @gemfile.activehash %>
+      <% if @gemfile.active_hash %>
         <p><%= f.radio_button :model_type_id, 2 %>ActiveHashの登録</p>
       <% end %>
     </div>
@@ -66,6 +66,8 @@
 <% if @models.length == 0 %>
   <p>
     このあと、モデルごとに作成するカラムと、そのオプションを登録していきます。 <br>
+    Deviseに関するモデルのため、emailカラムとpasswordカラムは自動で作成されています。<br>
+    それ以外に必要なカラムを登録してください。
     <br>
     モデル作成 -> カラムの作成 -> オプション設定 の順に行います。
   </p>
