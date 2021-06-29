@@ -13,6 +13,7 @@ class ColumnsController < ApplicationController
     if @column.save
       redirect_to new_application_model_column_option_path(params[:application_id], params[:model_id], @column)
     else
+      @models = Model.where(application_id: @application)
       @model = Model.find(params[:model_id])
       render :new
     end

@@ -51,7 +51,7 @@
         以下よりカラムのデータ型を選択してください
       </div>
       <div class="letter-field">
-        <p><%= f.radio_button :data_type_id, 1, checked: true %><%= DataType.find(1)[:type] %>型</p>  
+        <p><%= f.radio_button :data_type_id, 1 %><%= DataType.find(1)[:type] %>型</p>  
         <p><%= f.radio_button :data_type_id, 2 %><%= DataType.find(2)[:type] %>型</p>
       </div>
       <div class="number-field">
@@ -66,8 +66,6 @@
       </div>
       <div class="boolean-field">
         <p><%= f.radio_button :data_type_id, 11 %><%= DataType.find(11)[:type] %>型</p>  
-        <p><%= f.radio_button :data_type_id, 12 %><%= DataType.find(12)[:type] %>型 -> モデルが対象</p>  
-        <p><%= f.radio_button :data_type_id, 13 %><%= DataType.find(13)[:type] %>を対象とする</p>
       </div>
     </div>
 
@@ -104,7 +102,7 @@
 
       <div class="field">
         <%= f.label :name, 'カラム名' %>
-        <%= f.collection_select(:name, @models, :name, :name,{},{}) %>
+        <%= f.collection_select(:name, @models, :name, :name, include_blank: true) %>
         <%= f.hidden_field :name_ja, value: '' %>
       </div>
 
@@ -170,4 +168,5 @@
 <% end %>
 
 <br>
+<%= link_to 'モデル新規作成へ', new_application_model_path %><br>
 <%= link_to 'アプリケーション一覧へ戻る', root_path %>
