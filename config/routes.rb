@@ -4,8 +4,8 @@ Rails.application.routes.draw do
   resources :applications do
     resources :gemfiles, only: [:index, :new, :create, :edit, :update, :show]
     resources :models do
-      resources :columns, only: [:new, :create, :edit, :update] do
-        resources :options, only: [:new, :create, :edit, :update]
+      resources :columns, only: [:new, :create, :edit, :update, :destroy] do
+        resources :options, only: [:new, :create, :destroy]
       end
     end
   end

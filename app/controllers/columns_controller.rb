@@ -32,6 +32,12 @@ class ColumnsController < ApplicationController
     end
   end
 
+  def destroy
+    find_column
+    @column.destroy
+    redirect_to new_application_model_column_path
+  end
+
   private
   def set_application
     @application = Application.find(params[:application_id])

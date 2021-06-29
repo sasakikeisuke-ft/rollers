@@ -8,7 +8,8 @@
       <% column.options.each do |option| %>
         <%= option.option_type.info %>  
       <% end %><br>
-    <% end %>
+      <%= link_to 'カラムを削除', application_model_column_path(id: column), method: :delete %><br>
+    <% end %><br>
   <% if @model.model_type_id == 5 %>
     email -> string -> option: 空欄禁止 重複禁止<br>
     encrypted_password -> string -> 空欄禁止 
