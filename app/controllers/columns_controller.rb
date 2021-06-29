@@ -1,9 +1,8 @@
 class ColumnsController < ApplicationController
-  before_action :set_application
+  before_action :related_models
   before_action :find_column, only: [:edit, :update, :destroy]
 
   def new
-    @models = Model.where(application_id: @application)
     @model = Model.find(params[:model_id])
     @column = Column.new
   end
@@ -13,7 +12,6 @@ class ColumnsController < ApplicationController
     if @column.save
       redirect_to new_application_model_column_option_path(params[:application_id], params[:model_id], @column)
     else
-      @models = Model.where(application_id: @application)
       @model = Model.find(params[:model_id])
       render :new
     end
@@ -25,7 +23,10 @@ class ColumnsController < ApplicationController
 
   def update
     if @column.update(column_params)
-      redirect_to application_models_path(params[:application_id])
+      @column.options.each do |option|
+        option.destroy
+      end
+      redirect_to new_application_model_column_option_path(column_id: @column)
     else
       @model = Model.find(params[:model_id])
       render :edit
@@ -39,8 +40,9 @@ class ColumnsController < ApplicationController
   end
 
   private
-  def set_application
+  def related_models
     @application = Application.find(params[:application_id])
+    @models = Model.where(application_id: @application).includes(columns: :options)
     redirect_to new_user_session_path if @application.user_id != current_user.id
   end
 

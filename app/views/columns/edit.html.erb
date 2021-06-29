@@ -1,49 +1,173 @@
 <h1>カラム編集</h1>
+<% if ![2, 3, 4].include?(@model.model_type_id) %>
+  <div class="columns-index">
+    ＜<%= @model.name %>のカラム一覧＞<br>
+    <% @model.columns.each do |column| %>
+      <%= column.name %> -> <%= column.data_type.type %>型 -> option:
+      <%= '空欄禁止' if column.must_exist %> <%= '重複禁止' if column.unique %>
+      <% column.options.each do |option| %>
+        <%= option.option_type.info %>  
+      <% end %><br>
+      <%= link_to 'カラムを編集', edit_application_model_column_path(id: column) %><br>
+      <%= link_to 'カラムを削除', application_model_column_path(id: column), method: :delete %><br>
+    <% end %><br>
+  <% if @model.model_type_id == 5 %>
+    email -> string -> option: 空欄禁止 重複禁止<br>
+    encrypted_password -> string -> 空欄禁止 
+  <% elsif @model.columns.length == 0 %>
+    まだカラムは登録されていません
+  <% end %><br>
+  </div>
+  <br>
+  
+  <h3>対象カラム：<%= @column.name %></h4>
 
-<p><%= @model.name %>のカラム一覧</p>
-<% @model.columns.each do |column| %>
-  <%= column.name %> -> <%= column.data_type.type %>
-<% end %>
-
-<%= form_with model: @column, url: application_model_column_path ,local: true do |f| %>
-
-  <%= render 'shared/error_messages', model: f.object %>
-
-  <div class="field">
-      <%= f.label :name, 'カラム名' %><br />
-      <%= f.text_field :name, autofocus: true %>
+  <div>
+    カラムを編集すると、オプションは初期化されます。<br>
+    オプションの再設定も引き続き行ってください。<br>
   </div>
 
+  <br>
+  
+  <%= form_with(model: [@application, @model, @column] ,local: true) do |f| %>
+    <%= render 'shared/error_messages', model: f.object %>
 
-  <div class="field">
-      <%= f.label :name_ja, '読み方' %><br />
-      <%= f.label :name_ja, '日本語表記' %><br />
-      <%= f.text_field :name_ja %>
+    <div class="field">
+      <%= f.label :name, 'カラム名' %>
+      <%= f.text_field :name, autofocus: true, placeholder: 'nickname' %><br>
+      保存するカラムの名前を設定します。
+    </div>
+    <br>
+    <% if @application.gemfile.rails_i18n %>
+      <div class="field">
+        <%= f.label :name_ja, '日本語表記' %>
+        <%= f.text_field :name_ja, placeholder: 'ニックネーム' %><br>
+        エラー文を翻訳する際の表示を設定します。
+      </div>
+    <% end %>
+    <br>
+    <br>
+    <div class="field">
+      <div class="info">
+        以下よりカラムのデータ型を選択してください
+      </div>
+      <div class="letter-field">
+        <p><%= f.radio_button :data_type_id, 1 %><%= DataType.find(1)[:type] %>型</p>  
+        <p><%= f.radio_button :data_type_id, 2 %><%= DataType.find(2)[:type] %>型</p>
+      </div>
+      <div class="number-field">
+        <p><%= f.radio_button :data_type_id, 3 %><%= DataType.find(3)[:type] %>型</p>  
+        <p><%= f.radio_button :data_type_id, 4 %><%= DataType.find(4)[:type] %>型</p>
+        <p><%= f.radio_button :data_type_id, 5 %><%= DataType.find(5)[:type] %>型</p>
+      </div>
+      <div class="date-field">
+        <p><%= f.radio_button :data_type_id, 6 %><%= DataType.find(6)[:type] %>型</p>  
+        <p><%= f.radio_button :data_type_id, 7 %><%= DataType.find(7)[:type] %>型</p>
+        <p><%= f.radio_button :data_type_id, 8 %><%= DataType.find(8)[:type] %>型</p>
+      </div>
+      <div class="boolean-field">
+        <p><%= f.radio_button :data_type_id, 11 %><%= DataType.find(11)[:type] %>型</p>  
+      </div>
+    </div>
+
+    <div class="field">
+      <%= f.check_box :must_exist ,{}, true, false %>
+      <%= f.label :must_exist, '空欄を禁止する。' %>
+    </div>
+
+    <div class="field">
+      <%= f.check_box :unique ,{}, true, false %>
+      <%= f.label :unique, 'テーブル内での重複を禁止する' %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "オプション設定へ" %>
+    </div>
+  <% end %>
+  <br><br>
+
+  <div>
+    他のモデル名を参照する場合はこちらから<br>
+    こちらを登録するとアソシエーションが自動で組まれます。
+    </div>
+  <div class="models-index">
+    ＜<%= @application.name %>のモデル一覧＞<br>
+    <% @models.each do |model| %>
+      <%= model.name %> <%= '<- ActiveHash' if model.model_type_id == 2 %><br>
+    <% end %>
   </div>
+  <br>
+  <%# 他のモデル名を参照にするカラム %>
+  <%= form_with(model: [@application, @model, @column] ,local: true) do |f| %>
+    <%= render 'shared/error_messages', model: f.object %>
 
+      <div class="field">
+        <%= f.label :name, 'カラム名' %>
+        <%= f.collection_select(:name, @models, :name, :name, include_blank: true) %>
+        <%= f.hidden_field :name_ja, value: '' %>
+      </div>
 
-  <div class="field">
-      <%= f.label :data_type_id, 'データ型選択' %><br />
-      <%= f.collection_select(:data_type_id, DataType.all, :id, :type, {}, {class:"data-type-select"}) %>
-  </div>
+      <div class="references-field">
+        <p><%= f.radio_button :data_type_id, 12 %><%= DataType.find(12)[:type] %>型 -> モデルが対象</p>  
+        <p><%= f.radio_button :data_type_id, 13 %><%= DataType.find(13)[:type] %>を対象とする</p>
+      </div>
 
-  <div class="field">
-    <%= f.check_box :must_exist ,{}, true, false %>
-    <%= f.label :must_exist, '空欄を禁止する。' %>
-    <p>保存する際にnull: falseを適応する場合はチェックしてください</p>
-  </div>
+    <div class="actions">
+      <%= f.submit "オプション設定へ" %>
+    </div>
+  <% end %>
 
-  <div class="field">
-    <%= f.check_box :unique ,{}, true, false %>
-    <%= f.label :unique, 'テーブル内での重複を禁止する' %>
-    <p>同じテーブル内で重複を禁止する場合にチェックを入れてください</p>
-    <p>範囲を定めて重複を禁止する場合は後で設定します。</p>
-  </div>
+<% elsif @model.model_type_id == 2 %><%# ActiveHashを登録する場合 %>
+  <%= form_with model: @column, url: application_model_column_path ,local: true do |f| %>
+    <%= render 'shared/error_messages', model: f.object %>
 
-  <div class="actions">
-    <%= f.submit "登録" %>
-  </div>
+    <div class="field">
+        <%= f.label :name, '参照するモデルを選択してください' %><br>
+        <%= f.collection_select(:name, @models.where(application_id: params[:application_id]), :name, :name,{},{}) %>
+    </div>
+
+    <div class="field">
+        <%= f.label :name_ja, '日本語表記' %><br>
+        エラー文を翻訳する際の表示を設定します。
+        <%= f.text_field :name_ja, placeholder: '名前' %>
+    </div>
+
+    <div class="field">
+      <div class="letter-field">
+        <p><%= f.radio_button :data_type_id, 1, checked: true %><%= DataType.find(1)[:type] %>型</p>  
+        <p><%= f.radio_button :data_type_id, 2 %><%= DataType.find(2)[:type] %>型</p>
+      </div>
+      <div class="number-field">
+        <p><%= f.radio_button :data_type_id, 3 %><%= DataType.find(3)[:type] %>型</p>  
+        <p><%= f.radio_button :data_type_id, 4 %><%= DataType.find(4)[:type] %>型</p>
+        <p><%= f.radio_button :data_type_id, 5 %><%= DataType.find(5)[:type] %>型</p>
+      </div>
+      <div class="date-field">
+        <p><%= f.radio_button :data_type_id, 6 %><%= DataType.find(6)[:type] %>型</p>  
+        <p><%= f.radio_button :data_type_id, 7 %><%= DataType.find(7)[:type] %>型</p>
+        <p><%= f.radio_button :data_type_id, 8 %><%= DataType.find(8)[:type] %>型</p>
+      </div>
+      <div class="boolean-field">
+        <p><%= f.radio_button :data_type_id, 11 %><%= DataType.find(11)[:type] %>型</p>  
+      </div>
+    </div>
+
+    <div class="field">
+      <%= f.check_box :must_exist ,{}, true, false %>
+      <%= f.label :must_exist, '空欄を禁止する。' %>
+    </div>
+
+    <div class="field">
+      <%= f.check_box :unique ,{}, true, false %>
+      <%= f.label :unique, 'テーブル内での重複を禁止する' %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "オプション設定へ" %>
+    </div>
+  <% end %>
 <% end %>
 
 <br>
+<%= link_to 'モデル新規作成へ', new_application_model_path %><br>
 <%= link_to 'アプリケーション一覧へ戻る', root_path %>

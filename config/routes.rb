@@ -5,7 +5,7 @@ Rails.application.routes.draw do
     resources :gemfiles, only: [:index, :new, :create, :edit, :update, :show]
     resources :models do
       resources :columns, only: [:new, :create, :edit, :update, :destroy] do
-        resources :options, only: [:new, :create, :destroy]
+        resources :options, only: [:new, :create]
       end
     end
   end
