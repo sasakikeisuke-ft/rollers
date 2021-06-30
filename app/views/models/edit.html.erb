@@ -1,27 +1,5 @@
 <h1>モデル編集</h1>
 
-<%= form_with model: @model, url: application_model_path ,local: true do |f| %>
-
-  <%= render 'shared/error_messages', model: f.object %>
-
-  <div class="field">
-      <%= f.label :name %><br />
-      <%= f.text_field :name, autofocus: true %>
-  </div>
-
-  <div class="field">
-      <%= f.collection_select(:model_type_id, ModelType.all, :id, :name, {}, {class:"model-type-select"}) %>
-  </div>
-
-  <div class="field">
-    <%= f.check_box :not_only ,{}, false, true %>
-    <%= f.label :not_only, '親モデルに対して一対一の関係である has_one' %>
-    <p>親モデルに対して一対多、または親モデルが存在しない場合はチェックしないでください</p>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "登録" %>
-  </div>
-<% end %>
+<%= render partial: "shared/model_form", locals: {application: @application, model: @model} %>
 
 <%= link_to 'アプリケーション一覧へ戻る', root_path %>

@@ -1,7 +1,7 @@
 <h1>モデル作成</h1>
 
 
-<% if @models.length != 0 || !@gemfile.devise %><%# 登録モデルが0ではない＝deviseのモデルは作成されているとき %>
+<% if @models.length != 0 || !@application.gemfile.devise %><%# 登録モデルが0ではない＝deviseのモデルは作成されているとき %>
 
   <p>現在登録されているモデル</p>
   <% @models.each do |model| %>
@@ -13,35 +13,10 @@
   </p>
 
   <%# 通常モデル保存用フォーム %>
-  <%= form_with model: @model, url: application_models_path ,local: true do |f| %>
-    <%= render 'shared/error_messages', model: f.object %>
-
-    <div class="field">
-        <%= f.label :name %><br />
-        <%= f.text_field :name, autofocus: true, placeholder: 'itemなど単数形' %>
-    </div>
-
-     <div class="field">
-      <p>作成するモデルの種類を選択してください</p>
-      <p><%= f.radio_button :model_type_id, 1, checked: true %>一般的なモデルの登録</p>  
-      <% if @gemfile.active_hash %>
-        <p><%= f.radio_button :model_type_id, 2 %>ActiveHashの登録</p>
-      <% end %>
-    </div>
-
-    <div class="field">
-      <%= f.check_box :not_only ,{}, false, true %>
-      <%= f.label :not_only, '親モデルに対して一対一の関係である has_one' %><br>
-      親モデルに対して一対多、または親モデルが存在しない場合はチェックを外したまま登録してください
-    </div>
-
-    <div class="actions">
-      <%= f.submit "カラム登録へ" %>
-    </div>
-  <% end %>
+  <%= render partial: "shared/model_form", locals: {application: @application, model: @model} %>
 
 
-<% elsif @gemfile.devise %><%# Deviseによるユーザー登録に関する %>
+<% elsif @application.gemfile.devise %><%# Deviseによるユーザー登録に関する %>
   <%= form_with model: @model, url: application_models_path ,local: true do |f| %>
 
     <%= render 'shared/error_messages', model: f.object %>
