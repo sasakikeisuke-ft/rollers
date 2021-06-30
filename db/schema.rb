@@ -27,9 +27,11 @@ ActiveRecord::Schema.define(version: 2021_06_24_020324) do
     t.integer "data_type_id", null: false
     t.boolean "must_exist", default: true, null: false
     t.boolean "unique", default: false, null: false
+    t.bigint "application_id"
     t.bigint "model_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["application_id"], name: "index_columns_on_application_id"
     t.index ["model_id"], name: "index_columns_on_model_id"
   end
 
@@ -54,6 +56,7 @@ ActiveRecord::Schema.define(version: 2021_06_24_020324) do
     t.string "name", null: false
     t.integer "model_type_id", null: false
     t.boolean "not_only", default: true, null: false
+    t.boolean "attached_image", default: false
     t.bigint "application_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -84,6 +87,7 @@ ActiveRecord::Schema.define(version: 2021_06_24_020324) do
   end
 
   add_foreign_key "applications", "users"
+  add_foreign_key "columns", "applications"
   add_foreign_key "columns", "models"
   add_foreign_key "gemfiles", "applications"
   add_foreign_key "models", "applications"

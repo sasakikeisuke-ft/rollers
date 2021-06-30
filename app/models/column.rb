@@ -2,6 +2,7 @@ class Column < ApplicationRecord
   validates :name, presence: true
   validates :data_type_id, numericality: { other_than: 0, message: "を選択してください" }
 
+  belongs_to :application
   belongs_to :model
   has_many :options, dependent: :destroy
 
