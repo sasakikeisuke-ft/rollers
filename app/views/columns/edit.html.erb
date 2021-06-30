@@ -1,23 +1,6 @@
 <h1>カラム編集</h1>
 <% if ![2, 3, 4].include?(@model.model_type_id) %>
-  <div class="columns-index">
-    ＜<%= @model.name %>のカラム一覧＞<br>
-    <% @model.columns.each do |column| %>
-      <%= column.name %> -> <%= column.data_type.type %>型 -> option:
-      <%= '空欄禁止' if column.must_exist %> <%= '重複禁止' if column.unique %>
-      <% column.options.each do |option| %>
-        <%= option.option_type.info %>  
-      <% end %><br>
-      <%= link_to 'カラムを編集', edit_application_model_column_path(id: column) %><br>
-      <%= link_to 'カラムを削除', application_model_column_path(id: column), method: :delete %><br>
-    <% end %><br>
-  <% if @model.model_type_id == 5 %>
-    email -> string -> option: 空欄禁止 重複禁止<br>
-    encrypted_password -> string -> 空欄禁止 
-  <% elsif @model.columns.length == 0 %>
-    まだカラムは登録されていません
-  <% end %><br>
-  </div>
+  <%= render partial: "shared/related_models", locals: {model: @model} %>
   <br>
   
   <h3>対象カラム：<%= @column.name %></h4>
