@@ -50,7 +50,7 @@ class ColumnsController < ApplicationController
   end
 
   def find_column
-    @column = @model.columns.find(params[:id])
+    @column = Column.find(params[:id])
   end
 
 end

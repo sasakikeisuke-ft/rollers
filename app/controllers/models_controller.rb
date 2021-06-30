@@ -2,7 +2,7 @@ class ModelsController < ApplicationController
   before_action :find_model, only: [:edit, :update, :destroy]
 
   def index
-    @models = Model.where(application_id: params[:application_id]).includes(:titles)
+    @models = Model.where(application_id: params[:application_id]).includes(:columns)
   end
 
   def new
@@ -14,7 +14,7 @@ class ModelsController < ApplicationController
   def create
     @model = Model.new(model_params)
     if @model.save
-      redirect_to new_application_model_title_path(model_id: @model)
+      redirect_to new_application_model_column_path(model_id: @model)
     else
       render :new
     end
@@ -26,7 +26,7 @@ class ModelsController < ApplicationController
 
   def update
     if @model.update(model_params)
-      redirect_to new_application_model_title_path(model_id: @model)
+      redirect_to new_application_model_column_path(model_id: @model)
     else
       render :edit
     end
