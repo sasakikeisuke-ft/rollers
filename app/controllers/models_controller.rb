@@ -6,7 +6,7 @@ class ModelsController < ApplicationController
   end
 
   def new
-    @gemfile = Gemfile.find_by(application_id: params[:application_id])
+    @application = Application.find(params[:application_id])
     @models = Model.where(application_id: params[:application_id])
     @model = Model.new
   end
@@ -21,6 +21,7 @@ class ModelsController < ApplicationController
   end
 
   def edit
+    @application = Application.find(params[:application_id])
   end
 
   def update
