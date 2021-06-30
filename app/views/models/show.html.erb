@@ -3,209 +3,82 @@
 
 <%# ひとまず書いてみる。必要なインスタンス変数などの設定を確認することが目的 %>
 
-<%# READMEのDB設計に関するコード %>
-<div class="read_me">
+<%# モデルごとにマイグレーションファイル、モデルファイル、Rspecファイルを記載する。%>
 
-  <h1>README</h1>
-  <p>READMEに関するの記載内容です。</p>
-  <p>念の為、ご自身でも記載内容を確認するようお願いします。</p>
-  <br>
-
-  <div class="terminal-field">
-    <p>ターミナル<p>
-    <p>code README.md</p>
-  </div>
-
-  <div class="code-field">
-    <p># README</p>
-    <br>
-    <p># テーブル設計</p>
-    <br>
-
-    <%# ここからモデルごとにテーブル設計を記載していく。対象は通常モデルのみ %>
-    <% @models.each do |model| %>
-      <% if model.model_type_id == 1 %>
-        <p># <%= model.name.pluralize %></p>
-
-        <%#<p>| Column             | Type       | Options                   |</p>
-        <%# 別パターン。半角スペースの必要数を計算し挿入 %>
-        <%# 最も長いカラム名の文字数＝longestを決定する%>
-        <% longest = 6 %>
-        <% model.columns.each do |column| %>
-          <% long = column.name.length if column.data_type_id != 13 %>
-          <% long = column.name.length + 3 if column.data_type_id == 13 %>
-          <% longest = long if long >= longest   %>
-        <% end %>
-
-        <%# longestから必要なスペースを計算する %>
-        <% title_space = "" %>
-        <% title_bar = "" %>
-        <% if longest > 6 %>
-          <% (longest - 6).times do  %>
-            <% title_space += " " %>
-            <% title_bar += "-" %>
-          <% end %>
-        <% end %>
-
-          <p>| Column<%= title_space %> | Type       | Options                   |</p>
-          <p>| ------<%= title_bar   %> | ---------- | ------------------------- |</p>
-
-        <%# 各カラムの名前とデータ型とオプションの項目 %>
-        <% model.columns.each do |column| %>
-          <%# 入れる半角スペースの数を計算 %>
-          <% column_space = "" %>
-          <% if longest > column.length && column.data_type_id != 13 %>
-            <% (longest - column.length).times do %>
-              <% title_space += " " %>
-            <% end %>
-          <% elsif longest > column.length %>
-            <% (longest - column.length - 3).times do %>
-              <% title_space += " " %>
-            <% end %>
-          <% end %>
-          <p>
-            <%# カラムがActiveHashを参照しているかどうかで記載を場合分け %>
-            <% if column.data_type_id != 13 %>
-              | <%= column.name %><%= column_space %> | <%= column.data_type.type %> | 
-            <% else %>
-              | <%= column.name %>_id<%= column_space %> | <%= 'integer   ' %> | 
-            <% end %>
-
-            <%# カラムのデータ型により、オプションを場合分け %>
-            <% if column.data_type_id == 12 %>
-              foreign_key: true
-            <% elsif column.must_exist && column.unique %>
-              null: false, unique: true
-            <% elsif column.must_exist %>
-              null: false<%= "              " %>
-            <% elsif column.unique %>
-              unique: true<%= "             " %>
-            <% else %>
-              <%= "                         "%>
-            <% end %> |
-          </p>
-        <% end %>
-
-        <br>
-        <p># Association </p>
-        <br>
-
-        <%# referencesの対象=belongs_toの対象のため、抽出し記載 %>
-        <% model.columns.each do |column| %>
-          <% if column.data_type_id == 12 %>
-            <p>- belongs_to :<%= column.name %> </p>
-          <% end %>
-        <% end %>
-
-        <%# has_many/oneの記述を行う。%>
-        <%# 当モデルと同名のカラムを持つ=アソシエーションを組んでいるモデルを探し出す %>
-        <%# ただし、AvtiveHashは書かないため除外する。 %>
-        <% @columns.each do |column| %>
-          <% if column.name == model.name && not_only && column.data_type_id != 13 %>
-            <p>- has_many :<%= column.model.name %></p>
-          <% elsif column.name == model.name && column.data_type_id !=13 %>
-            <p>- has_one :<%= column.model.name %></p>
-          <% end %>
-        <% end %>
-      <% end %>
-    <% end %>
-  </div>
-
-<%# README実装における現在の課題 %>
-<%# ActiveHashに関するカラム_idをどのように登録し使用するか%>
-<%# modelsテーブルに置いてnot_onlyを設定し、has_oneの対象か設定する必要がある %>
-<%# 半角スペースが期待通りの数が挿入できるのか %>
-<%# 半角スペースを決めるメソッドは外部に保存できないか %>
-<%# 半角スペースを決めるには、columnに文字数のカラムが必要 %>
-<%# ActiveHashのカラム名文字数を保存する際には＋3する必要がある。 %>
-</div> <%# /read_me %>
-
-
-
-
-
-
-  
-<%# ここからモデルごとにマイグレーションファイル、モデルファイル、Rspecファイルを記載する。%>
-<%# models#showアクションでここを表示する可能性あり、その場合は@models.each. doは不要となる。 %>
-<% @models.each do |model| %>
-
-<%# 対象は通常モデルのみ。ActiveHashやFormオブジェクトには不要 %>
-<% if model.model_type_id == 1 %>
-  <div class="migration_file">
+<%# 通常モデルを対象とした記載を考える %>
+<% if @model.model_type_id == 1 %>
   <%# まずはマイグレーションファイルから。ファイルまるまる表示する。 %>
-
+  <div class="migration_file">
+    <div class="target">
+      <%= @model.name.tableize %>テーブルのマイグレーションファイル
+    </div>
+    <br>
+    <div class="code-field">
+      class Create<%= @model.name.pluralize.camelize %> < ActiveRecord::Migration[6.0]<br>
+      <%= "  def chande" %><br>
+      <%= "    create_table :" %><%= @model.name.tableize %> do |t|<br>
       
-      <div>
-        <p><%= model.name.tableize %>テーブルのマイグレーションファイル</p>
-      </div>
-
-      <div class="code-field">
-        <p>class Create<%= model.name.pluralize.camelize %> < ActiveRecord::Migration[6.0]</p>
-        <p><%= "  def chande" %></p>
-        <p><%= "    create_table :" %><%= model.name.tableize %> do |t|</p>
-        
-        <% model.column.each do |column| %>
-          <p>
-            <%= "      t." %><%= column.data_type.type %>
-            <% if column.data_type_id == 12 %>
-              , foreign_key: true
-            <% elsif column.must_exist && column.unique %>
-              , null: false, unique: true
-            <% elsif column.must_exist %>
-              , null: false
-            <% elsif column.unique %>
-              , unique: true
-            <% end %>
-          </p>
+      <% @model.columns.each do |column| %>
+        <%= "      " %>t.<%= column.data_type.type %>
+        <% if column.data_type_id == 12 %>
+          , foreign_key: true
+        <% elsif column.must_exist && column.unique %>
+          , null: false, unique: true
+        <% elsif column.must_exist %>
+          , null: false
+        <% elsif column.unique %>
+          , unique: true
         <% end %>
+        <br>
+      <% end %>
 
-        <%# ここからは固定のtimestamps以下 %>
-        <p><%= "      t.timestamps" %></p>
-        <p><%= "    end" %></p>
-        <p><%= "  end" %></p>
-        <p><%= "end" %></p>
-      </div>
+      <%# ここからは固定のtimestamps以下 %>
+      <%= "      t.timestamps" %><br>
+      <%= "    end" %><br>
+      <%= "  end" %><br>
+      <%= "end" %><br>
+    </div>
   </div>
 
-  <%# ここからモデルの処理を行う。対象は通常モデル %>
+  <%# ここからモデルのコードを表示する %>
 
   <div class="model">
-    <p>class <%= model.name.classify %></p>
+    class <%= @model.name.classify %><br>
     <div class="validation">
       <%# 表示内容を決めるための計算を行う。 %>
       <% presence_count = 0 %>
-      <% activehash_count = 0 %>
-      <% model.columns.each do |column| %>
+      <% active_hash_count = 0 %>
+      <% @model.columns.each do |column| %>
         <% presence_count += 1 if column.must_exist %>
-        <% activehash_count += 1 if column.data_type_id == 13 %>
+        <% active_hash_count += 1 if column.data_type_id == 13 %>
       <% end %>
 
       <% if presence_count >= 2 %>
-        <p><%= '  with_options presence: true do' %></p>
-          <% model.columns.each do |column| %>
-            <p>
-              <%= '    validates :' %><%= column.name %>
-              <%# オプションを付け足していく %>
-              <% column.options.each do |option| %>
-                <% if column.data_type_id == 1 %>
-                  <%= option.option_type.code %>
-                <% elsif column.data_type_id == 3 %>
-                  <%= '              format: { with: /\A[0-9]+\z/, message: "is invalid. Input half-width characters"},' %><br>
-                  <%= '    ' %><%= column.data_type.code %>
-                <% end %>
-                <% if @application.gemfile.rails_i18n %>
-                  <% option.option_type.message_ja %>
-                <% else %>
-                  <% option.option_type.message_en %>
-                <% end %> }
+        <%= '  ' %>with_options presence: true do<br>
+        <% @model.columns.each do |column| %>
+          <% if column.must_exist %>
+            <%= '    validates :' %><%= column.name %>
+            <%# オプションを付け足していく %>
+            <% column.options.each do |option| %>
+              <% if column.data_type_id == 1 %>
+                <%= option.option_type.code %>
+              <% elsif column.data_type_id == 3 %>
+                <%= '              format: { with: /\A[0-9]+\z/, message: "is invalid. Input half-width characters"},' %><br>
+                <%= '    ' %><%= column.data_type.type %>
               <% end %>
-            </p>
+              <% if @application.gemfile.rails_i18n %>
+                <% option.option_type.message_ja %>
+              <% else %>
+                <% option.option_type.message_en %>
+              <% end %> }
+            <% end %>
+            <br>
           <% end %>
+        <% end %>
         <p><%= '  end' %></p> <%# with_optionsに対するend %>
-      <% else %>
-        <% model.columns.each do |column| %>
-          <p>
+      <% else %><%# 空欄禁止が一つ、または存在しない場合 %>
+        <% @model.columns.each do |column| %>
+
             <%= '  validates :' %><%= column.name %>
             <%= column.option_type.code %>
             <% if @application.gemfile.rails_i18n %>
@@ -213,19 +86,20 @@
             <% else %>
               <% option.option_type.message_en %>
             <% end %> }
-          </p>
+          
+          <br>
         <% end %>
       <% end %>
       <br>
       <%# ActiveHashに対するバリデーション %>
-      <% if activehash_count >= 2 %>
+      <% if active_hash_count >= 2 %>
         <p><%= '    ' %>with_options numericality: { other_than: 0, message: "can't be blank" } do </p>
         <% model.columns.each do |column| %>
           <% if column.data_type_id == 13 %>
             <p><%= '      validates :' %><%= column.name %> </p>
           <% end %>
         <% end %>
-      <% elsif activehash_count == 1 %>
+      <% elsif active_hash_count == 1 %>
         <p><%= '      ' %><%= column.name if column.data_type_id ==13 %></p>
       <% end %>
       <p><%= '    end' %></p>
@@ -236,7 +110,7 @@
 
     <div class="association">
       <%# referencesの対象=belongs_toの対象のため、抽出し記載 %>
-      <% model.columns.each do |column| %>
+      <% @model.columns.each do |column| %>
         <% if column.data_type_id == 12 %>
           <p><%= '  belongs_to :' %><%= column.name %> </p>
         <% end %>
@@ -245,15 +119,15 @@
       <%# has_many/oneの記述を行う。%>
       <%# 当モデルと同名のカラムを持つ=アソシエーションを組んでいるモデルを探し出す %>
       <% @columns.each do |column| %>
-        <% if column.name == model.name && not_only %>
+        <% if column.name == @model.name && @model.not_only %>
           <p><%= 'has_many :' %><%= column.model.name %></p>
-        <% elsif column.name == model.name %>
+        <% elsif column.name == @model.name %>
           <p><%= 'has_one :' %><%= column.model.name %></p>
         <% end %>
       <% end %>
       <br>
       <%# ActiveHashに関するアソシエーション %>
-      <% if activehash_count >= 1 %>
+      <% if active_hash_count >= 1 %>
         <p><%= '  extend ActiveHash::Associations::ActiveRecordExtensions' %></p>
         <% model.columns.each do |column| %>
           <% if column.data_type_id == 13 %>
@@ -269,7 +143,6 @@
 
 
 <% end %> <%#/ if model.model_type_id == 1 %>
-<% end %> <%#/ @models.each do |model|  %>
 
 <%# そのほかメモ
 references型のカラムの登録時には、オプションを飛ばしちゃっていいかも。オプションはforeign_key: trueで固定なので

@@ -37,6 +37,12 @@ class ModelsController < ApplicationController
     redirect_to application_models_path(params[:application_id])
   end
 
+  def show
+    @application = Application.find(params[:application_id])
+    @model = Model.find(params[:id])
+    @columns = Column.where(application_id: params[:application_id])
+  end
+
   private
   def model_params
     params.require(:model).permit(:name, :model_type_id, :not_only).merge(application_id: params[:application_id])
