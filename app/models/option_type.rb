@@ -10,11 +10,11 @@ class OptionType < ActiveHash::Base
     # {id: 15, type: 'format', info: '英数字混合パスワード', code: '',            message_ja: '""',          message_en: '"is invalid."'},
 
 
-    {id: 21, type: 'numericality', info: '数値のみで登録する', code: ', numericality: true, message: ',           message_ja: '"は半角数字を入力してください"', message_en:'"is invalid. Input harf-width numbers"'},
-    {id: 22, type: 'numericality', info: '上限下限を設定する', code: ', numericality: {greater_than_or_equal_to: 数値, less_than_or_equal_to: 数値, message: ', message_ja: '"は数値が範囲外です。"', message_en: '"is out of setting range"'},
-    {id: 23, type: 'numericality', info: '上限のみを設定する', code: ', numericality: {less_than_or_equal_to: 数値, message: ', message_ja: '"は数値が範囲外です。"', message_en: '"is out of setting range"'},
-    {id: 24, type: 'numericality', info: '下限のみを設定する', code: ', numericality: {greater_than_or_equal_to: 数値, message: ', message_ja: '"は数値が範囲外です。"', message_en: '"is out of setting range"'},
-    {id: 25, type: 'numericality', info: '未選択状態での禁止', code: ', numericality: { other_than: 0, message: ', message_ja: '"を選択してください"', message_en: `"can't be blank"`},
+    {id: 21, type: 'numericality', info: '数値のみで登録する', code: 'numericality: true, message: ',           message_ja: '"は半角数字を入力してください"', message_en:'"is invalid. Input harf-width numbers"'},
+    {id: 22, type: 'numericality', info: '上限下限を設定する', code: 'numericality: {greater_than_or_equal_to: 数値, less_than_or_equal_to: 数値, message: ', message_ja: '"は数値が範囲外です。"', message_en: '"is out of setting range"'},
+    {id: 23, type: 'numericality', info: '上限のみを設定する', code: 'numericality: {less_than_or_equal_to: 数値, message: ', message_ja: '"は数値が範囲外です。"', message_en: '"is out of setting range"'},
+    {id: 24, type: 'numericality', info: '下限のみを設定する', code: 'numericality: {greater_than_or_equal_to: 数値, message: ', message_ja: '"は数値が範囲外です。"', message_en: '"is out of setting range"'},
+    {id: 25, type: 'numericality', info: '未選択状態での禁止', code: 'numericality: { other_than: 0, message: ', message_ja: '"を選択してください"', message_en: `"can't be blank"`},
     
     # {id: 31, type: 'length', info: 'length'},
     {id: 41, type: 'uniqueness', info: '当テーブル内での重複禁止', code: ', uniqueness: true'},
