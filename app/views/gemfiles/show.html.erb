@@ -1,38 +1,5 @@
 
 <%# READMEのDB設計に関するコード %>
-<%# 半角スペースを指定した回数だけ挿入するメソッド。 %>
-<%# おそらく専用のページに切り分けるべき内容。いずれ移動する %>
-<% def insert_space(roops) %>  
-  <% space = '' %>
-  <% if roops >= 1 %>
-    <% roops.times do  %>
-      <% space += '&nbsp;' %>
-    <% end %>
-  <% end %>
-  <% return space.html_safe %>
-<% end %>
-
-<% def insert_bar(roops) %>
-  <% bar = '' %>
-  <% roops.times do  %>
-    <% bar += '-' %>
-  <% end %>
-  <% return bar %>
-<% end %>
-
-<%# 比較検証用のlongest算出メソッド
-元々記載したものはモデルごとの算出だったが、
-こちらは全てのカラム名から算出する %>
-<%# longest = 6 %>
-  <%# @columns.each do |column| %>
-  <%# long = column.name.length if column.data_type_id != 13 %>
-  <%# long = column.name.length + 3 if column.data_type_id == 13 %>
-  <%# longest = long if long > longest   %>
-<%# end %>
-
-
-
-<%#/メソッド%>
 
 <div class="read_me">
 
@@ -42,7 +9,7 @@
   <p>念の為、ご自身でも記載内容を確認するようお願いします。</p>
   また、現在の仕様では枠がずれているように見えますが、
   ペーストすれとちょうど良い位置になるように調整されています
-  <br>
+  <br><br>
   <%= link_to 'アプリケーション詳細ページへ戻る', application_path(@application) %><br>
 
   <div class="terminal-field">
@@ -59,18 +26,14 @@
 
     <%# モデルごとのテーブル表記。対象は通常モデルのみ %>
     <% @models.each do |model| %>
+      
       <% if [1, 5].include?(model.model_type_id) %>
+        <%# 最も長いカラム名の文字数＝longestを決定する%>
+        <% longest = 6 %>
+        <% longest = the_longest(longest ,model) %>
+        
         # <%= model.name.pluralize %>テーブル<br>
         <br>
-         <%# 最も長いカラム名の文字数＝longestを決定する%>
-        <% longest = 6 if model.model_type_id != 5  %>
-        <% longest = 18 if model.model_type_id == 5  %>
-        <% model.columns.each do |column| %>
-          <% long = column.name.length if column.data_type_id != 13 %>
-          <% long = column.name.length + 3 if column.data_type_id == 13 %>
-          <% longest = long if long > longest   %>
-        <% end %>
-
         <%# マークダウン方式の表のタイトルと間仕切りを作成 %>
         | column<%= insert_space(longest - 6) %> | Type<%= insert_space(6) %>  | Options<%= insert_space(18) %> |<br>
         | <%= insert_bar(longest) %> | ---------- | ------------------------- |<br>
@@ -80,14 +43,16 @@
 
           <%# カラムがActiveHash関連ならば_idを付属するよう場合分け %>
           <% if column.data_type_id != 13 %>
-            | <%= column.name %><%= insert_space(longest - column.name.length) %> | <%= column.data_type.type %><%= insert_space(column.data_type.space) %> | 
+            | <%= column.name %><%= insert_space(longest - column.name.length) %> 
+            | <%= column.data_type.type %><%= insert_space(column.data_type.space) %>
           <% else %>
-            | <%= column.name %>_id<%= insert_space(longest - column.name.length - 3) %> | integer<%= insert_space(3) %> | 
-          <% end %>
-
+            | <%= column.name %>_id<%= insert_space(longest - column.name.length - 3) %> 
+            | integer<%= insert_space(3) %>
+          <% end %> |
+          
           <%# カラムのデータ型により、オプションを場合分け %>
           <% if column.data_type_id == 12 %>
-            foreign_key: true
+            foreign_key: true <%= insert_space(7) %>
           <% elsif column.must_exist && column.unique %>
             null: false, unique: true
           <% elsif column.must_exist %>
@@ -103,11 +68,11 @@
         <% if model.model_type_id == 5 %>
           | email <%= insert_space(12) %> | string <%= insert_space(3) %> | null: false, unique: true |<br>
           | encrypted_password | string <%= insert_space(3) %> | null: false <%= insert_space(13) %> |<br>
-        <% end %>
+        <% end %><br>
 
         <%#/テーブル表記 %>
 
-        <br>
+        
         # Association<br>
         <br>
 
@@ -132,15 +97,12 @@
       <% end %>
     <% end %>
   </div>
-
-<%# README実装における現在の課題 %>
-<%# ActiveHashに関するカラム_idをどのように登録し使用するか%>
-<%# modelsテーブルに置いてnot_onlyを設定し、has_oneの対象か設定する必要がある %>
-<%# 半角スペースが期待通りの数が挿入できるのか %>
-<%# 半角スペースを決めるメソッドは外部に保存できないか %>
-<%# 半角スペースを決めるには、columnに文字数のカラムが必要 %>
-<%# ActiveHashのカラム名文字数を保存する際には＋3する必要がある。 %>
 </div> <%# /read_me %>
 
 <%= link_to 'アプリケーション詳細ページへ戻る', application_path(@application) %><br>
 <%= link_to 'トップページに戻る', root_path %>
+
+<%# README実装における現在の課題 %>
+<%# 中間テーブルの表示はどのように行うか %>
+<%# 中間テーブル自体は問題なく表示される。references型によるbelongs_toで %>
+<%# 問題はhas_many :model名, through :中間model名 ここをどう表示するか %>
