@@ -229,7 +229,7 @@
     <% end %>
 
     <%# ImageMagickを使用する場合のアソシエーションを記載 %>
-    <%= "#{insert_space(2)}has_one_attached :image" if @gemfile.image_magick %><br>
+    <%= insert_space(2) + "has_one_attached :image" if @gemfile.image_magick %><br>
 
     <%# ActiveHashに関するアソシエーション %>
     <% if active_hash_count >= 1 %>
