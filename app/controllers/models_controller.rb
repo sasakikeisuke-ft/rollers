@@ -38,7 +38,7 @@ class ModelsController < ApplicationController
   end
 
   def show
-    @application = Application.find(params[:application_id])
+    @gemfile = Gemfile.find_by(application_id: params[:application_id])
     @model = Model.find(params[:id])
     @columns = Column.where(application_id: params[:application_id])
   end

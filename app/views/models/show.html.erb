@@ -121,8 +121,8 @@
     # パスワードを英数字混合に制限します。不要であれば削除してください。<br>
     <%= insert_space(2) %>PASSWORD_REGEX = /\A(?=.*?[a-z])(?=.*?\d)[a-z\d]+\z/i.freeze<br>
     <%= insert_space(2) %>validates_format_of :password, with: PASSWORD_REGEX, message: 
-    <%= "'は英字と数字の両方を含む必要があります'" if @application.gemfile.rails_i18n %>
-    <%= "'should contain both letters and numbers.'" unless @application.gemfile.rails_i18n %>
+    <%= "'は英字と数字の両方を含む必要があります'" if @gemfile.rails_i18n %>
+    <%= "'should contain both letters and numbers.'" unless @gemfile.rails_i18n %>
     <br><br>
   <% end %>
   <%#/ Deviseのみ対象の専用記述 %>
@@ -143,7 +143,7 @@
               <%= insert_space(14) %><%= option.option_type.code %>
             <% end %>
             <%# エラーメッセージの表示言語を選択 %>
-            <% if @application.gemfile.rails_i18n %>
+            <% if @gemfile.rails_i18n %>
               <%= option.option_type.message_ja %>
             <% else %>
               <%= option.option_type.message_en %>
@@ -163,7 +163,7 @@
         <% column.options.each do|option| %>
           <%= option.option_type.code %>
           <%# エラーメッセージの表示言語を選択 %>
-          <% if @application.gemfile.rails_i18n %>
+          <% if @gemfile.rails_i18n %>
             <% option.option_type.message_ja %>
           <% else %>
             <% option.option_type.message_en %>
@@ -187,7 +187,7 @@
     <%# 紐付けされているActiveHashが二つ以上の場合、with_optionsを使用する %>
     <% if active_hash_count >= 2 %>
       <%= insert_space(2) %>with_options numericality: { other_than: 0, message:
-      <% if @application.gemfile.rails_i18n %>
+      <% if @gemfile.rails_i18n %>
         "を選択してください"
       <% else %>
         "can't be blank"
@@ -229,7 +229,7 @@
     <% end %>
 
     <%# ImageMagickを使用する場合のアソシエーションを記載 %>
-    <%= "#{insert_space(2)}has_one_attached :image" if @application.gemfile.image_magick %><br>
+    <%= "#{insert_space(2)}has_one_attached :image" if @gemfile.image_magick %><br>
 
     <%# ActiveHashに関するアソシエーション %>
     <% if active_hash_count >= 1 %>
