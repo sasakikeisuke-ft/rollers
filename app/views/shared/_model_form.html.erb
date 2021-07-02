@@ -20,6 +20,12 @@
       親モデルに対して一対多、または親モデルが存在しない場合はチェックを外したまま登録してください
     </div>
 
+    <div class="field">
+      <%= f.check_box :attached_image ,{}, true, false %>
+      <%= f.label :attached_image, '画像データを紐付ける対象となる' %><br>
+      Imagemagickを使用し、当モデルに対して画像を紐づける場合はチェックを入れてください
+    </div>
+
     <div class="actions">
       <%= f.submit "カラム登録へ" %>
     </div>

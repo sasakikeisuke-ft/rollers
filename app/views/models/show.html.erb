@@ -29,7 +29,7 @@
   </div>
 <% end %>
 
-<%# モデルごとにマイグレーションファイル、モデルファイル、Rspecファイルを記載する。%>
+<%# 対象モデルのマイグレーションファイル、モデルファイル、Rspecファイルを記載する。%>
 
 <% if @model.model_type_id == 1 %>
   <%# まずはマイグレーションファイルから。ファイルまるまる表示する。 %>
@@ -227,6 +227,10 @@
         <%= insert_space(2) %>has_one :<%= column.model.name %><br>
       <% end %>
     <% end %>
+
+    <%# ImageMagickを使用する場合のアソシエーションを記載 %>
+    <%= "#{insert_space(2)}has_one_attached :image" if @application.gemfile.image_magick %><br>
+
     <%# ActiveHashに関するアソシエーション %>
     <% if active_hash_count >= 1 %>
       <br>
