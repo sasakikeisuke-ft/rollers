@@ -180,7 +180,36 @@ module ModelsHelper
     return html
   end
 
-  
+  def make_has(columns, model)
+    html = ''
+    columns.each do |column|
+      # 以下の条件が合った場合にのみ処理を行う。
+      if column.name == model.name
+        html += insert_space(2)
+        if model.not_only
+          html += 'has_many :' 
+        else
+          html += 'has_one :'
+        end
+        target = column.model
+        html += target.name
+        html += '<br>'
+        # 中間テーブルの場合、
+        # 動作確認が未実施。今後エラーの可能性があり注意が必要。
+        if target.model_type_id == 4 
+          target_columns = target.columns.where.not(name: model.name)
+          target_columns.each do |tie|
+            html += insert_space(2)
+            html += 'has_many :'
+            html += tie.name
+            html += ', through: :'
+            html += target.name
+          end
+        end
+      end
+    end
+    return html
+  end
 
-  
+
 end
