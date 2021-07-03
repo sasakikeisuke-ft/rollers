@@ -1,4 +1,4 @@
-<%# ひとまず書いてみる。必要なインスタンス変数などの設定を確認することが目的 %>
+<% contents_html = make_contents_html(@model, @gemfile) %>
 <h1><%= @model.name %>モデルの作成 </h1>
 <br>
 <% if @model.model_type_id != 5 %>
@@ -31,8 +31,7 @@
 
 <%# 対象モデルのマイグレーションファイル、モデルファイル、Rspecファイルを記載する。%>
 
-<% if @model.model_type_id == 1 %>
-  <%# まずはマイグレーションファイルから。ファイルまるまる表示する。 %>
+<% if @model.model_type.name == '通常モデル' %>
   <div class="migration_file">
     <div class="target">
       <%= @model.name.tableize %>テーブルのマイグレーションファイル
@@ -43,19 +42,8 @@
       <%= insert_space(2) %>def chande<br>
       <%= insert_space(4) %>create_table :<%= @model.name.tableize %> do |t|<br>
       
-      <% @model.columns.each do |column| %>
-        <%= insert_space(6) %>t.<%= column.data_type.type %>
-        <% if column.data_type_id == 12 %>
-          , foreign_key: true
-        <% elsif column.must_exist && column.unique %>
-          , null: false, unique: true
-        <% elsif column.must_exist %>
-          , null: false
-        <% elsif column.unique %>
-          , unique: true
-        <% end %>
-        <br>
-      <% end %>
+      <%# ヘルパーメソッドより作成 %>
+      <%== contents_html[:migration_html] %>
 
       <%# ここからは固定のtimestamps以下 %>
       <%= insert_space(6) %>t.timestamps<br>
@@ -64,24 +52,17 @@
       end<br>
     </div>
   </div>
-<% elsif @model.model_type_id == 5 %>
-  
-  <% @model.columns.each do |column| %>
-        t.<%= column.data_type.type %>
-        <% if column.data_type_id == 12 %>
-          , foreign_key: true
-        <% elsif column.must_exist && column.unique %>
-          , null: false, unique: true
-        <% elsif column.must_exist %>
-          , null: false
-        <% elsif column.unique %>
-          , unique: true
-        <% end %>
-        <br>
-    <% end %>
+<% elsif @model.model_type.name == 'devise' %>
+  <%== contents_html[:migration_html] %>
     上記を必要な箇所に挿入<br>
 <% end %>
 <br>
+
+<p>マイグレーションを実行します</p>
+<div class="terminal-field">
+  ターミナル<br>
+  rails db:migrate<br>
+</div><br>
 
 <p>マイグレーションを実行します</p>
 <div class="terminal-field">
@@ -98,18 +79,9 @@
 </div>
 <br>
 
+
 <div class="model">
   class <%= @model.name.classify %> < ApplicationRecord<br>
-  <%# 表示内容を決めるための計算を行う %>
-  <% presence_count = 0 %>
-  <% boolean_count = 0 %>
-  <% active_hash_count = 0 %>
-  <% @model.columns.each do |column| %>
-    <% presence_count += 1 if column.must_exist %>
-    <% boolean_count += 1 if column.data_type_id == 11 %>
-    <% active_hash_count += 1 if column.data_type_id == 13 %>
-  <% end %>
-  <%#/ 表示内容を決めるための計算を行う %>
   
   <%# Deviseのみ対象の専用記述 %>
   <% if @model.model_type_id == 5 %>
@@ -129,94 +101,14 @@
 
   <%# バリデーションに関する記述 %>
   <div class="validation">
-    <% if presence_count >= 2 %>
-      <%= insert_space(2) %>with_options presence: true do<br>
-      <% @model.columns.each do |column| %>
-        <% if column.must_exist && column.data_type_id <= 10 %>
-          <%= insert_space(4) %>validates :<%= column.name %>
-          <%# オプションを付け足す %>
-          <% column.options.each do |option| %>
-            <% if column.data_type_id == 1 %>
-              <%= option.option_type.code %>
-            <% elsif column.data_type_id == 3 %>
-              ,<br><%= insert_space(14) %>format: { with: /\A[0-9]+\z/, message: "is invalid. Input half-width characters"},<br>
-              <%= insert_space(14) %><%= option.option_type.code %>
-            <% end %>
-            <%# エラーメッセージの表示言語を選択 %>
-            <% if @gemfile.rails_i18n %>
-              <%= option.option_type.message_ja %>
-            <% else %>
-              <%= option.option_type.message_en %>
-            <% end %> }
-          <% end %>
-          <br>
-        <% end %>
-      <% end %>
-      <%= insert_space(2) %>end<br> <%# with_optionsに対するend %>
+    <%# ヘルパーメソッドにより作成 %>
+    <%== contents_html[:validation_html] %>
+  </div>
 
-    <% else %><%# 空欄禁止が一つ、または存在しない場合 %>
-      <% @model.columns.each do |column| %>
-        <%= insert_space(2) %>validates :<%= column.name %>
-        <%= ", presence: true" if column.must_exist %>
-        
-        <%# オプションを付け足す %>
-        <% column.options.each do|option| %>
-          <%= option.option_type.code %>
-          <%# エラーメッセージの表示言語を選択 %>
-          <% if @gemfile.rails_i18n %>
-            <% option.option_type.message_ja %>
-          <% else %>
-            <% option.option_type.message_en %>
-          <% end %> }<br>
-        <% end %>
-      <% end %>
-    <% end %>
-    <br>
-
-    <%# boolean型のカラムに対するバリデーション %>
-    <% if boolean_count >= 1 %>
-      <% @model.columns.each do |column|  %>
-        <% if column.data_type_id == 11 %>
-          <%= insert_space(2) %>validates :<%= column.name %>, inclusion: { in: [true, false] }
-        <% end %>
-      <% end %>
-    <% end %>
-    <%#/ boolean型のカラムに対するバリデーション %>
-
-    <%# ActiveHashに対するバリデーション %>
-    <%# 紐付けされているActiveHashが二つ以上の場合、with_optionsを使用する %>
-    <% if active_hash_count >= 2 %>
-      <%= insert_space(2) %>with_options numericality: { other_than: 0, message:
-      <% if @gemfile.rails_i18n %>
-        "を選択してください"
-      <% else %>
-        "can't be blank"
-      <% end %> } do<br>
-      <% model.columns.each do |column| %>
-        <% if column.data_type_id == 13 %>
-          <%= insert_space(4) %>validates :<%= column.name %><br>
-        <% end %>
-      <% end %>
-      <%= insert_space(2) %>end<br> <%# with_options に対するend %>
-
-    <%# 紐付けされているActiveHashが一つの場合は通常通り記載する %>
-    <% elsif active_hash_count == 1 %>
-      <% model.columns.each do |column| %>
-        <% if column.data_type_id == 13 %>
-          <%= insert_space(2) %>validates :<%= column.name %>, numericality: { other_than: 0, message:
-        <% end %>
-      <% end %>
-    <% end %>
-    <%#/ ActiveHashに対するバリデーション %>
-
-  </div><%#/ バリデーションに関する記述 %>
-  
 
   <div class="association">
-    <%# referencesの対象=belongs_toの対象のため、抽出し記載 %>
-    <% @model.columns.each do |column| %>
-      <%= insert_space(2) + 'belongs_to :' + column.name if column.data_type_id == 12 %><br>
-    <% end %>
+    <%# ヘルパーメソッドにより作成 %>
+    <%==contents_html[:belongs_to_html] %>
 
     <%# has_many/oneの記述を行う。%>
     <%# 当モデルと同名のカラムを持つ=アソシエーションを組んでいるモデルを探し出す %>
@@ -231,21 +123,14 @@
     <%# ImageMagickを使用する場合のアソシエーションを記載 %>
     <%= insert_space(2) + "has_one_attached :image" if @gemfile.image_magick %><br>
 
-    <%# ActiveHashに関するアソシエーション %>
-    <% if active_hash_count >= 1 %>
-      <br>
-      <%= insert_space(2) %>extend ActiveHash::Associations::ActiveRecordExtensions<br>
-      <% model.columns.each do |column| %>
-        <% if column.data_type_id == 13 %>
-          <%= insert_space(2) %>belongs_to:<% column.name %><br>
-        <% end %>
-      <% end %>
-    <% end %>
+    <%# ActiveHashに関するアソシエーションをヘルパーメソッドにより作成 %>
+    <%== contents_html[:activehash_html] %>
+
   </div> <%#/association %>
-
-
   end<br> <%# モデルファイルの記載の終了 %>
 </div>
+
+
 
 
 
