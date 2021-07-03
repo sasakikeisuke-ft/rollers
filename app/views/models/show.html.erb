@@ -1,19 +1,19 @@
 <% contents_html = make_contents_html(@model, @gemfile) %>
-<h1><%= @model.name %>モデルの作成 </h1>
+<h1><%= @model.name %>モデル機能の作成 </h1>
 <br>
 <% if @model.model_type_id != 5 %>
   それでは<%= @model.name %>のファイルを作成します。
 
   <div class="terminal-field">
-    ターミナル
+    ターミナル：関連ファイルの作成
     rails g model <%= @model.name.classify %>
   </div>
   <br>
-  これで<% @model.name %>に関係するファイルが作成されました。<br>
-  まずはマイグレーションファイルの編集を行います。<br>
-  ターミナルに記載されているマイグレーションファイルにカーソルを合わせ、<br>
-  <p>commandを押しながらクリック</p>
-  すると、対象のマイグレーションファイルを開くことができます。
+  <div class="terminal-field">
+    <p>ターミナルに表示されているマイグレーションファイルを対象に行います。</p>
+    <p>ターミナル：対象ファイルへジャンプ</p>
+    <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
+  </div>
 <% else %>
   Deviseを用いた<%= @model.name %>を作成します。
   <div class="terminal-field">
@@ -24,17 +24,17 @@
   </div>
   <div class="terminal-field">
     <p>ターミナルに表示されているマイグレーションファイルを対象に行います。</p>
-    <p>ターミナル</p>
+    <p>ターミナル：対象ファイルへジャンプ</p>
     <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
   </div>
 <% end %>
-
+<br><br>
 <%# 対象モデルのマイグレーションファイル、モデルファイル、Rspecファイルを記載する。%>
-
+<h2><%= @model.name.tableize %>テーブルのマイグレーションファイルの編集</h2>
 <% if @model.model_type.name == '通常モデル' %>
   <div class="migration_file">
     <div class="target">
-      <%= @model.name.tableize %>テーブルのマイグレーションファイル
+      ファイル：20XXXX...._devise_create_<%= @model.name %>
     </div>
     <br>
     <div class="code-field">
@@ -64,17 +64,11 @@
   rails db:migrate<br>
 </div><br>
 
-<p>マイグレーションを実行します</p>
-<div class="terminal-field">
-  ターミナル<br>
-  rails db:migrate<br>
-</div><br>
-
 
 <%# ここからモデルのコードを表示する %>
-
+<h2><%= @model.name.capitalize %>モデルのモデルファイルの編集</h2>
 <div class="terminal-code">
-  ターミナル<br>
+  ターミナル：対象ファイルへジャンプ<br>
   code app/models/<%= @model.name %>.rb
 </div>
 <br>
@@ -85,8 +79,8 @@
   
   <%# Deviseのみ対象の専用記述 %>
   <% if @model.model_type_id == 5 %>
-    <%= insert_space(2) %># Include default devise modules. Others available are:
-    <%= insert_space(2) %># :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+    <%= insert_space(2) %># Include default devise modules. Others available are:<br>
+    <%= insert_space(2) %># :confirmable, :lockable, :timeoutable, :trackable and :omniauthable<br>
     <%= insert_space(2) %>devise :database_authenticatable, :registerable,<br>
     <%= insert_space(9) %>:recoverable, :rememberable, :validatable<br>
     <br>
@@ -101,13 +95,13 @@
 
   <%# バリデーションに関する記述 %>
   <div class="validation">
-    <%# ヘルパーメソッドにより作成 %>
+    <%# ヘルパーメソッドによりバリデーションに関するHTMLを作成 %>
     <%== contents_html[:validation_html] %>
   </div>
 
 
   <div class="association">
-    <%# ヘルパーメソッドにより作成 %>
+    <%# ヘルパーメソッドによりbelongs_toに関連するHTMLを作成 %>
     <%==contents_html[:belongs_to_html] %>
 
     <%# has_many/oneの記述を行う。%>
@@ -131,7 +125,10 @@
 </div>
 
 
-
+<div class="terminal-field">
+    ターミナル
+    rails g model <%= @model.name.classify %>
+  </div>
 
 
 <%# そのほかメモ
