@@ -120,15 +120,19 @@ module ModelsHelper
       end
 
       # エラーメッセージを追加します
-      if japanese
-        html += option.option_type.message_ja
-        html += '}'
-      else
-        html += option.option_type.message_en
-        html += '}'
-      end
+      html += make_message_html(option, japanese)
+      html += '}'
     end
     return html
+  end
+
+  # エラー文日本語化を設定しているかどうかで、エラー文を選択します。
+  def make_message_html(option, japanese)
+    if japanese
+      html = option.option_type.message_ja
+    else
+      html = option.option_type.message_en
+    end
   end
 
   def make_validation_html(array, common)
@@ -180,6 +184,8 @@ module ModelsHelper
     return html
   end
 
+  # アソシエーションのhas_many/has_oneを作成するメソッド
+  # 中間メソッドの場合に必要な追記も組み込んでいます
   def make_has(columns, model)
     html = ''
     columns.each do |column|
@@ -210,6 +216,37 @@ module ModelsHelper
     end
     return html
   end
+
+  # FactoryBotのカラムを作成するメソッド
+
+  # FactoryBotのアソシエーションを作成するメソッド
+
+  # RSpecの正常系テストコードを作成するメソッド
+  # ≒空欄でも保存できるか確認するメソッド
+  def make_normal_examples_html(model)
+    html = ''
+    model.columns.each do |column| 
+      
+      # itの文章を作成するメソッドit~<br>まで
+      unless column.must_exist
+        html += insert_space(6)
+        html += "context '#{column.name}が空欄でも登録できる' do"
+        html += '<br>'
+        html += insert_space(8)
+        html += "@#{model.name}.#{column.name} = ''"
+        html += '<br>'
+        html += insert_space(8)
+        html += "expect(@#{model.name}).to be_valid"
+        html += '<br>'
+        html += insert_space(6)
+        html += 'end'
+        html += '<br>'
+      end
+    end
+    return html
+  end
+
+  # RSpecの異常系テストコードを作成するメソッド
 
 
 end
