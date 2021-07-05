@@ -7,8 +7,11 @@ class OptionType < ActiveHash::Base
     {id: 12, type: 'format', info: 'ひらがなのみで登録可', code: ', format: { with: /\A[ぁ-ん]+\z/, message: }',            message_ja: '"は全角ひらがなで入力してください"',           message_en: '"is invalid. Input full-width hiragana characters"'},
     {id: 13, type: 'format', info: 'カタカナのみで登録可', code: ', format: { with: /\A[ァ-ヶ]+\z/, message: }',            message_ja: '"は全角カタカナで入力してください"',           message_en: '"is invalid. Input full-width katakana characters"'},
     {id: 14, type: 'format', info: '郵便番号形式で登録可', code: ', format: { with: /\A\d{3}-\d{4}\z/, message: }',            message_ja: '"を入力してください。例：123-4567"',          message_en: '"is invalid. Enter it as follows (e.g. 123-4567)"'},
+    # {id: 15, type: 'format', info: '英字のみ限定で登録可', code: '',            message_ja: '""',          message_en: '"is invalid."'},
+    # {id: 15, type: 'format', info: '英字数字のみで登録可', code: '',            message_ja: '""',          message_en: '"is invalid."'},
+    # {id: 15, type: 'format', info: '英字数字記号で登録可', code: '',            message_ja: '""',          message_en: '"is invalid."'},
     # {id: 15, type: 'format', info: '英数字混合パスワード', code: '',            message_ja: '""',          message_en: '"is invalid."'},
-
+    
 
     {id: 21, type: 'numericality', info: '数値のみで登録する', code: 'numericality: true, message: ',           message_ja: '"は半角数字を入力してください"', message_en:'"is invalid. Input harf-width numbers"'},
     {id: 22, type: 'numericality', info: '上限下限を設定する', code: 'numericality: {greater_than_or_equal_to: 数値, less_than_or_equal_to: 数値, message: ', message_ja: '"は数値が範囲外です。"', message_en: '"is out of setting range"'},

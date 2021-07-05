@@ -119,16 +119,11 @@
 <br>
 <br>
 <%# RSpec関連ファイルの記載開始 %>
-<% spec = test(@model, @gemfile) %>  
 <h2><%= @model.name.classify %>モデルのRSpecの編集</h2>
-
-
 <div class="terminal-field">
   ターミナル
   rails g rspec:model <%= @model.name.classify %>
 </div>
-
-
 <div class="code-field">
   FactoryBot.define do<br>
   <%== insert_space(2) %>factory :<%= @model.name %> do
@@ -166,8 +161,8 @@
   <br><br>
   
   <%# ヘルパーメソッドにより正常系のテスト内容を記載 %>
-  <%# contents_html[:nomal_examples_html] %>
-  <%== spec[:normal_example_html] %>
+  <%== contents_html[:normal_example_html] %>
+
   上記はカラム後に変更する内容<br>
   <% if @model.model_type_id == 5 %>
     <%== insert_space(6) %>it 'passwordが英数字混合の6文字であれば登録できる' do<br>
@@ -178,6 +173,7 @@
   <% end %>
   <%== insert_space(4) %>end<br>
   <%# 正常系の記載終了 %>
+  <br>
   <%# 異常系の記載 %>
   <%== insert_space(4) %>context '不適切な内容があり登録できない' do<br>
   <%== insert_space(6) %>it 'カラム名が空欄だと登録できない' do<br>
@@ -187,16 +183,12 @@
   <%== insert_space(6) %>end<br>
   上記はカラムごとに記載する内容<br>
   <br>
-  <%== spec[:abnormal_example_html] %>
 
-
-
-
-
-
-
+  <%# ヘルパーメソッドにより異常系のテスト内容を記載 %>
+  <%== contents_html[:abnormal_example_html] %>
+  
   <br>
-  <% if @model.model_type_id == 5 && !@gemfile.rails_i18n %><%# エラー文：日本語 未完成 %>
+  <% if @model.model_type_id == 5 %><%# エラー文：日本語 未完成につき注意 %>
     <%== insert_space(6) %>it 'emailが空欄だと登録できない' do<br>
     <%== insert_space(8) %>@<%= @model.name %>.email = ''<br>
     <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
