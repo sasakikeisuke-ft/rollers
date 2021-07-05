@@ -46,7 +46,7 @@ class ColumnsController < ApplicationController
   end
 
   def column_params
-    params.require(:column).permit(:name, :name_ja, :data_type_id, :must_exsit, :unique).merge(application_id: params[:application_id], model_id: params[:model_id])
+    params.require(:column).permit(:name, :name_ja, :data_type_id, :must_exist, :unique).merge(application_id: params[:application_id], model_id: params[:model_id])
   end
 
   def find_column
