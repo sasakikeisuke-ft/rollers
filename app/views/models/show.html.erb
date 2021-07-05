@@ -114,10 +114,12 @@
     <%== contents_html[:activehash_html] %>
 
   </div> <%#/association %>
-  end<br> <%# モデルファイルの記載の終了 %>
-</div>
+  end<br> 
+</div><%# モデルファイルの記載の終了 %>
 <br>
 <br>
+<%# RSpec関連ファイルの記載開始 %>
+<% spec = test(@model, @gemfile) %>  
 <h2><%= @model.name.classify %>モデルのRSpecの編集</h2>
 
 
@@ -146,7 +148,6 @@
 </div><%# code-field %>
 <br>
 <div class="code-field">
-  <--コードの基準点<br>
   require 'rails_helper'<br>
   RSpec.describe <%= @model.name.classify %>, type: :model do<br>
   <%# FactoryBotを使用 %>
@@ -166,21 +167,17 @@
   
   <%# ヘルパーメソッドにより正常系のテスト内容を記載 %>
   <%# contents_html[:nomal_examples_html] %>
-
-      it '入力内容が全て適切であれば登録できる' do<br>
-        @bot名.カラム名 = '変更内容'<br>
-        expect(@bot名).to be_valid<br>
-      end<br>
+  <%== spec[:normal_example_html] %>
   上記はカラム後に変更する内容<br>
-  下記はdevise専用。今は表示しておく<br>
-  <%# if @model.model_type_id == 5 %>
+  <% if @model.model_type_id == 5 %>
     <%== insert_space(6) %>it 'passwordが英数字混合の6文字であれば登録できる' do<br>
     <%== insert_space(8) %>@<%= @model.name %>.password = 'a12345'<br>
     <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = @<%= @model.name %>.password<br>
     <%== insert_space(8) %>expect(@<%= @model.name %>).to be_valid<br>
     <%== insert_space(6) %>end<br>
-  <%# end %>
-  <%== insert_space(4) %>end<br> <%# 正常系の記載終了 %>
+  <% end %>
+  <%== insert_space(4) %>end<br>
+  <%# 正常系の記載終了 %>
   <%# 異常系の記載 %>
   <%== insert_space(4) %>context '不適切な内容があり登録できない' do<br>
   <%== insert_space(6) %>it 'カラム名が空欄だと登録できない' do<br>
@@ -190,6 +187,7 @@
   <%== insert_space(6) %>end<br>
   上記はカラムごとに記載する内容<br>
   <br>
+  <%== spec[:abnormal_example_html] %>
 
 
 
@@ -197,119 +195,108 @@
 
 
 
-
-  
-  下記はdevise専用。今は表示しておく<br>
-  <%# if @model.model_type_id == 5 && !@gemfile.rails_i18n %><%# エラー文：日本語 未完成 %>
+  <br>
+  <% if @model.model_type_id == 5 && !@gemfile.rails_i18n %><%# エラー文：日本語 未完成 %>
     <%== insert_space(6) %>it 'emailが空欄だと登録できない' do<br>
     <%== insert_space(8) %>@<%= @model.name %>.email = ''<br>
     <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to include("Eメールを入力してください")<br>
+    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
+    <% if @gemfile.rails_i18n %>
+      include('Eメールを入力してください')
+    <% else %>
+      include('Email can't be blank')
+    <% end %><br>
     <%== insert_space(6) %>end<br>
     <%== insert_space(6) %>it 'emailに@が含まれていない場合、登録できない' do<br>
     <%== insert_space(8) %>@<%= @model.name %>.email = 'abcdefgh'<br>
     <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to include('Eメール is invalid')<br>
+    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
+    <% if @gemfile.rails_i18n %>
+      Eメール is invalid')
+    <% else %>
+      include('Email is invalid')
+    <% end %><br>
     <%== insert_space(6) %>end<br>
     <%== insert_space(6) %>it 'emailの重複があり登録できない' do<br>
     <%== insert_space(8) %>@<%= @model.name %>.save<br>
     <%== insert_space(8) %>another_<%= @model.name %> = FactoryBot.build(:<%= @model.name %>, email: @<%= @model.name %>.email)<br>
     <%== insert_space(8) %>another_<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(another_<%= @model.name %>.errors.full_messages).to include("Eメールはすでに存在します")<br>
+    <%== insert_space(8) %>expect(another_<%= @model.name %>.errors.full_messages).to
+    <% if @gemfile.rails_i18n %>
+      include('Eメールはすでに存在します')
+    <% else %>
+      include('Email has already been taken')
+    <% end %>')<br>
     <%== insert_space(6) %>end<br>
     <%== insert_space(6) %>it 'passwordが空欄だと登録できない' do<br>
     <%== insert_space(8) %>@<%= @model.name %>.password = ''<br>
     <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to include("パスワードを入力してください")<br>
+    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
+    <% if @gemfile.rails_i18n %>
+      include("パスワードを入力してください")
+    <% else %>
+      include("password can't be blank")
+    <% end %>')<br>
     <%== insert_space(6) %>end<br>
     <%== insert_space(6) %>it 'passwordとpassword_confirmationが不一致では登録できない' do<br>
     <%== insert_space(8) %>@<%= @model.name %>.password = 'abcdef'<br>
     <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = 'ghijkl'<br>
     <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to include("パスワード（確認用）とパスワードの入力が一致しません")<br>
+    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
+    <% if @gemfile.rails_i18n %>
+      include('パスワード（確認用）とパスワードの入力が一致しません')
+    <% else %>
+      include("Password confirmation doesn't match password")
+    <% end %><br>
     <%== insert_space(6) %>end<br>
     <%== insert_space(6) %>it '5文字以下の場合、登録できない' do<br>
     <%== insert_space(8) %>@<%= @model.name %>.password = '1abcd'<br>
     <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = @<%= @model.name %>.password<br>
     <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to include('パスワードは6文字以上で入力してください')<br>
+    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
+    <% if @gemfile.rails_i18n %>
+      include(include('パスワードは6文字以上で入力してください')
+    <% else %>
+      include('password is too short (minimum is 6 characters)')
+    <% end %><br>
     <%== insert_space(6) %>end<br>
     <%== insert_space(6) %>it '全角文字では登録できない' do<br>
     <%== insert_space(8) %>@<%= @model.name %>.password = 'ひらがなカタカナ漢字'<br>
     <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = @<%= @model.name %>.password<br>
     <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to include('パスワード is invalid. Include both letters and numbers')<br>
+    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
+    <% if @gemfile.rails_i18n %>
+      include('パスワード is invalid. Include both letters and numbers')
+    <% else %>
+      include('password is invalid. Include both letters and numbers')
+    <% end %><br>
     <%== insert_space(6) %>end<br>
-  <%# elsif @model.model_type_id == 5 %><%# エラー文：英語 %>
-    <%== insert_space(6) %>it 'emailが空欄だと登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.email = ''<br>
-    <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to include("Email can't be blank")<br>
-    <%== insert_space(6) %>end<br>
-    <%== insert_space(6) %>it 'emailに@が含まれていない場合、登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.email = 'abcdefgh'<br>
-    <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to include('Email is invalid')<br>
-    <%== insert_space(6) %>end<br>
-    <%== insert_space(6) %>it 'emailの重複があり登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.save<br>
-    <%== insert_space(8) %>another_<%= @model.name %> = FactoryBot.build(:<%= @model.name %>, email: @<%= @model.name %>.email)<br>
-    <%== insert_space(8) %>another_<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(another_<%= @model.name %>.errors.full_messages).to include("Email has already been taken")<br>
-    <%== insert_space(6) %>end<br>
-    <%== insert_space(6) %>it 'passwordが空欄だと登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password = ''<br>
-    <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to include("password can't be blank")<br>
-    <%== insert_space(6) %>end<br>
-    <%== insert_space(6) %>it 'passwordとpassword_confirmationが不一致では登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password = 'abcdef'<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = 'ghijkl'<br>
-    <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to include("Password confirmation doesn't match password")<br>
-    <%== insert_space(6) %>end<br>
-    <%== insert_space(6) %>it '5文字以下の場合、登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password = '1abcd'<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = @<%= @model.name %>.password<br>
-    <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to include('password is too short (minimum is 6 characters)')<br>
-    <%== insert_space(6) %>end<br>
-    <%== insert_space(6) %>it '全角文字では登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password = 'ひらがなカタカナ漢字'<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = @<%= @model.name %>.password<br>
-    <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to include('password is invalid. Include both letters and numbers')<br>
-    <%== insert_space(6) %>end<br>
-  <%# end %>
+  <% end %>
 
 
 <br>
-      it 'カラム名_idが空欄だと登録できない' do
-        @bot名.カラム名_id = ''
-        @bot名.valid?
-        expect(@bot名.errors.full_messages).to include("カラム名 can't be blank")
-      end
-      it 'カラム名_idが未選択だと登録できない' do
-        @bot名.カラム名_id = 0
-        @bot名.valid?
-        expect(@bot名.errors.full_messages).to include("カラム名 can't be blank").
-      end
+      it 'カラム名_idが空欄だと登録できない' do<br>
+        @bot名.カラム名_id = ''<br>
+        @bot名.valid?<br>
+        expect(@bot名.errors.full_messages).to include("カラム名 can't be blank")<br>
+      end<br>
+      it 'カラム名_idが未選択だと登録できない' do<br>
+        @bot名.カラム名_id = 0<br>
+        @bot名.valid?<br>
+        expect(@bot名.errors.full_messages).to include("カラム名 can't be blank")<br>
+      end<br>
 
-      it 'userが紐付けされていないと登録できない' do
-        @bot名.user = nil
-        @bot名.valid?
-        expect(@bot名.errors.full_messages).to include('User must exist')
-      end
+      it 'userが紐付けされていないと登録できない' do<br>
+        @bot名.user = nil<br>
+        @bot名.valid?<br>
+        expect(@bot名.errors.full_messages).to include('User must exist')<br>
+      end<br>
 
-      it "tokenが空では登録できないこと" do
-        @bot名.token = nil
-        @bot名.valid?
-        expect(@bot名.errors.full_messages).to include("Token can't be blank")
-      end
-
-      it '内容詳細' do
-      end
-
+      it "tokenが空では登録できないこと" do<br>
+        @bot名.token = nil<br>
+        @bot名.valid?<br>
+        expect(@bot名.errors.full_messages).to include("Token can't be blank")<br>
+      end<br>
   <br>
   <br>
   <%== insert_space(4) %>end<br>
