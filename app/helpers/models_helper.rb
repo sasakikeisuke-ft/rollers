@@ -8,7 +8,7 @@ module ModelsHelper
     presence_true = []
     presence_false = []
     boolean_group = []
-    belong_group = []
+    references_group = []
     activehash_group = []
     normal_groups = []
     abnormal_groups = []
@@ -28,15 +28,19 @@ module ModelsHelper
         presence_false << content if !column.must_exist && content[:options] != ''
       # 処理内容を別にしたいカラムは、それぞれ専用の配列へ追加します。
       else
+        content[:options] = ''
         boolean_group << content if column.data_type_id == 11
-        belong_group << content if column.data_type_id == 12
+        references_group << content if column.data_type_id == 12
         activehash_group << content if column.data_type_id == 13
       end
-
+      
       # RSpecのための配列を作成します
       make_group_exist(model, column, abnormal_groups, normal_groups)
       make_group_options(model, column, abnormal_groups)
     end
+    # ここまでで作られた配列を基に、グループを追加する。
+    make_group_references(references_group, model, abnormal_groups)
+    make_activehash_example_html(activehash_group, model, abnormal_groups)
     #/ ここまでで配列が完成しました。
 
     # ここから実際のHTMLをmake_validation_htmlメソッドを使用し作成します
@@ -46,20 +50,22 @@ module ModelsHelper
     common = 'inclusion: { in: [true, false] }'
     validation_html += make_validation_html(boolean_group, common)
 
-    common = `numericality: { other_than: 0, message: "can't be blank" }`
+    
+    common = 'numericality: { other_than: 0, message: "'
+    common += "can't be blank"
+    common += '"}'
     validation_html += make_validation_html(activehash_group, common)
 
     common = ''
     validation_html += make_validation_html(presence_false, common)
 
     # アソシエーションのbelongs_toに関する記載を行います。
-    belongs_to_html = make_belong(belong_group, '', false)
+    belongs_to_html = make_belong(references_group, '', false)
     activehash_html = make_belong(activehash_group, '', true)
 
     # RSpecのexampleに関するHTMLを作成します
     normal_example_html = make_normal_examples_html(normal_groups)
     abnormal_example_html = make_abnormal_example_html(abnormal_groups, gemfile.rails_i18n)
-      
 
     # 作成したHTMLをハッシュにしてビューファイルへ返します
     contents_html = {
@@ -74,17 +80,21 @@ module ModelsHelper
 
   # マイグレーションに記載する項目のHTMLを作成するメソッド。
   def make_migration_html(column)
-    html = ""
-    html += insert_space(6)
-    html += "t.#{column.data_type.type} :#{column.name}"
-    if column.data_type.type == 'references'
-      html += ", foreign_key: true"
-    else 
-      html += ", null: false" if column.must_exist
-      html += ", unique: true" if column.unique
+    if column.data_type_id == 13
+      return ""
+    else
+      html = ""
+      html += insert_space(6)
+      html += "t.#{column.data_type.type} :#{column.name}"
+      if column.data_type.type == 'references'
+        html += ", foreign_key: true"
+      else 
+        html += ", null: false" if column.must_exist
+        html += ", unique: true" if column.unique
+      end
+      html += "<br>"
+      return html
     end
-    html += "<br>"
-    return html
   end
 
   # バリデーションにおけるoptionのHTMLを作成するメソッド
@@ -131,8 +141,9 @@ module ModelsHelper
       end
 
       # エラーメッセージを追加します
+      html += '"'
       html += make_message_html(option, japanese)
-      html += '}'
+      html += '"}'
     end
     return html
   end
@@ -156,6 +167,8 @@ module ModelsHelper
         html += insert_space(2)
         html += 'validates :'
         html += element[:name]
+        html += ', '
+        html += common
         html += element[:options]
         html += '<br>'
       end
@@ -182,6 +195,7 @@ module ModelsHelper
     return if array.length == 0
     html = ''
     if activehash
+      html += '<br>'
       html += insert_space(2)
       html += 'extend ActiveHash::Associations::ActiveRecordExtensions'
       html += '<br>'
@@ -210,7 +224,7 @@ module ModelsHelper
           html += 'has_one :'
         end
         target = column.model
-        html += target.name
+        html += target.name.tableize
         html += '<br>'
         # 中間テーブルの場合、
         # 動作確認が未実施。今後エラーの可能性があり注意が必要。
@@ -222,6 +236,7 @@ module ModelsHelper
             html += tie.name
             html += ', through: :'
             html += target.name
+            html += '<br>'
           end
         end
       end
@@ -242,8 +257,10 @@ module ModelsHelper
 
   # カラムを受け取ってexampleのための配列を作成するメソッド
   def make_group_exist(model, column, abnormal_groups, normal_groups)
-    content = {model: model.name, column: column.name}
-    if column.must_exist
+    content = {model: model.name, column: column.name, column_ja: column.name_ja}
+    if [12, 13].include?(column.data_type_id)
+      return
+    elsif column.must_exist
       content[:info] = 'が空欄だと登録できない'
       content[:change] = "''"
       content[:message_ja] = 'を入力してください'
@@ -260,17 +277,19 @@ module ModelsHelper
       case option.option_type.type
       when 'format'
         # 数字が含まれる場合に対するexample
-        if [11, 12, 13, 19].include?(option.option_type_id)
+        if [11, 12, 13].include?(option.option_type_id)
           content = group_of_base(model, column, option)
           content[:info] = 'に数字が含まれていると保存できない'
           content[:change] = "'12345678'"
           abnormal_groups << content
         end
-          # 英字が含まれる場合に対するexample
-        content = group_of_base(model, column, option)
-        content[:info] = 'に英字が含まれていると保存できない'
-        content[:change] = "'abcdefgh'"
-        abnormal_groups << content
+        # 英字が含まれる場合に対するexample
+        if [11, 12, 13].include?(option.option_type_id)
+          content = group_of_base(model, column, option)
+          content[:info] = 'に英字が含まれていると保存できない'
+          content[:change] = "'abcdefgh'"
+          abnormal_groups << content
+        end
         # 漢字が含まれる場合に対するexample
         if [12, 13, 19].include?(option.option_type_id)
           content = group_of_base(model, column, option)
@@ -301,6 +320,7 @@ module ModelsHelper
     content = {
       model: model.name,
       column: column.name,
+      column_ja: column.name_ja,
       message_ja: option.option_type.message_ja,
       message_en: option.option_type.message_en
     }
@@ -345,9 +365,9 @@ module ModelsHelper
       html += '<br>'
       html += insert_space(8)
       if japanese
-        html += "expect(#{group[:model]}.errors.full_messages).to include(#{group[:message_ja]})"
+        html += "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column_ja]}#{group[:message_ja]}')"
       else
-        html += "expect(#{group[:model]}.errors.full_messages).to include(#{group[:message_en]})"
+        html += "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
       end
       html += '<br>'
       html += insert_space(6)
@@ -355,6 +375,46 @@ module ModelsHelper
       html += '<br>'
     end
     return html
+  end
+
+  # references_groupを基に、紐付けに関するexampleの組み合わせを作成するメソッド
+  def make_group_references(references_group, model, abnormal_groups)
+    references_group.each do |group|
+      content = {}
+      content[:model] = model.name
+      content[:column] = group[:name]
+      content[:column_ja] = group[:name]
+      content[:info] = 'が紐づけられていないと登録できない'
+      content[:change] = 'nil'
+      content[:message_ja] = ' must exist'
+      content[:message_en] = ' must exist'
+      abnormal_groups << content
+    end
+  end
+
+  # activehash_groupを基に、必要なexampleを作成する組み合わせを作成するメソッド
+  def make_activehash_example_html(activehash_group, model, abnormal_groups)
+    activehash_group.each do |group|
+      content = {}
+      content[:model] = model.name
+      content[:column] = group[:name]
+      content[:column_ja] = group[:name]
+      content[:info] = 'が空欄だと登録できない'
+      content[:change] = ''
+      content[:message_ja] = ' must exist'
+      content[:message_en] = ' must exist'
+      abnormal_groups << content
+
+      content = {}
+      content[:model] = model.name
+      content[:column] = group[:name]
+      content[:column_ja] = group[:name]
+      content[:info] = 'が未選択だと登録できない'
+      content[:change] = 0
+      content[:message_ja] = ' must exist'
+      content[:message_en] = ' must exist'
+      abnormal_groups << content
+    end
   end
 
   def test(model, gemfile)
@@ -374,6 +434,12 @@ module ModelsHelper
     return test
   end
 
+  def test2(abnormal_groups)
+    abnormal_groups.each do |group|
+      puts group
+      puts "-----------"
+    end
+  end
 end
 
   

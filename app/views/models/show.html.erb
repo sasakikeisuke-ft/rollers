@@ -98,8 +98,7 @@
     <%# ヘルパーメソッドによりバリデーションに関するHTMLを作成 %>
     <%== contents_html[:validation_html] %>
   </div>
-
-
+  <br>
   <div class="association">
     <%# ヘルパーメソッドによりbelongs_toに関連するHTMLを作成 %>
     <%==contents_html[:belongs_to_html] %>
@@ -108,13 +107,15 @@
     <%== make_has(@columns, @model) %>
 
     <%# ImageMagickを使用する場合のアソシエーションを記載 %>
-    <%= insert_space(2) + "has_one_attached :image" if @model.attached_image %><br>
-
+    <% if @model.attached_image %>
+      <%== insert_space(2) %>has_one_attached :image<br>
+    <% end %>
+    
     <%# ActiveHashに関するアソシエーションをヘルパーメソッドにより作成 %>
     <%== contents_html[:activehash_html] %>
 
+  end<br>
   </div> <%#/association %>
-  end<br> 
 </div><%# モデルファイルの記載の終了 %>
 <br>
 <br>
@@ -122,11 +123,11 @@
 <h2><%= @model.name.classify %>モデルのRSpecの編集</h2>
 <div class="terminal-field">
   ターミナル
-  rails g rspec:model <%= @model.name.classify %>
+  rails g rspec:model <%= @model.name %>
 </div>
 <div class="code-field">
   FactoryBot.define do<br>
-  <%== insert_space(2) %>factory :<%= @model.name %> do
+  <%== insert_space(2) %>factory :<%= @model.name %> do<br>
   
   <%# contents_html[:factorybot_html] %>
   <%# contents_html[:association_html] %>
@@ -142,6 +143,9 @@
   end<br>
 </div><%# code-field %>
 <br>
+
+
+
 <div class="code-field">
   require 'rails_helper'<br>
   RSpec.describe <%= @model.name.classify %>, type: :model do<br>
@@ -152,18 +156,16 @@
   <%== insert_space(2) %>end<br>
   <br>
   <%# テストコードの記載 %>
-  <%== insert_space(2) %>describe '<%= @model.name.classify %>モデルの登録機能', type: :model do<br>
+  <%== insert_space(2) %>describe '<%= @model.name.classify %>モデルの登録機能' do<br>
   <%# 正常系の記載 %>
   <%== insert_space(4) %>context '入力内容が適切であれば登録できる' do<br>
   <%== insert_space(6) %>it '入力内容が全て適切であれば登録できる' do<br>
   <%== insert_space(8) %>expect(@<%= @model.name %>).to be_valid<br>
   <%== insert_space(6) %>end<br>
-  <br><br>
   
   <%# ヘルパーメソッドにより正常系のテスト内容を記載 %>
   <%== contents_html[:normal_example_html] %>
-
-  上記はカラム後に変更する内容<br>
+  
   <% if @model.model_type_id == 5 %>
     <%== insert_space(6) %>it 'passwordが英数字混合の6文字であれば登録できる' do<br>
     <%== insert_space(8) %>@<%= @model.name %>.password = 'a12345'<br>
@@ -176,18 +178,10 @@
   <br>
   <%# 異常系の記載 %>
   <%== insert_space(4) %>context '不適切な内容があり登録できない' do<br>
-  <%== insert_space(6) %>it 'カラム名が空欄だと登録できない' do<br>
-  <%== insert_space(8) %>@bot名.カラム名 = ''<br>
-  <%== insert_space(8) %>@bot名.valid?<br>
-  <%== insert_space(8) %>expect(@bot名.errors.full_messages).to include("カラム名 can't be blank")<br>
-  <%== insert_space(6) %>end<br>
-  上記はカラムごとに記載する内容<br>
-  <br>
 
   <%# ヘルパーメソッドにより異常系のテスト内容を記載 %>
   <%== contents_html[:abnormal_example_html] %>
-  
-  <br>
+
   <% if @model.model_type_id == 5 %><%# エラー文：日本語 未完成につき注意 %>
     <%== insert_space(6) %>it 'emailが空欄だと登録できない' do<br>
     <%== insert_space(8) %>@<%= @model.name %>.email = ''<br>
@@ -264,44 +258,23 @@
     <% end %><br>
     <%== insert_space(6) %>end<br>
   <% end %>
+  <%# 異常系の記載終了 %>
+  <%== insert_space(4) %>end<br>
+  <%== insert_space(2) %>end<br>
+  end<br>
+</div>
 
+<%# そのほかメモ
+この後の追加実装予定
+・Rspecのオプションに対するテストコード。まだ種類が少なく対応力に難あり。
+・日本語化用のファイル。ファイル自体は別の場所で作成予定
+・Formオブジェクトパターン、同時に二つのモデルに保存するやつ。一応同じ感じに表示したいが用途が違いすぎるか？。
+%>
 
-<br>
-      it 'カラム名_idが空欄だと登録できない' do<br>
-        @bot名.カラム名_id = ''<br>
-        @bot名.valid?<br>
-        expect(@bot名.errors.full_messages).to include("カラム名 can't be blank")<br>
-      end<br>
-      it 'カラム名_idが未選択だと登録できない' do<br>
-        @bot名.カラム名_id = 0<br>
-        @bot名.valid?<br>
-        expect(@bot名.errors.full_messages).to include("カラム名 can't be blank")<br>
-      end<br>
-
-      it 'userが紐付けされていないと登録できない' do<br>
-        @bot名.user = nil<br>
-        @bot名.valid?<br>
-        expect(@bot名.errors.full_messages).to include('User must exist')<br>
-      end<br>
-
+<%# 購入機能におけるtokenのテストコードは未実装
       it "tokenが空では登録できないこと" do<br>
         @bot名.token = nil<br>
         @bot名.valid?<br>
         expect(@bot名.errors.full_messages).to include("Token can't be blank")<br>
       end<br>
-  <br>
-  <br>
-  <%== insert_space(4) %>end<br>
-  <%== insert_space(2) %>end<br>
-  end<br>
-
-
-</div>
-<%# そのほかメモ
-references型のカラムの登録時には、オプションを飛ばしちゃっていいかも。オプションはforeign_key: trueで固定なので
-
-この後の追加実装予定
-・Rspec
-・日本語化用のファイル。ファイル自体は別の場所で作成予定
-・Formオブジェクトパターン、同時に二つのモデルに保存するやつ。一応同じ感じに表示したいが用途が違いすぎるか？。
 %>
