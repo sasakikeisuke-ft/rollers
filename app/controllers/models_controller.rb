@@ -39,7 +39,7 @@ class ModelsController < ApplicationController
 
   def show
     @gemfile = Gemfile.find_by(application_id: params[:application_id])
-    @model = Model.find(params[:id])
+    @model = Model.includes(columns: :options).find(params[:id])
     @columns = Column.where(application_id: params[:application_id])
   end
 
