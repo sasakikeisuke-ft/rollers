@@ -8,9 +8,8 @@
     <p>ターミナル：関連ファイルの作成</p>
     <p>rails g model <%= @model.name.classify %></p>
   </div>
-  <br>
+  <p>ターミナルに表示されているマイグレーションファイルを対象に行います。</p>
   <div class="terminal-field">
-    <p>ターミナルに表示されているマイグレーションファイルを対象に行います。</p>
     <p>ターミナル：対象ファイルへジャンプ</p>
     <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
   </div>
@@ -54,17 +53,13 @@
   </div>
 <% elsif @model.model_type.name == 'devise' %>
   <%== contents_html[:migration_html] %>
-    上記を必要な箇所に挿入<br>
+  上記を必要な箇所に挿入<br>
 <% end %>
-<br>
 
-<p>マイグレーションを実行します</p>
 <div class="terminal-field">
-  ターミナル<br>
-  rails db:migrate<br>
-</div><br>
-
-
+  <p>ターミナル：マイグレーションの実行</p>
+  <p>rails db:migrate </p>
+</div>
 <%# ここからモデルのコードを表示する %>
 <h2><%= @model.name.classify %>モデルのモデルファイルの編集</h2>
 <div class="terminal-field">
@@ -98,7 +93,6 @@
     <%# ヘルパーメソッドによりバリデーションに関するHTMLを作成 %>
     <%== contents_html[:validation_html] %>
   </div>
-  <br>
   <div class="association">
     <%# ヘルパーメソッドによりbelongs_toに関連するHTMLを作成 %>
     <%==contents_html[:belongs_to_html] %>
@@ -116,18 +110,20 @@
 
   end<br>
   </div> <%#/association %>
-</div><%# モデルファイルの記載の終了 %>
+</div><%#/ code-field モデルファイルの記載の終了 %>
 <br>
 <br>
 <%# RSpec関連ファイルの記載開始 %>
 <h2><%= @model.name.classify %>モデルのRSpecの編集</h2>
+
 <div class="terminal-field">
-  ターミナル
-  rails g rspec:model <%= @model.name %>
+  <p>ターミナル：関連ファイルの作成</p>
+  <p>rails g rspec:model <%= @model.name %> </p>
 </div>
-<br>
-
-
+<div class="terminal-field">
+  <p>ターミナル：対象ファイルへジャンプ</p>
+  <p>code spec/models/<%= @model.name %>_spec.rb </p>
+</div>
 
 <div class="code-field">
   require 'rails_helper'<br>
@@ -256,6 +252,7 @@
   FactoryBot.define do<br>
   <%== insert_space(2) %>factory :<%= @model.name %> do<br>
   
+  <%# ヘルパーメソッドを使用し、FactoryBotのカラムに関するHTMLを作成する %>
   <%== contents_html[:factorybot_html] %>
   
   <% if @model.model_type_id == 5 %>
@@ -263,7 +260,17 @@
     <%== insert_space(4) %>password {Faker::Internet.password(min_length: 6)}<br>
     <%== insert_space(4) %>password_confirmation {password}<br>
   <% end %>
-  <%# contents_html[:association_html] %>
+
+  <%# ヘルパーメソッドを使用し、FactoryBotのアソシエーションに関するHTMLを作成する %>
+  <%== contents_html[:association_html] %>
+
+  <% if @model.attached_image %>
+    <br>
+    <%== insert_space(4) %>after(:build) do |target|<br>
+    <%== insert_space(6) %>target.image.attach(io: File.open('public/images/test_image.png'), filename: 'test_image.png')
+    <%== insert_space(4) %>end<br>
+    # public/imagesのディレクトリを作成し、test_image.pngと名付けた画像ファイルを用意してください。
+  <% end %>
   <%== insert_space(2) %>end<br>
   end<br>
 </div><%# code-field %>
@@ -324,7 +331,13 @@
     </p>
   </div>
 </div>
-<br>
+<div class="terminal-field">
+  <p>ターミナル：テストコードの実行</p>
+  <p>bundle exec rspec spec/models/<%= @model.name %>_spec.rb </p>
+</div>
+<div>
+<p>これでモデルに関するファイルの記述は終了です。</p>
+</div>
 <div class="link">
   <%= link_to 'モデル一覧へ戻る', application_models_path %>
   <%= link_to 'トップページへへ戻る', root_path %>

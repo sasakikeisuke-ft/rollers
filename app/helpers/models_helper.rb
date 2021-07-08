@@ -64,12 +64,15 @@ module ModelsHelper
     validation_html += make_validation_html(presence_false, common)
 
     # アソシエーションのbelongs_toに関する記載を行います。
-    belongs_to_html = make_belong(references_group, '', false)
-    activehash_html = make_belong(activehash_group, '', true)
+    belongs_to_html = make_belong(references_group, insert_space(2), false)
+    activehash_html = make_belong(activehash_group, insert_space(2), true)
 
     # RSpecのexampleに関するHTMLを作成します
     normal_example_html = make_normal_examples_html(normal_groups)
     abnormal_example_html = make_abnormal_example_html(abnormal_groups, gemfile.rails_i18n)
+
+    # FactoryBotのアソシエーションに関するHTMLを作成します。
+    association_html = make_association_html(references_group)
 
     # 作成したHTMLをハッシュにしてビューファイルへ返します
     contents_html = {
@@ -79,7 +82,8 @@ module ModelsHelper
       activehash_html: activehash_html,
       normal_example_html: normal_example_html,
       abnormal_example_html: abnormal_example_html,
-      factorybot_html: factorybot_html
+      factorybot_html: factorybot_html,
+      association_html: association_html
     }
   end
 
@@ -201,13 +205,12 @@ module ModelsHelper
     html = ''
     if activehash
       html += '<br>'
-      html += insert_space(2)
+      html += before
       html += 'extend ActiveHash::Associations::ActiveRecordExtensions'
       html += '<br>'
     end
     array.each do |element|
-      html += insert_space(2) if before == ''
-      html += before if before != ''
+      html += before
       html += 'belongs_to :'
       html += element[:name]
       html += '<br>'
@@ -493,6 +496,17 @@ module ModelsHelper
     return html
   end
 
+  def make_association_html(groups)
+    html = ''
+    puts groups
+    groups.each do |group|
+      html += insert_space(4)
+      html += 'association :'
+      html += group[:name]
+      html += '<br>'
+    end
+    return html
+  end
 
   # 動作確認をするために作成したメソッド。最終的には削除する
   def test(model, gemfile)
