@@ -5,8 +5,8 @@
   それでは<%= @model.name %>のファイルを作成します。
 
   <div class="terminal-field">
-    ターミナル：関連ファイルの作成
-    rails g model <%= @model.name.classify %>
+    <p>ターミナル：関連ファイルの作成</p>
+    <p>rails g model <%= @model.name.classify %></p>
   </div>
   <br>
   <div class="terminal-field">
@@ -125,23 +125,6 @@
   ターミナル
   rails g rspec:model <%= @model.name %>
 </div>
-<div class="code-field">
-  FactoryBot.define do<br>
-  <%== insert_space(2) %>factory :<%= @model.name %> do<br>
-  
-  <%# contents_html[:factorybot_html] %>
-  <%# contents_html[:association_html] %>
-  <%== insert_space(4) %>nickname {Faker::Name.last_name}<br>
-  ＜ここにカラムごとのFakerとassociationが記載される＞<br>
-  
-  <% if @model.model_type_id == 5 %>
-  <%== insert_space(4) %>email {Faker::Internet.free_email}<br>
-  <%== insert_space(4) %>password {Faker::Internet.password(min_length: 6)}<br>
-  <%== insert_space(4) %>password_confirmation {password}<br>
-  <% end %>
-  <%== insert_space(2) %>end<br>
-  end<br>
-</div><%# code-field %>
 <br>
 
 
@@ -263,7 +246,89 @@
   <%== insert_space(2) %>end<br>
   end<br>
 </div>
-
+<br>
+<div class="terminal-field">
+  <p>ターミナル：対象ファイルへジャンプ</p>
+  <p>code spec/factories/<%= @model.name %>.rb</p>
+</div>
+<%# FactoryBotに関するコード %>
+<div class="code-field">
+  FactoryBot.define do<br>
+  <%== insert_space(2) %>factory :<%= @model.name %> do<br>
+  
+  <%== contents_html[:factorybot_html] %>
+  
+  <% if @model.model_type_id == 5 %>
+    <%== insert_space(4) %>email {Faker::Internet.free_email}<br>
+    <%== insert_space(4) %>password {Faker::Internet.password(min_length: 6)}<br>
+    <%== insert_space(4) %>password_confirmation {password}<br>
+  <% end %>
+  <%# contents_html[:association_html] %>
+  <%== insert_space(2) %>end<br>
+  end<br>
+</div><%# code-field %>
+<br>
+<div>
+  上記FactoryBotに関するコードは編集が必要な場合があります。<br>
+  その場合は以下のサンプルコードを参考に編集をお願いします。
+</div>
+<div class="sample-code">
+  <div class="left">
+    <p>
+      名前<br>
+      email<br>
+      パスワード：基本<br>
+      パスワード：英数字混合<br>
+      パスワード：再入力<br>
+      文章<br>
+      文字（10文字）<br>
+      数字（300〜9,999,999）<br>
+      人：苗字漢字<br>
+      人：名前漢字<br>
+      人：苗字カナ<br>
+      人：名前カナ<br>
+      人：生年月日<br>
+      住所：郵便番号<br>
+      住所：都道府県(ActiveHash)<br>
+      住所：市区町村<br>
+      住所：番地<br>
+      住所：建物名<br>
+      電話番号<br>
+      id<br>
+      トークン<br>
+    </p>
+  </div>
+  <div class="right">
+    <p>
+      name { Faker::Name.initials(number: 2) }<br>
+      email { Faker::Internet.free_email }<br>
+      password { Faker::Internet.password(min_length: 6) }<br>
+      password { 'a1' + Faker::Internet.password(min_length: 4) }<br>
+      password_confirmation { password }<br>
+      text { Faker::Lorem.sentence }<br>
+      characters { Faker::Lorem.characters(number: 10) }<br>
+      number { Faker::Number.within(range: 300..9_999_999) }<br>
+      last_name { Gimei.last.kanji }<br>
+      first_name { Gimei.first.kanji }<br>
+      last_name_kana { Gimei.last.katakana }<br>
+      first_name_kana { Gimei.first.katakana }<br>
+      birthday { Faker::Date.between(from: '1930-01-01', to: '2016-12-31') }<br>
+      postal_code { '123-4567' }<br>
+      prefecture_id { Faker::Number.within(range: 1..47) }<br>
+      city { Gimei.address.city.kanji }<br>
+      address { Gimei.address.town.kanji }<br>
+      building { '建物名' }<br>
+      phone_number { Faker::PhoneNumber.subscriber_number(length: 11) }<br>
+      order_id { Faker::Number.number(digits: 2) }<br>
+      token { 'tok_abcdefghijk00000000000000000' }<br>
+    </p>
+  </div>
+</div>
+<br>
+<div class="link">
+  <%= link_to 'モデル一覧へ戻る', application_models_path %>
+  <%= link_to 'トップページへへ戻る', root_path %>
+</div>
 <%# そのほかメモ
 この後の追加実装予定
 ・Rspecのオプションに対するテストコード。まだ種類が少なく対応力に難あり。

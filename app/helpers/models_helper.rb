@@ -5,6 +5,7 @@ module ModelsHelper
     
     migration_html = ''
     validation_html = ''
+    factorybot_html = ''
     presence_true = []
     presence_false = []
     boolean_group = []
@@ -37,6 +38,9 @@ module ModelsHelper
       # RSpecのための配列を作成します
       make_group_exist(model, column, abnormal_groups, normal_groups)
       make_group_options(model, column, abnormal_groups)
+
+      # FactoryBotのためのHTMLを作成します。
+      factorybot_html += make_factorybot_html(column)
     end
     # ここまでで作られた配列を基に、グループを追加する。
     make_group_references(references_group, model, abnormal_groups)
@@ -74,7 +78,8 @@ module ModelsHelper
       belongs_to_html: belongs_to_html,
       activehash_html: activehash_html,
       normal_example_html: normal_example_html,
-      abnormal_example_html: abnormal_example_html
+      abnormal_example_html: abnormal_example_html,
+      factorybot_html: factorybot_html
     }
   end
 
@@ -417,6 +422,79 @@ module ModelsHelper
     end
   end
 
+  # FactoryBotで使用するFaker及びGimeiのHTMLを作成するメソッド
+  def make_factorybot_html(column)
+    html = "#{insert_space(4)}#{column.name} { "
+    case column.data_type_id
+    when 1 # 'string'
+      if column.options.exists?
+        column.options.each do |option|
+          case option.option_type.info
+          when '漢字かなカナで登録可'
+            html += 'Gimei.kanji }'
+          when 'ひらがなのみで登録可'
+            html += 'Gimei.hiragana }'
+          when 'カタカナのみで登録可'
+            html += 'Gimei.katakana }'
+          when '郵便番号形式で登録可'
+            html += "'123-4567'}"
+          end
+        end
+      else
+        html += 'Faker::Lorem.characters(number: 10) }'
+      end
+    when 2 # 'text'
+      html += 'Faker::Lorem.sentence }'
+    when 3 #'integer'
+      if column.options.exists?
+        column.options.each do |option|
+          case option.data_type.info
+          when '数値のみで登録する'
+            html += 'Faker::Number(digits: 8) }'
+          when '上限下限を設定する'
+            html += 'Faker::Number.within(range: '
+            html += option.input2 if option.input2 != nil
+            html += '..'
+            html += option.input1 if option.input1 != nil
+            html += ') }'
+          when '上限のみを設定する'
+            html += 'Faker::Number.within(range: '
+            html += '0..'
+            html += option.input1 if option.input1 != nil
+            html += ') }'
+          when '下限のみを設定する'
+            html += 'Faker::Number.within(range: '
+            html += option.input2 if option.input2 != nil
+            html += '..10000000'
+            html += ') }'
+          when '未選択状態での禁止'
+            html += 'Faker::Number.non_zero_digit }'
+          else
+            html += 'Faker::Number(digits: 8) }'
+          end
+        end
+      else
+        html += 'Faker::Number(digits: 8) }'
+      end
+    when 4, 5 # 'decimal', 'float'
+      html += 'Faker::Number.decimal(l_digits: 3, r_digits: 3) }'
+    when 6 # 'date'
+      html += 'Faker::Date.between(from: 50.years.ago, to: Date.today) }'
+    when 7 # 'time'
+      html += 'Faker::Time.between(DateTime.now - 1, DateTime.now).strftime("%H:%M:%S") }'
+    when 8 # 'datetime'
+      html += 'Faker::Time.between(DateTime.now - 1, DateTime.now) }'
+    when 11 # 'boolean'
+      html += 'Faker::Boolean.boolean }'
+    when 12, 13 # 'references', 'ActiveHash'
+      html += 'Faker::Number.non_zero_digit }'
+    end
+    html += '<br>'
+    return html
+  end
+
+
+  # 動作確認をするために作成したメソッド。最終的には削除する
   def test(model, gemfile)
     normal_groups = []
     abnormal_groups = []
@@ -440,9 +518,12 @@ module ModelsHelper
       puts "-----------"
     end
   end
+
+
 end
 
-  
+
+
 
 # メモ
 devise_abnormal_group = [
