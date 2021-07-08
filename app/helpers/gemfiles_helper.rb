@@ -32,5 +32,21 @@ module GemfilesHelper
     end
   end
     
+  def make_japanise_html(models)
+    html = ''
+    models.each do |model|
+      html += "#{insert_space(6)}#{model.name}:"
+      html += '<br>'
+      model.columns.each do |column|
+        if column.name_ja != ''
+          html += "#{insert_space(8)}#{column.name}: #{column.name_ja}"
+        else
+          html += "#{insert_space(8)}#{column.name}: #{column.name}"
+        end
+        html += '<br>'
+      end
+    end
+    return html
+  end
 
 end

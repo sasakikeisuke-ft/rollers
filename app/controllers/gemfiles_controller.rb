@@ -29,8 +29,8 @@ class GemfilesController < ApplicationController
   end
 
   def show
-    @application = Application.find(params[:id])
-    @models = Model.where(application_id: params[:id]).includes(columns: :options)
+    @application = Application.includes(models: :columns).find(params[:id])
+    @models = @application.models
     @columns = Column.where(application_id: @application)
   end
 

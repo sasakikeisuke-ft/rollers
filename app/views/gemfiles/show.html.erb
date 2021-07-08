@@ -99,6 +99,32 @@
   </div>
 </div> <%# /read_me %>
 
+<div class="terminal-field">
+  <p>ターミナル：対象ファイルの作成</p>
+  <p>touch config/locals/ja.yml</p>
+</div>
+<div class="terminal-field">
+  <p>ターミナル：対象ファイルへのジャンプ</p>
+  <p>code config/locals/ja.yml</p>
+</div>
+<div class="code-field">
+ja:<br>
+<%== insert_space(2) %>activerecord:<br>
+<%== insert_space(4) %>attributes:<br>
+<%# ヘルパーメソッドを使用し、各モデルごとに必要なHTMLを作成 %>
+<%== make_japanise_html(@models) %>
+<br>
+<br><br>
+      user:
+        nickname: ニックネーム
+      application:
+        name: アプリケーション名
+        description: 概要
+      # model名:
+      #   カラム名: 翻訳＝表示文字列
+
+</div>
+
 <%= link_to 'アプリケーション詳細ページへ戻る', application_path(@application) %><br>
 <%= link_to 'トップページに戻る', root_path %>
 
