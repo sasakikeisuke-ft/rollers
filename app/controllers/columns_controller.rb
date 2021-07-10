@@ -1,5 +1,5 @@
 class ColumnsController < ApplicationController
-  before_action :related_models, only: [:new, :edit]
+  before_action :show_index, only: [:new, :edit]
   before_action :find_column, only: [:edit, :update, :destroy]
 
   def new
@@ -11,7 +11,7 @@ class ColumnsController < ApplicationController
     if @column.save
       redirect_to new_application_model_column_option_path(params[:application_id], params[:model_id], @column)
     else
-      related_models
+      show_index
       render :new
     end
   end
@@ -26,7 +26,7 @@ class ColumnsController < ApplicationController
       end
       redirect_to new_application_model_column_option_path(column_id: @column)
     else
-      related_models
+      show_index
       render :edit
     end
   end
@@ -38,7 +38,7 @@ class ColumnsController < ApplicationController
   end
 
   private
-  def related_models
+  def show_index
     @application = Application.find(params[:application_id])
     @models = Model.includes(columns: :options).where(application_id: @application)
     @model = @models.find(params[:model_id])

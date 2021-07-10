@@ -1,0 +1,55 @@
+<%= form_with(model: [application, model, column], local: true) do |f| %>
+  <%= render 'shared/error_messages', model: f.object %>
+
+  <div class="field">
+    <%= f.label :name, 'カラム名' %>
+    <%= f.text_field :name, autofocus: true, placeholder: 'nickname' %><br>
+    保存するカラムの名前を設定します。
+  </div>
+  <br>
+  <% if @application.gemfile.rails_i18n %>
+    <div class="field">
+      <%= f.label :name_ja, '日本語表記' %>
+      <%= f.text_field :name_ja, placeholder: 'ニックネーム' %><br>
+      エラー文を翻訳する際の表示を設定します。
+    </div>
+  <% end %>
+  <br>
+  <br>
+  <div class="field">
+    <div class="info">
+      以下よりカラムのデータ型を選択してください
+    </div>
+    <div class="letter-field">
+      <p><%= f.radio_button :data_type_id, 1 %><%= DataType.find(1)[:type] %>型</p>  
+      <p><%= f.radio_button :data_type_id, 2 %><%= DataType.find(2)[:type] %>型</p>
+    </div>
+    <div class="number-field">
+      <p><%= f.radio_button :data_type_id, 3 %><%= DataType.find(3)[:type] %>型</p>  
+      <p><%= f.radio_button :data_type_id, 4 %><%= DataType.find(4)[:type] %>型</p>
+      <p><%= f.radio_button :data_type_id, 5 %><%= DataType.find(5)[:type] %>型</p>
+    </div>
+    <div class="date-field">
+      <p><%= f.radio_button :data_type_id, 6 %><%= DataType.find(6)[:type] %>型</p>  
+      <p><%= f.radio_button :data_type_id, 7 %><%= DataType.find(7)[:type] %>型</p>
+      <p><%= f.radio_button :data_type_id, 8 %><%= DataType.find(8)[:type] %>型</p>
+    </div>
+    <div class="boolean-field">
+      <p><%= f.radio_button :data_type_id, 11 %><%= DataType.find(11)[:type] %>型</p>  
+    </div>
+  </div>
+
+  <div class="field">
+    <%= f.check_box :must_exist ,{}, true, false %>
+    <%= f.label :must_exist, '空欄を禁止する。' %>
+  </div>
+
+  <div class="field">
+    <%= f.check_box :unique ,{}, true, false %>
+    <%= f.label :unique, 'テーブル内での重複を禁止する' %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "オプション設定へ" %>
+  </div>
+<% end %>
