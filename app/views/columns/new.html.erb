@@ -1,9 +1,8 @@
-<h1>新規カラム登録</h1>
 <% if [1, 5].include?(@model.model_type_id) %>
   <%= render partial: "shared/related_models", locals: {model: @model} %>
   <br>
   
-  
+  <h1>新規カラム登録</h1>
   <div>
     先程作成した上記モデルのカラムを作成していきます。<br>
     保存する際にnull: falseを適応する場合は、空欄禁止にチェックしてください。<br>

@@ -80,6 +80,21 @@
     </div>
   <% end %>
 
+
+  <p>選んだオプションに必要な情報があれば、下のフォームに入力してください。</p>
+  <div class="field">
+    <%= f.label :input1, '入力1' %>
+    <%= f.text_field :input1, placeholder: 'user_idなど' %><br>
+    上限または重複禁止の範囲対象となるmodel_idを入力してください。
+  </div>
+  <br>
+  <div class="field">
+    <%= f.label :input2, '入力2' %>
+    <%= f.text_field :input2, placeholder: 'user_idなど' %><br>
+    下限または重複禁止の範囲における追加対象となるmodel_idを入力してください。<br>
+    三つ目以降の重複禁止対象はご自身での記載をお願いします。
+  </div>
+
   <div class="actions">
     <%= f.submit "追加" %>
   </div>

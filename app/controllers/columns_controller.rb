@@ -40,7 +40,7 @@ class ColumnsController < ApplicationController
   private
   def related_models
     @application = Application.find(params[:application_id])
-    @models = Model.where(application_id: @application).includes(columns: :options)
+    @models = Model.includes(columns: :options).where(application_id: @application)
     @model = @models.find(params[:model_id])
     redirect_to new_user_session_path if @application.user_id != current_user.id
   end

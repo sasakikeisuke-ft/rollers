@@ -1,10 +1,9 @@
-<h1>カラム編集</h1>
 <% if ![2, 3, 4].include?(@model.model_type_id) %>
   <%= render partial: "shared/related_models", locals: {model: @model} %>
   <br>
-  
-  <h3>対象カラム：<%= @column.name %></h4>
 
+  <h1>カラム編集</h1>
+  <h3>対象カラム：<%= @column.name %></h3>
   <div>
     カラムを編集すると、オプションは初期化されます。<br>
     オプションの再設定も引き続き行ってください。<br>
