@@ -10,6 +10,7 @@ module ModelsHelper
     presence_false = []
     boolean_group = []
     references_group = []
+    valid_regerences_group = []
     activehash_group = []
     normal_groups = []
     abnormal_groups = []
@@ -27,12 +28,17 @@ module ModelsHelper
         content[:options] = make_options_html(column, gemfile.rails_i18n)
         presence_true << content if column.must_exist
         presence_false << content if !column.must_exist && content[:options] != ''
-      # 処理内容を別にしたいカラムは、それぞれ専用の配列へ追加します。
       else
-        content[:options] = ''
-        boolean_group << content if column.data_type_id == 11
-        references_group << content if column.data_type_id == 12
-        activehash_group << content if column.data_type_id == 13
+        content[:options] = make_options_html(column, gemfile.rails_i18n)
+        case column.data_type_id
+        when 11
+          boolean_group << content
+        when 12
+          references_group << content
+          valid_regerences_group << content if content[:options] != ''
+        when 13
+          activehash_group << content
+        end
       end
       
       # RSpecのための配列を作成します
@@ -42,7 +48,7 @@ module ModelsHelper
       # FactoryBotのためのHTMLを作成します。
       factorybot_html += make_factorybot_html(column)
     end
-    # ここまでで作られた配列を基に、グループを追加する。
+    # ここまでで作られた配列を基に、RSpecのグループへさらに追加する。
     make_group_references(references_group, model, abnormal_groups)
     make_activehash_example_html(activehash_group, model, abnormal_groups)
     #/ ここまでで配列が完成しました。
@@ -54,7 +60,6 @@ module ModelsHelper
     common = 'inclusion: { in: [true, false] }'
     validation_html += make_validation_html(boolean_group, common)
 
-    
     common = 'numericality: { other_than: 0, message: "'
     common += "can't be blank"
     common += '"}'
@@ -62,6 +67,7 @@ module ModelsHelper
 
     common = ''
     validation_html += make_validation_html(presence_false, common)
+    validation_html += make_validation_html(valid_regerences_group, common)
 
     # アソシエーションのbelongs_toに関する記載を行います。
     belongs_to_html = make_belong(references_group, insert_space(2), false)
@@ -112,7 +118,7 @@ module ModelsHelper
     column.options.each do |option|
       
       # ActiveHash app/models/option_type.rbのデータを使用しています。
-      if option.option_type_id <= 20 || option.option_type_id >= 41
+      if option.option_type.type == 'format'
         html += option.option_type.code
 
       # オプションがnumericalityの場合は特別処理を行います。
@@ -126,9 +132,10 @@ module ModelsHelper
           html += "'is invalid. Input harf-width numbers' },<br>"
         end
         html += insert_space(14)
-        if [21, 25].include?(option.option_type_id)
+        case option.option_type.info
+        when '数値のみで登録する', '未選択状態での禁止'
           html += option.option_type.code
-        elsif option.option_type.info == '上限下限を設定する'
+        when '上限下限を設定する'
           html += 'numericality: {greater_than_or_equal_to: '
           html += option.input1 if option.input1 != nil
           html += '数値' if option.input1 == nil
@@ -136,28 +143,32 @@ module ModelsHelper
           html += option.input2 if option.input2 != nil
           html += '数値' if option.input2 == nil
           html += ', message: '
-        elsif option.option_type.info == '上限のみを設定する'
+        when '上限のみを設定する'
           html += 'numericality: {less_than_or_equal_to: '
           html += option.input1 if option.input1 != nil
           html += '数値' if option.input1 == nil
           html += ', message: '
-        elsif option.option_type.info == '上限下限を設定する'
+        when '上限下限を設定する'
           html += 'numericality: {greater_than_or_equal_to: '
           html += option.input2 if option.input2 != nil
           html += '数値' if option.input2 == nil
           html += ', message: '
         end
+      elsif option.option_type.type == 'uniqueness'
+        html += "#{option.option_type.code}#{option.input1}"
+        html += ", :#{option.input2}" if option.option_type.info == '複数のモデルでの重複禁止'
+        html += ', message: '
       end
 
       # エラーメッセージを追加します
       html += '"'
       html += make_message_html(option, japanese)
-      html += '"}'
+      html += '" }'
     end
     return html
   end
 
-  # エラー文日本語化を設定しているかどうかで、エラー文を選択します。
+  # エラー文日本語化を設定しているかどうかで、エラー文を選択するメソッド。
   def make_message_html(option, japanese)
     if japanese
       html = option.option_type.message_ja
@@ -434,6 +445,8 @@ module ModelsHelper
             html += 'Gimei.katakana }'
           when '郵便番号形式で登録可'
             html += "'123-4567'}"
+          when '対象モデル内での重複禁止', '複数のモデルでの重複禁止'
+            unique_count = true
           end
         end
       else
