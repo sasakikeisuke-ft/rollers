@@ -1,345 +1,377 @@
-<% contents_html = make_contents_html(@model, @gemfile) %>
-<h1><%= @model.name %>モデル機能の作成 </h1>
-<br>
-<div>
-  <% if @model.model_type_id != 5 %>
-    それでは<%= @model.name %>のファイルを作成します。
-
-    <div class="terminal-field">
-      <p>ターミナル：関連ファイルの作成</p>
-      <p>rails g model <%= @model.name %></p>
-    </div>
-    <p>ターミナルに表示されているマイグレーションファイルを対象に行います。</p>
-    <div class="terminal-field">
-      <p>ターミナル：対象ファイルへジャンプ</p>
-      <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
-    </div>
-  <% else %>
-    Deviseを用いた<%= @model.name %>を作成します。
-    <div class="terminal-field">
-      <p>ターミナル</p>
-      <p>rails g devise:install</p>
-      <p>rails g devise:views</p>
-      <p>rails g devise <%= @model.name %></p>
-    </div>
-    <div class="terminal-field">
-      <p>ターミナルに表示されているマイグレーションファイルを対象に行います。</p>
-      <p>ターミナル：対象ファイルへジャンプ</p>
-      <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
-    </div>
-  <% end %>
-</div>
-<br><br>
-<%# 対象モデルのマイグレーションファイル、モデルファイル、Rspecファイルを記載する。%>
-<h2><%= @model.name.tableize %>テーブルのマイグレーションファイルの編集</h2>
-<% if @model.model_type.name == '通常モデル' || @model.model_type.name == '中間テーブル' %>
-  <div class="migration_file">
-    <div class="target">
-      ファイル：20XXXX...._devise_create_<%= @model.name %>
-    </div>
-    <br>
-    <div class="code-field">
-      class Create<%= @model.name.pluralize.camelize %> < ActiveRecord::Migration[6.0]<br>
-      <%= insert_space(2) %>def chande<br>
-      <%= insert_space(4) %>create_table :<%= @model.name.tableize %> do |t|<br>
-      
-      <%# ヘルパーメソッドより作成 %>
-      <%== contents_html[:migration_html] %>
-
-      <%# ここからは固定のtimestamps以下 %>
-      <%= insert_space(6) %>t.timestamps<br>
-      <%= insert_space(4) %>end<br>
-      <%= insert_space(2) %>end<br>
-      end<br>
-    </div>
-  </div>
-<% elsif @model.model_type.name == 'devise' %>
-  <%== contents_html[:migration_html] %>
-  上記を必要な箇所に挿入<br>
-<% end %>
-
-<div class="terminal-field">
-  <p>ターミナル：マイグレーションの実行</p>
-  <p>rails db:migrate </p>
-</div>
-<%# ここからモデルのコードを表示する %>
-<h2><%= @model.name.classify %>モデルのモデルファイルの編集</h2>
-<div class="terminal-field">
-  ターミナル：対象ファイルへジャンプ<br>
-  code app/models/<%= @model.name %>.rb
-</div>
-<br>
-
-
-<div class="code-field">
-  class <%= @model.name.classify %> < ApplicationRecord<br>
-  
-  <%# Deviseのみ対象の専用記述 %>
-  <% if @model.model_type_id == 5 %>
-    <%= insert_space(2) %># Include default devise modules. Others available are:<br>
-    <%= insert_space(2) %># :confirmable, :lockable, :timeoutable, :trackable and :omniauthable<br>
-    <%= insert_space(2) %>devise :database_authenticatable, :registerable,<br>
-    <%= insert_space(9) %>:recoverable, :rememberable, :validatable<br>
-    <br>
-    # パスワードを英数字混合に制限します。不要であれば削除してください。<br>
-    <%= insert_space(2) %>PASSWORD_REGEX = /\A(?=.*?[a-z])(?=.*?\d)[a-z\d]+\z/i.freeze<br>
-    <%= insert_space(2) %>validates_format_of :password, with: PASSWORD_REGEX, message: 
-    <%= "'は英字と数字の両方を含む必要があります'" if @gemfile.rails_i18n %>
-    <%= "'should contain both letters and numbers.'" unless @gemfile.rails_i18n %>
-    <br><br>
-  <% end %>
-  <%#/ Deviseのみ対象の専用記述 %>
-
-  <%# バリデーションに関する記述 %>
-  <div class="validation">
-    <%# ヘルパーメソッドによりバリデーションに関するHTMLを作成 %>
-    <%== contents_html[:validation_html] %>
-  </div>
-  <div class="association">
-    <%# ヘルパーメソッドによりbelongs_toに関連するHTMLを作成 %>
-    <%==contents_html[:belongs_to_html] %>
-
-    <%# ヘルパーメソッドによりhasのアソシエーションに関するHTMLを作成 %>
-    <%== make_has(@columns, @model) %>
-
-    <%# ImageMagickを使用する場合のアソシエーションを記載 %>
-    <% if @model.attached_image %>
-      <%== insert_space(2) %>has_one_attached :image<br>
-    <% end %>
-    
-    <%# ActiveHashに関するアソシエーションをヘルパーメソッドにより作成 %>
-    <%== contents_html[:activehash_html] %>
-
-  end<br>
-  </div> <%#/association %>
-</div><%#/ code-field モデルファイルの記載の終了 %>
-<br>
-<br>
-<%# RSpec関連ファイルの記載開始 %>
-<h2><%= @model.name.classify %>モデルのRSpecの編集</h2>
-
-<div class="terminal-field">
-  <p>ターミナル：関連ファイルの作成</p>
-  <p>rails g rspec:model <%= @model.name %> </p>
-</div>
-<div class="terminal-field">
-  <p>ターミナル：対象ファイルへジャンプ</p>
-  <p>code spec/models/<%= @model.name %>_spec.rb </p>
-</div>
-
-<div class="code-field">
-  require 'rails_helper'<br>
-  RSpec.describe <%= @model.name.classify %>, type: :model do<br>
-  <%# FactoryBotを使用 %>
-  <%== insert_space(2) %>before do<br>
-  <%== insert_space(4) %>@<%= @model.name %> = FactoryBot.build(:<%= @model.name %>)<br>
-  <%== insert_space(4) %>sleep 0.1 # エラーを防ぐために休止時間を入れています。不要なら削除してください。<br>
-  <%== insert_space(2) %>end<br>
+<% if @model.model_type_id != 2 %><%# ActiveHashの場合は別処理を行う %>
+  <% contents_html = make_contents_html(@model, @gemfile) %>
+  <h1><%= @model.name %>モデル機能の作成 </h1>
   <br>
-  <%# テストコードの記載 %>
-  <%== insert_space(2) %>describe '<%= @model.name.classify %>モデルの登録機能' do<br>
-  <%# 正常系の記載 %>
-  <%== insert_space(4) %>context '入力内容が適切であれば登録できる' do<br>
-  <%== insert_space(6) %>it '入力内容が全て適切であれば登録できる' do<br>
-  <%== insert_space(8) %>expect(@<%= @model.name %>).to be_valid<br>
-  <%== insert_space(6) %>end<br>
-  
-  <%# ヘルパーメソッドにより正常系のテスト内容を記載 %>
-  <%== contents_html[:normal_example_html] %>
-  
-  <% if @model.model_type_id == 5 %>
-    <%== insert_space(6) %>it 'passwordが英数字混合の6文字であれば登録できる' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password = 'a12345'<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = @<%= @model.name %>.password<br>
+  <div>
+    <% if @model.model_type_id == 1 %>
+      <%= @model.name %>の関連ファイルを作成します。
+
+      <div class="terminal-field">
+        <p>ターミナル：関連ファイルの作成</p>
+        <p>rails g model <%= @model.name %></p>
+      </div>
+      <p>ターミナルに表示されているマイグレーションファイルを対象に行います。</p>
+      <div class="terminal-field">
+        <p>ターミナル：対象ファイルへジャンプ</p>
+        <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
+      </div>
+    <% else %>
+      Deviseを用いた<%= @model.name %>を作成します。
+      <div class="terminal-field">
+        <p>ターミナル</p>
+        <p>rails g devise:install</p>
+        <p>rails g devise:views</p>
+        <p>rails g devise <%= @model.name %></p>
+      </div>
+      <div class="terminal-field">
+        <p>ターミナルに表示されているマイグレーションファイルを対象に行います。</p>
+        <p>ターミナル：対象ファイルへジャンプ</p>
+        <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
+      </div>
+    <% end %>
+  </div>
+  <br>
+  <%# 対象モデルのマイグレーションファイル、モデルファイル、Rspecファイルを記載する。%>
+  <h2><%= @model.name.tableize %>テーブルのマイグレーションファイルの編集</h2>
+  <% if @model.model_type.name == '通常モデル' || @model.model_type.name == '中間テーブル' %>
+    <div class="migration_file">
+      <div class="target">
+        ファイル：20XXXX...._devise_create_<%= @model.name %>
+      </div>
+      <br>
+      <div class="code-field">
+        class Create<%= @model.name.pluralize.camelize %> < ActiveRecord::Migration[6.0]<br>
+        <%= insert_space(2) %>def chande<br>
+        <%= insert_space(4) %>create_table :<%= @model.name.tableize %> do |t|<br>
+        
+        <%# ヘルパーメソッドより作成 %>
+        <%== contents_html[:migration_html] %>
+
+        <%# ここからは固定のtimestamps以下 %>
+        <%= insert_space(6) %>t.timestamps<br>
+        <%= insert_space(4) %>end<br>
+        <%= insert_space(2) %>end<br>
+        end<br>
+      </div>
+    </div>
+    <div class="terminal-field">
+      <p>ターミナル：マイグレーションの実行</p>
+      <p>rails db:migrate </p>
+    </div>
+
+  <% elsif @model.model_type.name == 'ActiveHash' %>
+    <p><%= @model.name %>はActiveHashのため、マイグレーションは不要です。</p>
+
+  <% elsif @model.model_type.name == 'devise' %>
+    <%== contents_html[:migration_html] %>
+    上記を必要な箇所に挿入<br>
+    <div class="terminal-field">
+      <p>ターミナル：マイグレーションの実行</p>
+      <p>rails db:migrate </p>
+    </div>
+  <% end %>
+
+  <%# ここからモデルのコードを表示する %>
+  <h2><%= @model.name.classify %>モデルのモデルファイルの編集</h2>
+  <div class="terminal-field">
+    ターミナル：対象ファイルへジャンプ<br>
+    code app/models/<%= @model.name %>.rb
+  </div>
+  <br>
+
+  <div class="code-field">
+    class <%= @model.name.classify %> < ApplicationRecord<br>
+    <%# Deviseのみ対象の専用記述 %>
+    <% if @model.model_type_id == 5 %>
+      <%= insert_space(2) %># Include default devise modules. Others available are:<br>
+      <%= insert_space(2) %># :confirmable, :lockable, :timeoutable, :trackable and :omniauthable<br>
+      <%= insert_space(2) %>devise :database_authenticatable, :registerable,<br>
+      <%= insert_space(9) %>:recoverable, :rememberable, :validatable<br>
+      <br>
+      # パスワードを英数字混合に制限します。不要であれば削除してください。<br>
+      <%= insert_space(2) %>PASSWORD_REGEX = /\A(?=.*?[a-z])(?=.*?\d)[a-z\d]+\z/i.freeze<br>
+      <%= insert_space(2) %>validates_format_of :password, with: PASSWORD_REGEX, message: 
+      <%= "'は英字と数字の両方を含む必要があります'" if @gemfile.rails_i18n %>
+      <%= "'should contain both letters and numbers.'" unless @gemfile.rails_i18n %>
+      <br><br>
+    <% end %>
+    <%#/ Deviseのみ対象の専用記述 %>
+
+    <%# バリデーションに関する記述 %>
+    <div class="validation">
+      <%# ヘルパーメソッドによりバリデーションに関するHTMLを作成 %>
+      <%== contents_html[:validation_html] %>
+    </div>
+    <div class="association">
+      <%# ヘルパーメソッドによりbelongs_toに関連するHTMLを作成 %>
+      <%==contents_html[:belongs_to_html] %>
+
+      <%# ヘルパーメソッドによりhasのアソシエーションに関するHTMLを作成 %>
+      <%== make_has(@columns, @model) %>
+
+      <%# ImageMagickを使用する場合のアソシエーションを記載 %>
+      <% if @model.attached_image %>
+        <%== insert_space(2) %>has_one_attached :image<br>
+      <% end %>
+      
+      <%# ActiveHashに関するアソシエーションをヘルパーメソッドにより作成 %>
+      <%== contents_html[:activehash_html] %>
+
+    end<br>
+    </div> <%#/association %>
+  </div><%#/ code-field モデルファイルの記載の終了 %>
+  <br>
+  <br>
+  <%# RSpec関連ファイルの記載開始 %>
+  <h2><%= @model.name.classify %>モデルのRSpecの編集</h2>
+
+  <div class="terminal-field">
+    <p>ターミナル：関連ファイルの作成</p>
+    <p>rails g rspec:model <%= @model.name %> </p>
+  </div>
+  <div class="terminal-field">
+    <p>ターミナル：対象ファイルへジャンプ</p>
+    <p>code spec/models/<%= @model.name %>_spec.rb </p>
+  </div>
+
+  <div class="code-field">
+    require 'rails_helper'<br>
+    RSpec.describe <%= @model.name.classify %>, type: :model do<br>
+    <%# FactoryBotを使用 %>
+    <%== insert_space(2) %>before do<br>
+    <%== insert_space(4) %>@<%= @model.name %> = FactoryBot.build(:<%= @model.name %>)<br>
+    <%== insert_space(4) %>sleep 0.1 # エラーを防ぐために休止時間を入れています。不要なら削除してください。<br>
+    <%== insert_space(2) %>end<br>
+    <br>
+    <%# テストコードの記載 %>
+    <%== insert_space(2) %>describe '<%= @model.name.classify %>モデルの登録機能' do<br>
+    <%# 正常系の記載 %>
+    <%== insert_space(4) %>context '入力内容が適切であれば登録できる' do<br>
+    <%== insert_space(6) %>it '入力内容が全て適切であれば登録できる' do<br>
     <%== insert_space(8) %>expect(@<%= @model.name %>).to be_valid<br>
     <%== insert_space(6) %>end<br>
-  <% end %>
-  <%== insert_space(4) %>end<br>
-  <%# 正常系の記載終了 %>
-  <br>
-  <%# 異常系の記載 %>
-  <%== insert_space(4) %>context '不適切な内容があり登録できない' do<br>
-
-  <%# ヘルパーメソッドにより異常系のテスト内容を記載 %>
-  <%== contents_html[:abnormal_example_html] %>
-
-  <% if @model.model_type_id == 5 %><%# エラー文：日本語 未完成につき注意 %>
-    <%== insert_space(6) %>it 'emailが空欄だと登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.email = ''<br>
-    <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
-    <% if @gemfile.rails_i18n %>
-      include('Eメールを入力してください')
-    <% else %>
-      include('Email can't be blank')
-    <% end %><br>
-    <%== insert_space(6) %>end<br>
-    <%== insert_space(6) %>it 'emailに@が含まれていない場合、登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.email = 'abcdefgh'<br>
-    <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
-    <% if @gemfile.rails_i18n %>
-      Eメール is invalid')
-    <% else %>
-      include('Email is invalid')
-    <% end %><br>
-    <%== insert_space(6) %>end<br>
-    <%== insert_space(6) %>it 'emailの重複があり登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.save<br>
-    <%== insert_space(8) %>another_<%= @model.name %> = FactoryBot.build(:<%= @model.name %>, email: @<%= @model.name %>.email)<br>
-    <%== insert_space(8) %>another_<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(another_<%= @model.name %>.errors.full_messages).to
-    <% if @gemfile.rails_i18n %>
-      include('Eメールはすでに存在します')
-    <% else %>
-      include('Email has already been taken')
-    <% end %>')<br>
-    <%== insert_space(6) %>end<br>
-    <%== insert_space(6) %>it 'passwordが空欄だと登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password = ''<br>
-    <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
-    <% if @gemfile.rails_i18n %>
-      include("パスワードを入力してください")
-    <% else %>
-      include("password can't be blank")
-    <% end %>')<br>
-    <%== insert_space(6) %>end<br>
-    <%== insert_space(6) %>it 'passwordとpassword_confirmationが不一致では登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password = 'abcdef'<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = 'ghijkl'<br>
-    <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
-    <% if @gemfile.rails_i18n %>
-      include('パスワード（確認用）とパスワードの入力が一致しません')
-    <% else %>
-      include("Password confirmation doesn't match password")
-    <% end %><br>
-    <%== insert_space(6) %>end<br>
-    <%== insert_space(6) %>it '5文字以下の場合、登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password = '1abcd'<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = @<%= @model.name %>.password<br>
-    <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
-    <% if @gemfile.rails_i18n %>
-      include(include('パスワードは6文字以上で入力してください')
-    <% else %>
-      include('password is too short (minimum is 6 characters)')
-    <% end %><br>
-    <%== insert_space(6) %>end<br>
-    <%== insert_space(6) %>it '全角文字では登録できない' do<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password = 'ひらがなカタカナ漢字'<br>
-    <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = @<%= @model.name %>.password<br>
-    <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
-    <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
-    <% if @gemfile.rails_i18n %>
-      include('パスワード is invalid. Include both letters and numbers')
-    <% else %>
-      include('password is invalid. Include both letters and numbers')
-    <% end %><br>
-    <%== insert_space(6) %>end<br>
-  <% end %>
-  <%# 異常系の記載終了 %>
-  <%== insert_space(4) %>end<br>
-  <%== insert_space(2) %>end<br>
-  end<br>
-</div>
-<br>
-<div class="terminal-field">
-  <p>ターミナル：対象ファイルへジャンプ</p>
-  <p>code spec/factories/<%= @model.name %>.rb</p>
-</div>
-<%# FactoryBotに関するコード %>
-<div class="code-field">
-  FactoryBot.define do<br>
-  <%== insert_space(2) %>factory :<%= @model.name %> do<br>
-  
-  <%# ヘルパーメソッドを使用し、FactoryBotのカラムに関するHTMLを作成する %>
-  <%== contents_html[:factorybot_html] %>
-  
-  <% if @model.model_type_id == 5 %>
-    <%== insert_space(4) %>email {Faker::Internet.free_email}<br>
-    <%== insert_space(4) %>password {Faker::Internet.password(min_length: 6)}<br>
-    <%== insert_space(4) %>password_confirmation {password}<br>
-  <% end %>
-
-  <%# ヘルパーメソッドを使用し、FactoryBotのアソシエーションに関するHTMLを作成する %>
-  <%== contents_html[:association_html] %>
-
-  <% if @model.attached_image %>
-    <br>
-    <%== insert_space(4) %>after(:build) do |target|<br>
-    <%== insert_space(6) %>target.image.attach(io: File.open('public/images/test_image.png'), filename: 'test_image.png')
+    
+    <%# ヘルパーメソッドにより正常系のテスト内容を記載 %>
+    <%== contents_html[:normal_example_html] %>
+    
+    <% if @model.model_type_id == 5 %>
+      <%== insert_space(6) %>it 'passwordが英数字混合の6文字であれば登録できる' do<br>
+      <%== insert_space(8) %>@<%= @model.name %>.password = 'a12345'<br>
+      <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = @<%= @model.name %>.password<br>
+      <%== insert_space(8) %>expect(@<%= @model.name %>).to be_valid<br>
+      <%== insert_space(6) %>end<br>
+    <% end %>
     <%== insert_space(4) %>end<br>
-    # public/imagesのディレクトリを作成し、test_image.pngと名付けた画像ファイルを用意してください。
-  <% end %>
-  <%== insert_space(2) %>end<br>
-  end<br>
-</div><%# code-field %>
-<br>
-<div>
-  上記FactoryBotに関するコードは編集が必要な場合があります。<br>
-  その場合は以下のサンプルコードを参考に編集をお願いします。
-</div>
-<div class="sample-code">
-  <div class="left">
-    <p>
-      名前<br>
-      email<br>
-      パスワード：基本<br>
-      パスワード：英数字混合<br>
-      パスワード：再入力<br>
-      文章<br>
-      文字（10文字）<br>
-      数字（300〜9,999,999）<br>
-      人：苗字漢字<br>
-      人：名前漢字<br>
-      人：苗字カナ<br>
-      人：名前カナ<br>
-      人：生年月日<br>
-      住所：郵便番号<br>
-      住所：都道府県(ActiveHash)<br>
-      住所：市区町村<br>
-      住所：番地<br>
-      住所：建物名<br>
-      電話番号<br>
-      id<br>
-      トークン<br>
-    </p>
+    <%# 正常系の記載終了 %>
+    <br>
+    <%# 異常系の記載 %>
+    <%== insert_space(4) %>context '不適切な内容があり登録できない' do<br>
+
+    <%# ヘルパーメソッドにより異常系のテスト内容を記載 %>
+    <%== contents_html[:abnormal_example_html] %>
+
+    <% if @model.model_type_id == 5 %><%# エラー文：日本語 未完成につき注意 %>
+      <%== insert_space(6) %>it 'emailが空欄だと登録できない' do<br>
+      <%== insert_space(8) %>@<%= @model.name %>.email = ''<br>
+      <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
+      <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
+      <% if @gemfile.rails_i18n %>
+        include('Eメールを入力してください')
+      <% else %>
+        include('Email can't be blank')
+      <% end %><br>
+      <%== insert_space(6) %>end<br>
+      <%== insert_space(6) %>it 'emailに@が含まれていない場合、登録できない' do<br>
+      <%== insert_space(8) %>@<%= @model.name %>.email = 'abcdefgh'<br>
+      <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
+      <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
+      <% if @gemfile.rails_i18n %>
+        Eメール is invalid')
+      <% else %>
+        include('Email is invalid')
+      <% end %><br>
+      <%== insert_space(6) %>end<br>
+      <%== insert_space(6) %>it 'emailの重複があり登録できない' do<br>
+      <%== insert_space(8) %>@<%= @model.name %>.save<br>
+      <%== insert_space(8) %>another_<%= @model.name %> = FactoryBot.build(:<%= @model.name %>, email: @<%= @model.name %>.email)<br>
+      <%== insert_space(8) %>another_<%= @model.name %>.valid?<br>
+      <%== insert_space(8) %>expect(another_<%= @model.name %>.errors.full_messages).to
+      <% if @gemfile.rails_i18n %>
+        include('Eメールはすでに存在します')
+      <% else %>
+        include('Email has already been taken')
+      <% end %>')<br>
+      <%== insert_space(6) %>end<br>
+      <%== insert_space(6) %>it 'passwordが空欄だと登録できない' do<br>
+      <%== insert_space(8) %>@<%= @model.name %>.password = ''<br>
+      <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
+      <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
+      <% if @gemfile.rails_i18n %>
+        include("パスワードを入力してください")
+      <% else %>
+        include("password can't be blank")
+      <% end %>')<br>
+      <%== insert_space(6) %>end<br>
+      <%== insert_space(6) %>it 'passwordとpassword_confirmationが不一致では登録できない' do<br>
+      <%== insert_space(8) %>@<%= @model.name %>.password = 'abcdef'<br>
+      <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = 'ghijkl'<br>
+      <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
+      <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
+      <% if @gemfile.rails_i18n %>
+        include('パスワード（確認用）とパスワードの入力が一致しません')
+      <% else %>
+        include("Password confirmation doesn't match password")
+      <% end %><br>
+      <%== insert_space(6) %>end<br>
+      <%== insert_space(6) %>it '5文字以下の場合、登録できない' do<br>
+      <%== insert_space(8) %>@<%= @model.name %>.password = '1abcd'<br>
+      <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = @<%= @model.name %>.password<br>
+      <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
+      <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
+      <% if @gemfile.rails_i18n %>
+        include(include('パスワードは6文字以上で入力してください')
+      <% else %>
+        include('password is too short (minimum is 6 characters)')
+      <% end %><br>
+      <%== insert_space(6) %>end<br>
+      <%== insert_space(6) %>it '全角文字では登録できない' do<br>
+      <%== insert_space(8) %>@<%= @model.name %>.password = 'ひらがなカタカナ漢字'<br>
+      <%== insert_space(8) %>@<%= @model.name %>.password_confirmation = @<%= @model.name %>.password<br>
+      <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
+      <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
+      <% if @gemfile.rails_i18n %>
+        include('パスワード is invalid. Include both letters and numbers')
+      <% else %>
+        include('password is invalid. Include both letters and numbers')
+      <% end %><br>
+      <%== insert_space(6) %>end<br>
+    <% end %>
+    <%# 異常系の記載終了 %>
+    <%== insert_space(4) %>end<br>
+    <%== insert_space(2) %>end<br>
+    end<br>
   </div>
-  <div class="right">
-    <p>
-      name { Faker::Name.initials(number: 2) }<br>
-      email { Faker::Internet.free_email }<br>
-      password { Faker::Internet.password(min_length: 6) }<br>
-      password { 'a1' + Faker::Internet.password(min_length: 4) }<br>
-      password_confirmation { password }<br>
-      text { Faker::Lorem.sentence }<br>
-      characters { Faker::Lorem.characters(number: 10) }<br>
-      number { Faker::Number.within(range: 300..9_999_999) }<br>
-      last_name { Gimei.last.kanji }<br>
-      first_name { Gimei.first.kanji }<br>
-      last_name_kana { Gimei.last.katakana }<br>
-      first_name_kana { Gimei.first.katakana }<br>
-      birthday { Faker::Date.between(from: '1930-01-01', to: '2016-12-31') }<br>
-      postal_code { '123-4567' }<br>
-      prefecture_id { Faker::Number.within(range: 1..47) }<br>
-      city { Gimei.address.city.kanji }<br>
-      address { Gimei.address.town.kanji }<br>
-      building { '建物名' }<br>
-      phone_number { Faker::PhoneNumber.subscriber_number(length: 11) }<br>
-      order_id { Faker::Number.number(digits: 2) }<br>
-      token { 'tok_abcdefghijk00000000000000000' }<br>
-    </p>
+  <br>
+  <div class="terminal-field">
+    <p>ターミナル：対象ファイルへジャンプ</p>
+    <p>code spec/factories/<%= @model.name %>.rb</p>
   </div>
-</div>
-<div class="terminal-field">
-  <p>ターミナル：テストコードの実行</p>
-  <p>bundle exec rspec spec/models/<%= @model.name %>_spec.rb </p>
-</div>
-<div>
-<p>これでモデルに関するファイルの記述は終了です。</p>
-</div>
+  <%# FactoryBotに関するコード %>
+  <div class="code-field">
+    FactoryBot.define do<br>
+    <%== insert_space(2) %>factory :<%= @model.name %> do<br>
+    
+    <%# ヘルパーメソッドを使用し、FactoryBotのカラムに関するHTMLを作成する %>
+    <%== contents_html[:factorybot_html] %>
+    
+    <% if @model.model_type_id == 5 %>
+      <%== insert_space(4) %>email {Faker::Internet.free_email}<br>
+      <%== insert_space(4) %>password {Faker::Internet.password(min_length: 6)}<br>
+      <%== insert_space(4) %>password_confirmation {password}<br>
+    <% end %>
+
+    <%# ヘルパーメソッドを使用し、FactoryBotのアソシエーションに関するHTMLを作成する %>
+    <%== contents_html[:association_html] %>
+
+    <% if @model.attached_image %>
+      <br>
+      <%== insert_space(4) %>after(:build) do |target|<br>
+      <%== insert_space(6) %>target.image.attach(io: File.open('public/images/test_image.png'), filename: 'test_image.png')
+      <%== insert_space(4) %>end<br>
+      # public/imagesのディレクトリを作成し、test_image.pngと名付けた画像ファイルを用意してください。
+    <% end %>
+    <%== insert_space(2) %>end<br>
+    end<br>
+  </div><%# code-field %>
+  <br>
+  <div>
+    上記FactoryBotに関するコードは編集が必要な場合があります。<br>
+    その場合は以下のサンプルコードを参考に編集をお願いします。
+  </div>
+  <div class="sample-code">
+    <div class="left">
+      <p>
+        名前<br>
+        email<br>
+        パスワード：基本<br>
+        パスワード：英数字混合<br>
+        パスワード：再入力<br>
+        文章<br>
+        文字（10文字）<br>
+        数字（300〜9,999,999）<br>
+        人：苗字漢字<br>
+        人：名前漢字<br>
+        人：苗字カナ<br>
+        人：名前カナ<br>
+        人：生年月日<br>
+        住所：郵便番号<br>
+        住所：都道府県(ActiveHash)<br>
+        住所：市区町村<br>
+        住所：番地<br>
+        住所：建物名<br>
+        電話番号<br>
+        id<br>
+        トークン<br>
+      </p>
+    </div>
+    <div class="right">
+      <p>
+        name { Faker::Name.initials(number: 2) }<br>
+        email { Faker::Internet.free_email }<br>
+        password { Faker::Internet.password(min_length: 6) }<br>
+        password { 'a1' + Faker::Internet.password(min_length: 4) }<br>
+        password_confirmation { password }<br>
+        text { Faker::Lorem.sentence }<br>
+        characters { Faker::Lorem.characters(number: 10) }<br>
+        number { Faker::Number.within(range: 300..9_999_999) }<br>
+        last_name { Gimei.last.kanji }<br>
+        first_name { Gimei.first.kanji }<br>
+        last_name_kana { Gimei.last.katakana }<br>
+        first_name_kana { Gimei.first.katakana }<br>
+        birthday { Faker::Date.between(from: '1930-01-01', to: '2016-12-31') }<br>
+        postal_code { '123-4567' }<br>
+        prefecture_id { Faker::Number.within(range: 1..47) }<br>
+        city { Gimei.address.city.kanji }<br>
+        address { Gimei.address.town.kanji }<br>
+        building { '建物名' }<br>
+        phone_number { Faker::PhoneNumber.subscriber_number(length: 11) }<br>
+        order_id { Faker::Number.number(digits: 2) }<br>
+        token { 'tok_abcdefghijk00000000000000000' }<br>
+      </p>
+    </div>
+  </div>
+  <div class="terminal-field">
+    <p>ターミナル：テストコードの実行</p>
+    <p>bundle exec rspec spec/models/<%= @model.name %>_spec.rb </p>
+  </div>
+  <div>
+  <p>これでモデルに関するファイルの記述は終了です。</p>
+  </div>
+
+
+<% elsif @model.model_type_id == 2 %><%# ActiveHashの場合 %>
+  <h1>ActiveHash:<%= @model.name %>の作成 </h1>
+  <br>
+  <div>
+    <p>ActiveHash: <%= @model.name %>を作成します。</p>
+    <div class="terminal-field">
+      <p>ターミナル：対象ファイルの作成</p>
+      <p>touch app/models/<%= @model.name %>.rb</p>
+    </div>
+    <div class="terminal-field">
+      <p>ターミナル：対象ファイルへジャンプ</p>
+      <p>code app/models/<%= @model.name %>.rb</p>
+    </div>
+  </div>
+  <br>
+  <div class="code-field">
+    <%== make_activehash_html(@model, @columns) %>
+  </div>
+  <p>上記の'内容'の部分を編集してください。</p>
+  <p>以上でActiveHashに関する記述は終了です。</p>
+<% end %>
+
+
 <div class="link">
   <%= link_to 'モデル一覧へ戻る', application_models_path %>
   <%= link_to 'トップページへへ戻る', root_path %>
@@ -347,7 +379,6 @@
 <%# そのほかメモ
 この後の追加実装予定
 ・Rspecのオプションに対するテストコード。まだ種類が少なく対応力に難あり。
-・日本語化用のファイル。ファイル自体は別の場所で作成予定
 ・Formオブジェクトパターン、同時に二つのモデルに保存するやつ。一応同じ感じに表示したいが用途が違いすぎるか？。
 %>
 

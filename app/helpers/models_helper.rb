@@ -502,29 +502,36 @@ module ModelsHelper
     return html
   end
 
-  # 動作確認をするために作成したメソッド。最終的には削除する
-  def test(model, gemfile)
-    normal_groups = []
-    abnormal_groups = []
+  # ActiveHashのHTMLを作成するメソッド
+  def make_activehash_html(model, columns)
+    html = "class = #{model.name.classify}"
+    html += '<br>'
+    html += "#{insert_space(2)}self.data = ["
+    html += '<br>'
+    before = "#{insert_space(4)}{ id: "
+    center = ''
     model.columns.each do |column|
-      make_group_exist(model, column, abnormal_groups, normal_groups)
-      make_group_options(model, column, abnormal_groups)
+      center += ', '
+      center += column.name
+      center += ": ''"
     end
-    normal_example_html = make_normal_examples_html(normal_groups)
-    abnormal_example_html = make_abnormal_example_html(abnormal_groups, gemfile.rails_i18n)
-  
-    test = {
-      normal_example_html: normal_example_html,
-      abnormal_example_html: abnormal_example_html
-    }
-    return test
-  end
-
-  def test2(abnormal_groups)
-    abnormal_groups.each do |group|
-      puts group
-      puts "-----------"
+    after = ' }'
+    content = '--'
+    6.times do |i|
+      content = '内容' if i >= 1
+      content = '最後' if i == 5
+      html += "#{before}#{i}#{center}#{content}#{after}"
+      html += ',' if i != 5
+      html += '<br>'
     end
+    html += insert_space(2)
+    html += ']'
+    html += '<br>'
+    html += insert_space(2)
+    html += 'include ActiveHash::Associations'
+    html += insert_space(2)
+    html += make_has(columns, model)
+    return html
   end
 
 
