@@ -419,10 +419,11 @@ module ModelsHelper
 
   # FactoryBotで使用するFaker及びGimeiのHTMLを作成するメソッド
   def make_factorybot_html(column)
+    return '' if column.data_type_id == 12
     html = "#{insert_space(4)}#{column.name} { "
     case column.data_type_id
     when 1 # 'string'
-      if column.options.exists?
+      if column.options.length != 0
         column.options.each do |option|
           case option.option_type.info
           when '漢字かなカナで登録可'
@@ -436,14 +437,14 @@ module ModelsHelper
           end
         end
       else
-        html += 'Faker::Lorem.characters(number: 10) }'
+        html += 'Faker::Lorem.characters(number: 8) }'
       end
     when 2 # 'text'
       html += 'Faker::Lorem.sentence }'
     when 3 #'integer'
-      if column.options.exists?
+      if column.options.length != 0
         column.options.each do |option|
-          case option.data_type.info
+          case option.option_type.info
           when '数値のみで登録する'
             html += 'Faker::Number(digits: 8) }'
           when '上限下限を設定する'
@@ -481,7 +482,7 @@ module ModelsHelper
       html += 'Faker::Time.between(DateTime.now - 1, DateTime.now) }'
     when 11 # 'boolean'
       html += 'Faker::Boolean.boolean }'
-    when 12, 13 # 'references', 'ActiveHash'
+    when 13 # 'ActiveHash' refarences型はここでは記載不要だがassociationに記載が必要
       html += 'Faker::Number.non_zero_digit }'
     end
     html += '<br>'

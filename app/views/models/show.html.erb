@@ -1,36 +1,38 @@
 <% contents_html = make_contents_html(@model, @gemfile) %>
 <h1><%= @model.name %>モデル機能の作成 </h1>
 <br>
-<% if @model.model_type_id != 5 %>
-  それでは<%= @model.name %>のファイルを作成します。
+<div>
+  <% if @model.model_type_id != 5 %>
+    それでは<%= @model.name %>のファイルを作成します。
 
-  <div class="terminal-field">
-    <p>ターミナル：関連ファイルの作成</p>
-    <p>rails g model <%= @model.name.classify %></p>
-  </div>
-  <p>ターミナルに表示されているマイグレーションファイルを対象に行います。</p>
-  <div class="terminal-field">
-    <p>ターミナル：対象ファイルへジャンプ</p>
-    <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
-  </div>
-<% else %>
-  Deviseを用いた<%= @model.name %>を作成します。
-  <div class="terminal-field">
-    <p>ターミナル</p>
-    <p>rails g devise:install</p>
-    <p>rails g devise:views</p>
-    <p>rails g devise <%= @model.name %></p>
-  </div>
-  <div class="terminal-field">
+    <div class="terminal-field">
+      <p>ターミナル：関連ファイルの作成</p>
+      <p>rails g model <%= @model.name %></p>
+    </div>
     <p>ターミナルに表示されているマイグレーションファイルを対象に行います。</p>
-    <p>ターミナル：対象ファイルへジャンプ</p>
-    <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
-  </div>
-<% end %>
+    <div class="terminal-field">
+      <p>ターミナル：対象ファイルへジャンプ</p>
+      <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
+    </div>
+  <% else %>
+    Deviseを用いた<%= @model.name %>を作成します。
+    <div class="terminal-field">
+      <p>ターミナル</p>
+      <p>rails g devise:install</p>
+      <p>rails g devise:views</p>
+      <p>rails g devise <%= @model.name %></p>
+    </div>
+    <div class="terminal-field">
+      <p>ターミナルに表示されているマイグレーションファイルを対象に行います。</p>
+      <p>ターミナル：対象ファイルへジャンプ</p>
+      <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
+    </div>
+  <% end %>
+</div>
 <br><br>
 <%# 対象モデルのマイグレーションファイル、モデルファイル、Rspecファイルを記載する。%>
 <h2><%= @model.name.tableize %>テーブルのマイグレーションファイルの編集</h2>
-<% if @model.model_type.name == '通常モデル' %>
+<% if @model.model_type.name == '通常モデル' || @model.model_type.name == '中間テーブル' %>
   <div class="migration_file">
     <div class="target">
       ファイル：20XXXX...._devise_create_<%= @model.name %>

@@ -27,7 +27,7 @@
     <%# モデルごとのテーブル表記。対象は通常モデルのみ %>
     <% @models.each do |model| %>
       
-      <% if [1, 5].include?(model.model_type_id) %>
+      <% if [1, 3, 5].include?(model.model_type_id) %>
         <%# 最も長いカラム名の文字数＝longestを決定する%>
         <% longest = 6 %>
         <% longest = the_longest(longest ,model) %>
