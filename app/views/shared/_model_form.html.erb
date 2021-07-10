@@ -12,6 +12,7 @@
       <% if application.gemfile.active_hash %>
         <p><%= f.radio_button :model_type_id, 2 %>ActiveHashの登録</p>
       <% end %>
+      <p><%= f.radio_button :model_type_id, 3 %>中間テーブルの登録</p>
     </div>
 
     <div class="field">

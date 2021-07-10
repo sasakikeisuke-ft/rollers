@@ -236,7 +236,7 @@ module ModelsHelper
         html += '<br>'
         # 中間テーブルの場合、
         # 動作確認が未実施。今後エラーの可能性があり注意が必要。
-        if target.model_type_id == 4 
+        if target.model_type_id == 3
           target_columns = target.columns.where.not(name: model.name)
           target_columns.each do |tie|
             html += insert_space(2)
@@ -254,14 +254,6 @@ module ModelsHelper
 
 
   # 以下はRSpecに関するメソッド
-
-  # FactoryBotのカラムを作成するメソッド
-
-  # FactoryBotのアソシエーションを作成するメソッド
-
-
-  
-
 
   # カラムを受け取ってexampleのための配列を作成するメソッド
   def make_group_exist(model, column, abnormal_groups, normal_groups)
@@ -496,6 +488,7 @@ module ModelsHelper
     return html
   end
 
+  # FactoryBotのアソシエーションを作成するメソッド
   def make_association_html(groups)
     html = ''
     puts groups
@@ -537,16 +530,4 @@ module ModelsHelper
 end
 
 
-
-
-# メモ
-devise_abnormal_group = [
-  {name: 'email', info: 'が空欄だと登録できない', change: "''", message_ja: 'を入力してください', message_en: ''},
-  {name: 'email', info: 'に@が含まれていない場合、登録できない', change: "'abcdefgh'", message_ja: 'を入力してください', message_en: ''},
-  {name: 'password', info: 'が空欄だと登録できない', change: "''", message_ja: 'を入力してください', message_en: ''},
-  {name: 'password', info: 'が空欄だと登録できない', change: "''", message_ja: 'を入力してください', message_en: ''},
-  {name: 'password', info: 'が空欄だと登録できない', change: "''", message_ja: 'を入力してください', message_en: ''},
-  {name: 'password', info: 'が空欄だと登録できない', change: "''", message_ja: 'を入力してください', message_en: ''},
-  
-]
 # 重複があり登録できない -> 例外処理が必要

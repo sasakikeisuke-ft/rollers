@@ -6,8 +6,7 @@ class ModelsController < ApplicationController
   end
 
   def new
-    @application = Application.find(params[:application_id])
-    @models = Model.where(application_id: params[:application_id])
+    show_index
     @model = Model.new
   end
 
@@ -16,6 +15,7 @@ class ModelsController < ApplicationController
     if @model.save
       redirect_to new_application_model_column_path(model_id: @model)
     else
+      show_index
       render :new
     end
   end
@@ -53,4 +53,8 @@ class ModelsController < ApplicationController
     redirect_to root_path if current_user.id != @model.application.user_id
   end
 
+  def show_index
+    @application = Application.find(params[:application_id])
+    @models = Model.where(application_id: params[:application_id])
+  end
 end

@@ -1,7 +1,7 @@
 <h1>モデル作成</h1>
 
-
-<% if @models.length != 0 || !@application.gemfile.devise %><%# 登録モデルが0ではない＝deviseのモデルは作成されているとき %>
+<%# 登録モデルが0ではない＝deviseのモデルは作成されているとき %>
+<% if @models.length != 0 || !@application.gemfile.devise %>
 
   <p>現在登録されているモデル</p>
   <% @models.each do |model| %>
