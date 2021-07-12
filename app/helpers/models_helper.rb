@@ -14,6 +14,7 @@ module ModelsHelper
     activehash_group = []
     normal_groups = []
     abnormal_groups = []
+    overlapping_groups = []
       
     # 取得したカラムごとに文章を作成していきます。eachメソッドは一回で済むようにします。
     model.columns.each do |column|
@@ -43,7 +44,7 @@ module ModelsHelper
       
       # RSpecのための配列を作成します
       make_group_exist(model, column, abnormal_groups, normal_groups)
-      make_group_options(model, column, abnormal_groups)
+      make_group_options(model, column, abnormal_groups, overlapping_groups)
 
       # FactoryBotのためのHTMLを作成します。
       factorybot_html += make_factorybot_html(column)
@@ -76,6 +77,7 @@ module ModelsHelper
     # RSpecのexampleに関するHTMLを作成します
     normal_example_html = make_normal_examples_html(normal_groups)
     abnormal_example_html = make_abnormal_example_html(abnormal_groups, gemfile.rails_i18n)
+    abnormal_example_html += make_overlapping_example_html(overlapping_groups, gemfile.rails_i18n)
 
     # FactoryBotのアソシエーションに関するHTMLを作成します。
     association_html = make_association_html(references_group)
@@ -283,7 +285,7 @@ module ModelsHelper
   end
 
   # columnのoptionごとにexampleのための配列を作成するメソッド
-  def make_group_options(model, column, abnormal_groups)
+  def make_group_options(model, column, abnormal_groups, overlapping_groups)
     column.options.each do |option| 
       case option.option_type.type
       when 'format'
@@ -322,6 +324,24 @@ module ModelsHelper
           content[:change] = "'カタカナカタカナ'"
           abnormal_groups << content
         end
+      when 'numericality'
+        if [22, 24].include?(option.option_type_id)
+          content = group_of_base(model, column, option)
+          content[:info] = 'が設定した数値より大きいと保存できない'
+          content[:change] = "#{option.input1 + 1}"
+          abnormal_groups << content
+        end
+        if [22, 23].include?(option.option_type_id)
+          content = group_of_base(model, column, option)
+          content[:info] = 'が設定した数値より小さいと保存できない'
+          content[:change] = "#{option.input2 - 1}"
+          abnormal_groups << content
+        end
+      when 'uniqueness'
+        content = group_of_base(model, column, option)
+        content[:info] = 'の重複があり登録できない'
+        content[:change] = option.input1
+        overlapping_groups << content
       end
     end
   end
@@ -426,6 +446,36 @@ module ModelsHelper
       content[:message_en] = ' must exist'
       abnormal_groups << content
     end
+  end
+
+  # 重複保存禁止に関するexampleのhtmlを作成するメソッド
+  def make_overlapping_example_html(overlapping_groups, japanese)
+    html = ''
+    overlapping_groups.each do |group|
+      html += insert_space(6)
+      html += "it '#{group[:column]}#{group[:info]}' do"
+      html += '<br>'
+      html += insert_space(8)
+      html += "@#{group[:model]}.save"
+      html += '<br>'
+      html += insert_space(8)
+      html += "another_#{group[:model]} = FactoryBot.build(:#{group[:model]}, #{group[:column]}: @#{group[:model]}.#{group[:column]})"
+      html += '<br>'
+      html += insert_space(8)
+      html += "another_#{group[:model]}.valid?"
+      html += '<br>'
+      html += insert_space(8)
+      if japanese
+        html += "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_ja]}')"
+      else
+        html += "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
+      end
+      html += '<br>'
+      html += insert_space(6)
+      html += 'end'
+      html += '<br>'
+    end
+    return html
   end
 
   # FactoryBotで使用するFaker及びGimeiのHTMLを作成するメソッド
