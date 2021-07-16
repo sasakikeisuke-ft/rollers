@@ -8,8 +8,11 @@ class ColumnsController < ApplicationController
 
   def create
     @column = Column.new(column_params)
-    if @column.save
-      redirect_to new_application_model_column_option_path(params[:application_id], params[:model_id], @column)
+    @model = Model.find(params[:model_id])
+    if @column.save && [1, 3, 5].include?(@model.model_type_id)
+      redirect_to new_application_model_column_option_path(column_id: @column)
+    elsif @column.save
+      redirect_to new_application_model_column_path
     else
       show_index
       render :new
