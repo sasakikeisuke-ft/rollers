@@ -1,5 +1,5 @@
 <div class="columns-index">
-  ＜<%= model.name %>のカラム一覧＞<br>
+  <h2>＜<%= model.name %>のカラム一覧＞</h2>
   <% model.columns.each do |column| %>
     <%= column.name %> -> <%= column.data_type.type %>型 -> option:
     <%= '空欄禁止' if column.must_exist %> <%= '重複禁止' if column.unique %>

@@ -10,7 +10,7 @@
     範囲を定めて重複を禁止する場合はオプション設定で設定します。<br>
   </div>
 
-  <%= render partial: "column_normal_form", locals: {application: @application, model: @model, column: @column} %>
+  <%= render partial: "normal_form", locals: {column: @column} %>
   <br>
   <div>
     他のモデル名を参照する場合はこちらから<br>
@@ -23,104 +23,39 @@
     <% end %>
   </div>
   <br>
+
   <%# 他のモデル名を参照にするカラム %>
-  <%= form_with model: @column, url: application_model_columns_path ,local: true do |f| %>
-    <%= render 'shared/error_messages', model: f.object %>
-
-      <div class="field">
-        <%= f.label :name, 'カラム名' %>
-        <%= f.collection_select(:name, @models, :name, :name, include_blank: true) %>
-        <%= f.hidden_field :name_ja, value: '' %>
-        <%= f.hidden_field :must_exist, value: false %>
-        <%= f.hidden_field :unique, value: false %>
-      </div>
-
-      <div class="references-field">
-        <p><%= f.radio_button :data_type_id, 12 %><%= DataType.find(12)[:type] %>型 -> モデルが対象</p>  
-        <p><%= f.radio_button :data_type_id, 13 %><%= DataType.find(13)[:type] %>を対象とする</p>
-      </div>
-
-    <div class="actions">
-      <%= f.submit "オプション設定へ" %>
-    </div>
-  <% end %>
+  <%= render partial: "references_form", locals: {column: @column} %>
 
 <% elsif @model.model_type_id == 2 %><%# ActiveHashを登録する場合 %>
-  <%= form_with model: @column, url: application_model_columns_path ,local: true do |f| %>
-    <%= render 'shared/error_messages', model: f.object %>
-
-    <div>
-    class = <%= @model.name.classify %> < ActiveHash::Base<br>
+  <div>
+    class = <%= model.name.classify %> < ActiveHash::Base<br>
     <% insert_space(2) %>{ id = 0,
     <% @model.columns.each do |column| %>
       <%= column.name + ": '--', " %>
     <% end %><- この次を登録 }
-    </div>
-    <div class="field">
-      <%= f.label :name, '要素名' %>
-      <%= f.text_field :name, autofocus: true, placeholder: 'nameなど' %><br>
-      <%= f.hidden_field :name_ja, value: '' %>
-      <%= f.hidden_field :data_type_id, value: 15 %>
-      <%= f.hidden_field :must_exist, value: false %>
-      <%= f.hidden_field :unique, value: false %>
-      ActiveHashの要素名を設定します。
-    </div>
-
-    <div class="actions">
-      <%= f.submit "次の要素を設定する。" %>
-    </div>
-  <% end %>
+    <p>ActiveHashで事前に用意したい要素名を入力してください。</p>
+  </div>
+  <%# ActiveHashの登録フォームを部分テンプレートを使用 %>
+  <%= render partial: "activehash_form", locals: {model: @model, column: @column} %>
+  
 
 <%# 中間テーブルの場合 %>
 <% elsif @model.model_type_id == 3 %>
   <h2>中間テーブル：<%= @model.name %>の対象モデル設定</h2>
-  <%= form_with model: @column, url: application_model_columns_path ,local: true do |f| %>
-    <%= render 'shared/error_messages', model: f.object %>
-
-      <div class="field">
-        <%= f.label :name, '対象モデル名を選択' %><br>
-        <%= f.collection_select(:name, @models, :name, :name, include_blank: true) %>
-        <%= f.hidden_field :name_ja, value: '' %>
-        <%= f.hidden_field :must_exist, value: false %>
-        <%= f.hidden_field :unique, value: false %>
-      </div>
-      <div class="references-field">
-        <p><%= f.radio_button :data_type_id, 12, checked: true %><%= DataType.find(12)[:type] %>型 -> モデルが対象</p>  
-      </div>
-
-    <div class="actions">
-      <%= f.submit "オプション設定へ" %>
-    </div>
-  <% end %>
-
+  <p>
+    中間テーブルの対象となるモデルを選択してください。<br>
+    カラムは自動でrefarences型に設定されます。
+  </p>
+  <%= render partial: "relation_form", locals: {column: @column} %>
+  
 <% else %><%# Formオブジェクトを作成する場合 %>
   <h2>Formオブジェクト：<%= @model.name %>の対象モデル設定</h2>
-  <%= form_with model: @column, url: application_model_columns_path ,local: true do |f| %>
-    <%= render 'shared/error_messages', model: f.object %>
-    <div>
-    <p>同時保存をする対象モデル</p>
-      <% if @model.columns.length == 0 %>
-        対象モデルはまだ設定されていません。
-      <% else %>
-        <% @model.columns.each_with_index do |column, index| %>
-          <%= "#{index + 1}: #{column.name}" %><br>
-        <% end %>
-      <% end %>
-    </div>
-    <p>同時に保存したいモデルを選択してください。</p>
-      <div class="field">
-        <%= f.label :name, '対象モデル名を選択' %><br>
-        <%= f.collection_select(:name, @models, :name, :name, include_blank: true) %>
-        <%= f.hidden_field :name_ja, value: '' %>
-        <%= f.hidden_field :data_type_id, value: 16 %>
-        <%= f.hidden_field :must_exist, value: false %>
-        <%= f.hidden_field :unique, value: false %>
-      </div>
-    <div class="actions">
-      <%= f.submit "登録して次の対象モデルを設定する。" %>
-    </div>
-  <% end %>
-
+  <p>
+    対象モデルを同時に登録するためのFormオブジェクトパターンを作成します。<br>
+    対象にしたいモデルを選択してください。
+  </p>
+  <%= render partial: "formobject_form", locals: {column: @column} %>
 
 <% end %>
 

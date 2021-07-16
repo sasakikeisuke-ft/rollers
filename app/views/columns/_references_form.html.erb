@@ -1,0 +1,20 @@
+<%= form_with model: column, url: application_model_columns_path ,local: true do |f| %>
+  <%= render 'shared/error_messages', model: f.object %>
+
+    <div class="field">
+      <%= f.label :name, 'カラム名' %>
+      <%= f.collection_select(:name, @models, :name, :name, include_blank: true) %>
+      <%= f.hidden_field :name_ja, value: '' %>
+      <%= f.hidden_field :must_exist, value: false %>
+      <%= f.hidden_field :unique, value: false %>
+    </div>
+
+    <div class="references-field">
+      <p><%= f.radio_button :data_type_id, 12 %><%= DataType.find(12)[:type] %>型 -> モデルが対象</p>  
+      <p><%= f.radio_button :data_type_id, 13 %><%= DataType.find(13)[:type] %>を対象とする</p>
+    </div>
+
+  <div class="actions">
+    <%= f.submit "オプション設定へ" %>
+  </div>
+<% end %>

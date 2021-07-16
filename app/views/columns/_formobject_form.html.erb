@@ -1,0 +1,25 @@
+<%= form_with model: column, url: application_model_columns_path ,local: true do |f| %>
+    <%= render 'shared/error_messages', model: f.object %>
+    <div>
+    <h4>現在設定されている対象モデル</h4>
+      <% if @model.columns.length == 0 %>
+        対象モデルはまだ設定されていません。
+      <% else %>
+        <% @model.columns.each_with_index do |column, index| %>
+          <%= "#{index + 1}: #{column.name}" %><br>
+        <% end %>
+      <% end %>
+    </div>
+    <br>
+    <div class="field">
+      <%= f.label :name, '対象モデル名' %>
+      <%= f.collection_select(:name, @models, :name, :name, include_blank: true) %>
+      <%= f.hidden_field :name_ja, value: '' %>
+      <%= f.hidden_field :data_type_id, value: 16 %>
+      <%= f.hidden_field :must_exist, value: false %>
+      <%= f.hidden_field :unique, value: false %>
+    </div>
+    <div class="actions">
+      <%= f.submit "登録して次の対象モデルを設定する。" %>
+    </div>
+  <% end %>

@@ -12,77 +12,45 @@
   <br>
   <%= render partial: "shared/column_form", locals: {application: @application, model: @model, column: @column} %>
   <br>
-  <%# 他のモデル名を参照にするカラム %>
-  <%= form_with(model: [@application, @model, @column] ,local: true) do |f| %>
-    <%= render 'shared/error_messages', model: f.object %>
-
-      <div class="field">
-        <%= f.label :name, 'カラム名' %>
-        <%= f.collection_select(:name, @models, :name, :name, include_blank: true) %>
-        <%= f.hidden_field :name_ja, value: '' %>
-        <%= f.hidden_field :must_exist, value: false %>
-        <%= f.hidden_field :unique, value: false %>
-      </div>
-
-      <div class="references-field">
-        <p><%= f.radio_button :data_type_id, 12 %><%= DataType.find(12)[:type] %>型 -> モデルが対象</p>  
-        <p><%= f.radio_button :data_type_id, 13 %><%= DataType.find(13)[:type] %>を対象とする</p>
-      </div>
-
-    <div class="actions">
-      <%= f.submit "オプション設定へ" %>
-    </div>
+  ＜<%= @application.name %>のモデル一覧＞<br>
+  <% @models.each do |model| %>
+    <%= model.name %> <%= '<- ActiveHash' if model.model_type_id == 2 %><br>
   <% end %>
+  
+  <%# 他のモデル名を参照にするカラム %>
+  <%= render partial: "references_form", locals: {column: @column} %>
 
 <% elsif @model.model_type_id == 2 %><%# ActiveHashを登録する場合 %>
-  <%= form_with model: @column, url: application_model_column_path ,local: true do |f| %>
-    <%= render 'shared/error_messages', model: f.object %>
+  <div>
+    class = <%= model.name.classify %> < ActiveHash::Base<br>
+    <% insert_space(2) %>{ id = 0,
+    <% @model.columns.each do |column| %>
+      <%= column.name + ": '--', " %>
+    <% end %> }
+    <p>
+      この中の<%= @column.name %>を別のモデルを対象に再設定します。<br>
+      再設定する対象モデルを選択してください。
+    </p>
+  </div>
+  <%= render partial: "activehash_form", locals: {model: @model, column: @column} %>
 
-    <div class="field">
-        <%= f.label :name, '参照するモデルを選択してください' %><br>
-        <%= f.collection_select(:name, @models.where(application_id: params[:application_id]), :name, :name,{},{}) %>
-    </div>
+<%# 中間テーブルの場合 %>
+<% elsif @model.model_type_id == 3 %>
+  <h2>中間テーブル：<%= @model.name %>の対象モデル設定</h2>
+  <p>
+    中間テーブルの対象となるモデルを再選択します。<br>
+    <%= @column.name %>を別のモデルへ変更します。
+  </p>
+  <%= render partial: "relation_form", locals: {column: @column} %>
+  
+<% else %><%# Formオブジェクトを作成する場合 %>
+  <h2>Formオブジェクト：<%= @model.name %>の対象モデル設定</h2>
+  <p>
+    Formオブジェクトパターンの対象モデルを再選択します。<br>
+    <%= @column.name %>を別のモデルへ変更します。
+  </p>
+  <%= render partial: "formobject_form", locals: {column: @column} %>
 
-    <div class="field">
-        <%= f.label :name_ja, '日本語表記' %><br>
-        エラー文を翻訳する際の表示を設定します。
-        <%= f.text_field :name_ja, placeholder: '名前' %>
-    </div>
-
-    <div class="field">
-      <div class="letter-field">
-        <p><%= f.radio_button :data_type_id, 1, checked: true %><%= DataType.find(1)[:type] %>型</p>  
-        <p><%= f.radio_button :data_type_id, 2 %><%= DataType.find(2)[:type] %>型</p>
-      </div>
-      <div class="number-field">
-        <p><%= f.radio_button :data_type_id, 3 %><%= DataType.find(3)[:type] %>型</p>  
-        <p><%= f.radio_button :data_type_id, 4 %><%= DataType.find(4)[:type] %>型</p>
-        <p><%= f.radio_button :data_type_id, 5 %><%= DataType.find(5)[:type] %>型</p>
-      </div>
-      <div class="date-field">
-        <p><%= f.radio_button :data_type_id, 6 %><%= DataType.find(6)[:type] %>型</p>  
-        <p><%= f.radio_button :data_type_id, 7 %><%= DataType.find(7)[:type] %>型</p>
-        <p><%= f.radio_button :data_type_id, 8 %><%= DataType.find(8)[:type] %>型</p>
-      </div>
-      <div class="boolean-field">
-        <p><%= f.radio_button :data_type_id, 11 %><%= DataType.find(11)[:type] %>型</p>  
-      </div>
-    </div>
-
-    <div class="field">
-      <%= f.check_box :must_exist ,{}, true, false %>
-      <%= f.label :must_exist, '空欄を禁止する。' %>
-    </div>
-
-    <div class="field">
-      <%= f.check_box :unique ,{}, true, false %>
-      <%= f.label :unique, 'テーブル内での重複を禁止する' %>
-    </div>
-
-    <div class="actions">
-      <%= f.submit "オプション設定へ" %>
-    </div>
-  <% end %>
 <% end %>
 
 <br>
