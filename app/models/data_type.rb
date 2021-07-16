@@ -12,7 +12,8 @@ class DataType < ActiveHash::Base
     {id: 11, type: 'boolean   ', space: 2},
     {id: 12, type: 'references', space: 0},
     {id: 13, type: 'ActiveHash', space: 0},
-    {id: 15, type: 'ActiveHashの要素', space: 0}
+    {id: 15, type: 'ActiveHashの要素', space: 0},
+    {id: 16, type: 'Formオブジェクトの対象モデル', space: 0}
   ]
   include ActiveHash::Associations
   has_many :columns

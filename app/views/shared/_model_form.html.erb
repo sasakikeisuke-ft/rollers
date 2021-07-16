@@ -13,8 +13,13 @@
         <p><%= f.radio_button :model_type_id, 2 %>ActiveHashの登録</p>
       <% end %>
       <p><%= f.radio_button :model_type_id, 3 %>中間テーブルの登録</p>
+      <p><%= f.radio_button :model_type_id, 4 %>Formオブジェクトパターンの登録</p>
     </div>
 
+    <p>
+      一般的なモデルを作成する場合、以下のチェック項目を確認してください。<br>
+      該当する場合はチェックを入れてください。
+    </p>
     <div class="field">
       <%= f.check_box :not_only ,{}, false, true %>
       <%= f.label :not_only, '親モデルに対して一対一の関係である has_one' %><br>

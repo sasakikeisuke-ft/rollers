@@ -10,7 +10,7 @@
     範囲を定めて重複を禁止する場合はオプション設定で設定します。<br>
   </div>
 
-  <%= render partial: "shared/column_form", locals: {application: @application, model: @model, column: @column} %>
+  <%= render partial: "column_normal_form", locals: {application: @application, model: @model, column: @column} %>
   <br>
   <div>
     他のモデル名を参照する場合はこちらから<br>
@@ -67,13 +67,13 @@
     </div>
 
     <div class="actions">
-      <%= f.submit "オプション設定へ" %>
+      <%= f.submit "次の要素を設定する。" %>
     </div>
   <% end %>
 
 <%# 中間テーブルの場合 %>
 <% elsif @model.model_type_id == 3 %>
-  <h2>中間テーブル：<%= @model.name %>の関連カラム設定</h2>
+  <h2>中間テーブル：<%= @model.name %>の対象モデル設定</h2>
   <%= form_with model: @column, url: application_model_columns_path ,local: true do |f| %>
     <%= render 'shared/error_messages', model: f.object %>
 
@@ -84,7 +84,6 @@
         <%= f.hidden_field :must_exist, value: false %>
         <%= f.hidden_field :unique, value: false %>
       </div>
-      <p></p>
       <div class="references-field">
         <p><%= f.radio_button :data_type_id, 12, checked: true %><%= DataType.find(12)[:type] %>型 -> モデルが対象</p>  
       </div>
@@ -93,6 +92,36 @@
       <%= f.submit "オプション設定へ" %>
     </div>
   <% end %>
+
+<% else %><%# Formオブジェクトを作成する場合 %>
+  <h2>Formオブジェクト：<%= @model.name %>の対象モデル設定</h2>
+  <%= form_with model: @column, url: application_model_columns_path ,local: true do |f| %>
+    <%= render 'shared/error_messages', model: f.object %>
+    <div>
+    <p>同時保存をする対象モデル</p>
+      <% if @model.columns.length == 0 %>
+        対象モデルはまだ設定されていません。
+      <% else %>
+        <% @model.columns.each_with_index do |column, index| %>
+          <%= "#{index + 1}: #{column.name}" %><br>
+        <% end %>
+      <% end %>
+    </div>
+    <p>同時に保存したいモデルを選択してください。</p>
+      <div class="field">
+        <%= f.label :name, '対象モデル名を選択' %><br>
+        <%= f.collection_select(:name, @models, :name, :name, include_blank: true) %>
+        <%= f.hidden_field :name_ja, value: '' %>
+        <%= f.hidden_field :data_type_id, value: 16 %>
+        <%= f.hidden_field :must_exist, value: false %>
+        <%= f.hidden_field :unique, value: false %>
+      </div>
+    <div class="actions">
+      <%= f.submit "登録して次の対象モデルを設定する。" %>
+    </div>
+  <% end %>
+
+
 <% end %>
 
 <br>

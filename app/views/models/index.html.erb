@@ -1,12 +1,12 @@
-modelsコントローラー<br>
-indexアクション
-<br>
+<h1>モデル一覧</h1>
 <% if @models.length != 0 %>
   <% @models.each do |model| %>
     <%= model.name %>
-    <%= link_to '編集画面へ', edit_application_model_path(params[:application_id], model) %><br>
-    <%= link_to '削除', application_model_path(params[:application_id], model), method: :delete %><br>
-    <%= link_to 'コード表示', application_model_path(params[:application_id], model) %><br>
+    <%= link_to 'モデル編集', edit_application_model_path(id: model) %>
+    <%= link_to 'カラム追加', new_application_model_column_path(model_id: model) %>
+    <br>
+    <%= link_to '削除', application_model_path(id: model), method: :delete %><br>
+    <%= link_to 'コード表示', application_model_path(id: model) %><br>
     
     <%# モデルに対するカラム名を表示。編集画面へのリンクも付属 %>
     <% model.columns.each do |column| %>
