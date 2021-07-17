@@ -1,4 +1,4 @@
 FactoryBot.define do
-  factory :gemfile do
+  factory :option do
   end
 end

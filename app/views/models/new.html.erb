@@ -1,0 +1,52 @@
+<h1>モデル作成</h1>
+
+<%# 登録モデルが0ではない＝deviseのモデルは作成されているとき %>
+<% if @models.length != 0 || !@application.gemfile.devise %>
+
+  <p>現在登録されているモデル</p>
+  <% @models.each do |model| %>
+    <%= model.name %><br>
+  <% end %><br>
+  <p>
+    モデルの名前と、モデルのタイプを設定し作成します。<br>
+    参照される事になる親モデルやActiveHashを優先すると、カラムの設定がスムーズになります。
+  </p>
+
+  <%# 通常モデル保存用フォーム %>
+  <%= render partial: "shared/model_form", locals: {application: @application, model: @model} %>
+
+
+<% elsif @application.gemfile.devise %><%# Deviseによるユーザー登録に関する %>
+  <%= form_with model: @model, url: application_models_path ,local: true do |f| %>
+
+    <%= render 'shared/error_messages', model: f.object %>
+
+    まずはDevaiseのユーザー機能に関するモデルを作成します。<br>
+    ユーザーに関するモデル名を設定してください。<br>
+    <br>
+    <div class="field">
+        <%= f.label :name, 'モデル名' %>
+        <%= f.text_field :name, autofocus: true, placeholder: 'userなど' %>
+        <%= f.hidden_field :model_type_id, value: 5 %>
+        <%= f.hidden_field :not_only, value: true %>
+    </div>
+    <br>
+    
+    <div class="actions">
+      <%= f.submit "登録" %>
+    </div>
+  <% end %>
+<% end %>
+
+<% if @models.length == 0 %>
+  <p>
+    このあと、モデルごとに作成するカラムと、そのオプションを登録していきます。 <br>
+    Deviseに関するモデルのため、emailカラムとpasswordカラムは自動で作成されています。<br>
+    それ以外に必要なカラムを登録してください。
+    <br>
+    モデル作成 -> カラムの作成 -> オプション設定 の順に行います。
+  </p>
+<% end %>
+<br>
+<%= link_to 'モデル一覧へ', application_models_path %><br>
+<%= link_to 'アプリケーション一覧へ戻る', root_path %>

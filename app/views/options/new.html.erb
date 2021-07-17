@@ -1,0 +1,136 @@
+<h1>新規オプション登録</h1>
+<br>
+<%= @column.name %>のオプション設定
+<p>現在のオプション</p>
+<p><%= 'presence: true' if @column.must_exist %></p>
+<% format_count = 0 %>
+<% numericality_count = 0 %>
+<% uniqueness_count = 0 %>
+<% option_count = 0 %>
+<% if @options.length != 0 %>
+  <% @options.each do |option| %>
+    <%= option.option_type.info %>
+    <% format_count += 1 if option.option_type.type == 'format' %>
+    <% numericality_count += 1 if option.option_type.type == 'numericality' %>
+    <% uniqueness_count += 1 if option.option_type.type == 'uniqueness' %>
+  <% end %>
+<% else %>
+  <p>追加オプションは設定されていません</p>
+<% end %>
+<br>
+<br>
+
+<%= link_to 'カラム新規作成へ戻る', new_application_model_column_path(params[:application_id], params[:model_id]) %>
+
+<%= form_with model: @option, url: application_model_column_options_path ,local: true do |f| %>
+  <%= render 'shared/error_messages', model: f.object %>
+  <% option_count = 0 %>
+
+  <%# 対象カラムのデータ型がstringまたはtextの場合 %>
+  <% if [1, 2].include?(@column.data_type_id) && format_count == 0 %>
+    <% option_count += 1 %>
+    <div class="field">
+      <p>正規表現による制限(:format)</p>
+        <%= f.radio_button :option_type_id, 11 %>
+        <%= OptionType.find(11)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 12 %>
+        <%= OptionType.find(12)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 13 %>
+        <%= OptionType.find(13)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 14 %>
+        <%= OptionType.find(14)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 15 %>
+        <%= OptionType.find(15)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 16 %>
+        <%= OptionType.find(16)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 17 %>
+        <%= OptionType.find(17)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 18 %>
+        <%= OptionType.find(18)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 19 %>
+        <%= OptionType.find(19)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 20 %>
+        <%= OptionType.find(20)[:info] %>
+        <br>
+    </div>
+
+
+
+  <% elsif @column.data_type_id == 3 && numericality_count == 0 %>
+    <% option_count += 1 %>
+    <div class="field">
+      <p>数値に関する制限(:numericality)</p>
+        <%= f.radio_button :option_type_id, 21 %>
+        <%= OptionType.find(21)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 22 %>
+        <%= OptionType.find(22)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 23 %>
+        <%= OptionType.find(23)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 24 %>
+        <%= OptionType.find(24)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 25 %>
+        <%= OptionType.find(25)[:info] %>
+        <br>
+    </div>
+  <% end %>
+
+  <% if uniqueness_count == 0 %>
+  <% option_count += 1 %>
+    <div class="field">
+      <p>重複禁止に関する制限(:uniqueness)</p>
+        <%= f.radio_button :option_type_id, 41 %>
+        <%= OptionType.find(41)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 42 %>
+        <%= OptionType.find(42)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 43 %>
+        <%= OptionType.find(43)[:info] %>
+        <br>
+    </div>
+  <% end %>
+
+<% if option_count != 0 %>
+  <p>選んだオプションに必要な情報があれば、下のフォームに入力してください。</p>
+  <div class="field">
+    <%= f.label :input1, '入力1' %>
+    <%= f.text_field :input1, placeholder: 'user_idなど' %><br>
+    上限または重複禁止の範囲対象となるmodel_idを入力してください。
+  </div>
+  <br>
+  <div class="field">
+    <%= f.label :input2, '入力2' %>
+    <%= f.text_field :input2, placeholder: 'user_idなど' %><br>
+    下限または重複禁止の範囲における追加対象となるmodel_idを入力してください。<br>
+    三つ目以降の重複禁止対象はご自身での記載をお願いします。
+  </div>
+<% else %><%# 追加できるオプションがないとき %>
+  <p>追加できるオプションはありません。</p>
+<% end %>
+
+  <div class="actions">
+    <%= f.submit "オプション追加" %>
+  </div>
+<% end %>
+<br>
+<div>
+  正規表現を作成、チェックをする場合は以下のリンクを参考にしてください<br>
+  <%= link_to '正規表現チェッカー', 'https://weblabo.oscasierra.net/tools/regex/' %>
+</div>
+<br>
+<%= link_to 'カラム新規作成へ戻る', new_application_model_column_path(params[:application_id], params[:model_id]) %><br>
+<%= link_to 'モデル一覧へ戻る', application_models_path %><br>
+<%= link_to 'アプリケーション一覧へ戻る', root_path %>

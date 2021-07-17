@@ -1,0 +1,24 @@
+<%= form_with model: column, url: application_model_columns_path ,local: true do |f| %>
+  <%= render 'shared/error_messages', model: f.object %>
+
+  <div>
+    class = <%= model.name.classify %> < ActiveHash::Base<br>
+    <% insert_space(2) %>{ id = 0,
+    <% @model.columns.each do |column| %>
+      <%= column.name + ": '--', " %>
+    <% end %><- この次を登録 }
+  </div>
+  <div class="field">
+    <%= f.label :name, '要素名' %>
+    <%= f.text_field :name, autofocus: true, placeholder: 'nameなど' %><br>
+    <%= f.hidden_field :name_ja, value: '' %>
+    <%= f.hidden_field :data_type_id, value: 15 %>
+    <%= f.hidden_field :must_exist, value: false %>
+    <%= f.hidden_field :unique, value: false %>
+    ActiveHashの要素名を設定します。
+  </div>
+
+  <div class="actions">
+    <%= f.submit "次の要素を設定する。" %>
+  </div>
+<% end %>

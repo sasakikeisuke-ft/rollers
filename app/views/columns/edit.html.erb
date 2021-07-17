@@ -1,0 +1,59 @@
+<% if ![2, 3, 4].include?(@model.model_type_id) %>
+  <%= render partial: "shared/related_models", locals: {model: @model} %>
+  <br>
+
+  <h1>カラム編集</h1>
+  <h3>対象カラム：<%= @column.name %></h3>
+  <div>
+    カラムを編集すると、オプションは初期化されます。<br>
+    オプションの再設定も引き続き行ってください。<br>
+  </div>
+
+  <br>
+  <%= render partial: "shared/column_form", locals: {application: @application, model: @model, column: @column} %>
+  <br>
+  ＜<%= @application.name %>のモデル一覧＞<br>
+  <% @models.each do |model| %>
+    <%= model.name %> <%= '<- ActiveHash' if model.model_type_id == 2 %><br>
+  <% end %>
+  
+  <%# 他のモデル名を参照にするカラム %>
+  <%= render partial: "references_form", locals: {column: @column} %>
+
+<% elsif @model.model_type_id == 2 %><%# ActiveHashを登録する場合 %>
+  <div>
+    class = <%= model.name.classify %> < ActiveHash::Base<br>
+    <% insert_space(2) %>{ id = 0,
+    <% @model.columns.each do |column| %>
+      <%= column.name + ": '--', " %>
+    <% end %> }
+    <p>
+      この中の<%= @column.name %>を別のモデルを対象に再設定します。<br>
+      再設定する対象モデルを選択してください。
+    </p>
+  </div>
+  <%= render partial: "activehash_form", locals: {model: @model, column: @column} %>
+
+<%# 中間テーブルの場合 %>
+<% elsif @model.model_type_id == 3 %>
+  <h2>中間テーブル：<%= @model.name %>の対象モデル設定</h2>
+  <p>
+    中間テーブルの対象となるモデルを再選択します。<br>
+    <%= @column.name %>を別のモデルへ変更します。
+  </p>
+  <%= render partial: "relation_form", locals: {column: @column} %>
+  
+<% else %><%# Formオブジェクトを作成する場合 %>
+  <h2>Formオブジェクト：<%= @model.name %>の対象モデル設定</h2>
+  <p>
+    Formオブジェクトパターンの対象モデルを再選択します。<br>
+    <%= @column.name %>を別のモデルへ変更します。
+  </p>
+  <%= render partial: "formobject_form", locals: {column: @column} %>
+
+<% end %>
+
+<br>
+<%= link_to 'モデル新規作成へ', new_application_model_path %><br>
+<%= link_to 'モデル一覧へ', application_models_path %><br>
+<%= link_to 'アプリケーション一覧へ戻る', root_path %>

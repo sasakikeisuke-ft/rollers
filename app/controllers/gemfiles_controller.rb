@@ -11,7 +11,7 @@ class GemfilesController < ApplicationController
   def create
     @gemfile = Gemfile.new(gemfile_params)
     if @gemfile.save
-      redirect_to root_path
+      redirect_to new_application_model_path(params[:application_id])
     else
       render :new
     end
@@ -28,16 +28,23 @@ class GemfilesController < ApplicationController
     end
   end
 
+  def show
+    @application = Application.includes(models: :columns).find(params[:id])
+    @models = @application.models
+    @columns = Column.where(application_id: @application)
+  end
+
   private
+
   def gemfile_params
-    params.require(:gemfile).permit(:devise, :pry_rails,:image_magick, :active_hash, :rails_i18n, :ransack, :rubocop, :rspec, :payjp, :s3).merge(application_id: params[:application_id])
+    params.require(:gemfile).permit(:devise, :pry_rails, :image_magick, :active_hash, :rails_i18n, :ransack, :rubocop, :rspec,
+                                    :payjp, :s3).merge(application_id: params[:application_id])
   end
 
   def find_gemfile
     @application = Application.find(params[:application_id])
     @gemfile = @application.gemfile
     redirect_to root_path if current_user.id != @application.user_id
-    redirect_to new_application_gemfile_path(@application.id) if @gemfile == nil
+    redirect_to new_application_gemfile_path(@application.id) if @gemfile.nil?
   end
-
 end

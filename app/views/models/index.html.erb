@@ -1,0 +1,26 @@
+<h1>モデル一覧</h1>
+<% if @models.length != 0 %>
+  <% @models.each do |model| %>
+    <%= model.name %>
+    <%= link_to 'モデル編集', edit_application_model_path(id: model) %>
+    <%= link_to 'カラム追加', new_application_model_column_path(model_id: model) %>
+    <br>
+    <%= link_to '削除', application_model_path(id: model), method: :delete %><br>
+    <%= link_to 'コード表示', application_model_path(id: model) %><br>
+    
+    <%# モデルに対するカラム名を表示。編集画面へのリンクも付属 %>
+    <% model.columns.each do |column| %>
+      <%= link_to column.name, edit_application_model_column_path(params[:application_id], model, column) %>
+      <%= column.data_type.type %>
+      <br>
+    <% end %>
+    <br>
+  <% end %>
+  <br>
+<% else %>
+  モデルはまだ登録されていません
+<% end %>
+<br>
+<%= link_to 'モデル作成へ', new_application_model_path %><br>
+<%= link_to 'アプリケーション内容へ戻る', application_path(params[:application_id]) %><br>
+<%= link_to 'トップページへ戻る', application_path(params[:application_id]) %>
