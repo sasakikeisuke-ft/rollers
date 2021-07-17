@@ -1,5 +1,5 @@
 class Column < ApplicationRecord
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: { scope: :model_id }
   validates :data_type_id, numericality: { other_than: 0, message: 'を選択してください' }
 
   with_options inclusion: { in: [true, false] } do
