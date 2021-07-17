@@ -35,15 +35,16 @@ class GemfilesController < ApplicationController
   end
 
   private
+
   def gemfile_params
-    params.require(:gemfile).permit(:devise, :pry_rails,:image_magick, :active_hash, :rails_i18n, :ransack, :rubocop, :rspec, :payjp, :s3).merge(application_id: params[:application_id])
+    params.require(:gemfile).permit(:devise, :pry_rails, :image_magick, :active_hash, :rails_i18n, :ransack, :rubocop, :rspec,
+                                    :payjp, :s3).merge(application_id: params[:application_id])
   end
 
   def find_gemfile
     @application = Application.find(params[:application_id])
     @gemfile = @application.gemfile
     redirect_to root_path if current_user.id != @application.user_id
-    redirect_to new_application_gemfile_path(@application.id) if @gemfile == nil
+    redirect_to new_application_gemfile_path(@application.id) if @gemfile.nil?
   end
-
 end

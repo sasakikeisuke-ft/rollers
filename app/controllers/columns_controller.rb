@@ -41,6 +41,7 @@ class ColumnsController < ApplicationController
   end
 
   private
+
   def show_index
     @application = Application.find(params[:application_id])
     @models = Model.includes(columns: :options).where(application_id: @application)
@@ -49,11 +50,12 @@ class ColumnsController < ApplicationController
   end
 
   def column_params
-    params.require(:column).permit(:name, :name_ja, :data_type_id, :must_exist, :unique).merge(application_id: params[:application_id], model_id: params[:model_id])
+    params.require(:column).permit(:name, :name_ja, :data_type_id, :must_exist, :unique).merge(
+      application_id: params[:application_id], model_id: params[:model_id]
+    )
   end
 
   def find_column
     @column = Column.find(params[:id])
   end
-
 end

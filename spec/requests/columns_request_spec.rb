@@ -1,5 +1,4 @@
 require 'rails_helper'
 
-RSpec.describe "Columns", type: :request do
-
+RSpec.describe 'Columns', type: :request do
 end

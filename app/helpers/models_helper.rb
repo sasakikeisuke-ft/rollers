@@ -1,8 +1,6 @@
 module ModelsHelper
-
   # メインとなるHTML作成メソッド。
   def make_contents_html(model, gemfile)
-    
     migration_html = ''
     validation_html = ''
     factorybot_html = ''
@@ -15,22 +13,20 @@ module ModelsHelper
     normal_groups = []
     abnormal_groups = []
     overlapping_groups = []
-      
+
     # 取得したカラムごとに文章を作成していきます。eachメソッドは一回で済むようにします。
     model.columns.each do |column|
-
       # マイグレーションファイルのモデルごとの記載を作成します。
       migration_html += make_migration_html(column)
 
       # データ型とmust_existによって、追加先の配列を選択します。
-      content = {name: column.name}
-      #optionの表記が必要なグループを、さらにpresence: trueが必要かで追加先の配列を決めます
+      content = { name: column.name }
+      # optionの表記が必要なグループを、さらにpresence: trueが必要かで追加先の配列を決めます
+      content[:options] = make_options_html(column, gemfile.rails_i18n)
       if column.data_type_id <= 10
-        content[:options] = make_options_html(column, gemfile.rails_i18n)
         presence_true << content if column.must_exist
         presence_false << content if !column.must_exist && content[:options] != ''
       else
-        content[:options] = make_options_html(column, gemfile.rails_i18n)
         case column.data_type_id
         when 11
           boolean_group << content
@@ -41,7 +37,7 @@ module ModelsHelper
           activehash_group << content
         end
       end
-      
+
       # RSpecのための配列を作成します
       make_group_exist(model, column, abnormal_groups, normal_groups)
       make_group_options(model, column, abnormal_groups, overlapping_groups)
@@ -52,7 +48,7 @@ module ModelsHelper
     # ここまでで作られた配列を基に、RSpecのグループへさらに追加する。
     make_group_references(references_group, model, abnormal_groups)
     make_activehash_example_html(activehash_group, model, abnormal_groups)
-    #/ ここまでで配列が完成しました。
+    # / ここまでで配列が完成しました。
 
     # ここから実際のHTMLをmake_validation_htmlメソッドを使用し作成します
     common = 'presence: true'
@@ -98,27 +94,26 @@ module ModelsHelper
   # マイグレーションに記載する項目のHTMLを作成するメソッド。
   def make_migration_html(column)
     if column.data_type_id == 13
-      return ""
+      ''
     else
-      html = ""
+      html = ''
       html += insert_space(6)
       html += "t.#{column.data_type.type} :#{column.name}"
       if column.data_type.type == 'references'
-        html += ", foreign_key: true"
-      else 
-        html += ", null: false" if column.must_exist
-        html += ", unique: true" if column.unique
+        html += ', foreign_key: true'
+      else
+        html += ', null: false' if column.must_exist
+        html += ', unique: true' if column.unique
       end
-      html += "<br>"
-      return html
+      html += '<br>'
+      html
     end
   end
 
   # バリデーションにおけるoptionのHTMLを作成するメソッド
   def make_options_html(column, japanese)
-    html = ""
+    html = ''
     column.options.each do |option|
-      
       # ActiveHash app/models/option_type.rbのデータを使用しています。
       if option.option_type.type == 'format'
         html += option.option_type.code
@@ -128,32 +123,32 @@ module ModelsHelper
         html += ',<br>'
         html += insert_space(14)
         html += 'format: { with: /\A[0-9]+\z/, message: '
-        if japanese
-          html += "'は半角数字を入力してください' },<br>"
-        else
-          html += "'is invalid. Input harf-width numbers' },<br>"
-        end
+        html += if japanese
+                  "'は半角数字を入力してください' },<br>"
+                else
+                  "'is invalid. Input harf-width numbers' },<br>"
+                end
         html += insert_space(14)
         case option.option_type.info
         when '数値のみで登録する', '未選択状態での禁止'
           html += option.option_type.code
         when '上限下限を設定する'
           html += 'numericality: {greater_than_or_equal_to: '
-          html += option.input1 if option.input1 != nil
-          html += '数値' if option.input1 == nil
+          html += option.input1 unless option.input1.nil?
+          html += '数値' if option.input1.nil?
           html += ', less_than_or_equal_to: '
-          html += option.input2 if option.input2 != nil
-          html += '数値' if option.input2 == nil
+          html += option.input2 unless option.input2.nil?
+          html += '数値' if option.input2.nil?
           html += ', message: '
         when '上限のみを設定する'
           html += 'numericality: {less_than_or_equal_to: '
-          html += option.input1 if option.input1 != nil
-          html += '数値' if option.input1 == nil
+          html += option.input1 unless option.input1.nil?
+          html += '数値' if option.input1.nil?
           html += ', message: '
         when '上限下限を設定する'
           html += 'numericality: {greater_than_or_equal_to: '
-          html += option.input2 if option.input2 != nil
-          html += '数値' if option.input2 == nil
+          html += option.input2 unless option.input2.nil?
+          html += '数値' if option.input2.nil?
           html += ', message: '
         end
       elsif option.option_type.type == 'uniqueness'
@@ -167,22 +162,22 @@ module ModelsHelper
       html += make_message_html(option, japanese)
       html += '" }'
     end
-    return html
+    html
   end
 
   # エラー文日本語化を設定しているかどうかで、エラー文を選択するメソッド。
   def make_message_html(option, japanese)
-    if japanese
-      html = option.option_type.message_ja
-    else
-      html = option.option_type.message_en
-    end
+    html = if japanese
+             option.option_type.message_ja
+           else
+             option.option_type.message_en
+           end
   end
 
   # with_optionsが使用できるかどうかで記載形態を変更するメソッド
   def make_validation_html(array, common)
     html = ''
-    if array.length  == 0
+    if array.length == 0
       return ''
     elsif array.length == 1 || common == ''
       array.each do |element|
@@ -209,12 +204,14 @@ module ModelsHelper
       html += insert_space(2)
       html += 'end<br><br>'
     end
-    return html
+
+    html
   end
 
   # references型カラム名からbelongs_toの対象を定め、HTMLを作成するメソッド。
   def make_belong(array, before, activehash)
     return if array.length == 0
+
     html = ''
     if activehash
       html += '<br>'
@@ -228,7 +225,7 @@ module ModelsHelper
       html += element[:name]
       html += '<br>'
     end
-    return html
+    html
   end
 
   # アソシエーションのhas_many/has_oneを作成するメソッド
@@ -237,42 +234,41 @@ module ModelsHelper
     html = ''
     columns.each do |column|
       # 以下の条件が合った場合にのみ処理を行う。
-      if column.name == model.name
+      next unless column.name == model.name
+
+      html += insert_space(2)
+      html += if model.not_only
+                'has_many :'
+              else
+                'has_one :'
+              end
+      target = column.model
+      html += target.name.tableize
+      html += '<br>'
+      # 中間テーブルの場合、
+      # 動作確認が未実施。今後エラーの可能性があり注意が必要。
+      next unless target.model_type_id == 3
+
+      target_columns = target.columns.where.not(name: model.name)
+      target_columns.each do |tie|
         html += insert_space(2)
-        if model.not_only
-          html += 'has_many :' 
-        else
-          html += 'has_one :'
-        end
-        target = column.model
-        html += target.name.tableize
+        html += 'has_many :'
+        html += tie.name
+        html += ', through: :'
+        html += target.name
         html += '<br>'
-        # 中間テーブルの場合、
-        # 動作確認が未実施。今後エラーの可能性があり注意が必要。
-        if target.model_type_id == 3
-          target_columns = target.columns.where.not(name: model.name)
-          target_columns.each do |tie|
-            html += insert_space(2)
-            html += 'has_many :'
-            html += tie.name
-            html += ', through: :'
-            html += target.name
-            html += '<br>'
-          end
-        end
       end
     end
-    return html
+    html
   end
-
 
   # 以下はRSpecに関するメソッド
 
   # カラムを受け取ってexampleのための配列を作成するメソッド
   def make_group_exist(model, column, abnormal_groups, normal_groups)
-    content = {model: model.name, column: column.name, column_ja: column.name_ja}
+    content = { model: model.name, column: column.name, column_ja: column.name_ja }
     if [12, 13].include?(column.data_type_id)
-      return
+      nil
     elsif column.must_exist
       content[:info] = 'が空欄だと登録できない'
       content[:change] = "''"
@@ -286,7 +282,7 @@ module ModelsHelper
 
   # columnのoptionごとにexampleのための配列を作成するメソッド
   def make_group_options(model, column, abnormal_groups, overlapping_groups)
-    column.options.each do |option| 
+    column.options.each do |option|
       case option.option_type.type
       when 'format'
         # 数字が含まれる場合に対するexample
@@ -328,13 +324,13 @@ module ModelsHelper
         if [22, 24].include?(option.option_type_id)
           content = group_of_base(model, column, option)
           content[:info] = 'が設定した数値より大きいと保存できない'
-          content[:change] = "#{option.input1 + 1}"
+          content[:change] = (option.input1 + 1).to_s
           abnormal_groups << content
         end
         if [22, 23].include?(option.option_type_id)
           content = group_of_base(model, column, option)
           content[:info] = 'が設定した数値より小さいと保存できない'
-          content[:change] = "#{option.input2 - 1}"
+          content[:change] = (option.input2 - 1).to_s
           abnormal_groups << content
         end
       when 'uniqueness'
@@ -348,14 +344,13 @@ module ModelsHelper
 
   # combination_of_optionの重複部分をまとめるメソッド
   def group_of_base(model, column, option)
-    content = {
+    {
       model: model.name,
       column: column.name,
       column_ja: column.name_ja,
       message_ja: option.option_type.message_ja,
       message_en: option.option_type.message_en
     }
-    return content
   end
 
   # RSpecの正常系テストコードを作成するメソッド
@@ -363,7 +358,7 @@ module ModelsHelper
   # 引数を変更している。未編集
   def make_normal_examples_html(normal_groups)
     html = ''
-    normal_groups.each do |group| 
+    normal_groups.each do |group|
       # itの文章を作成する。it~<br>まで
       html += insert_space(6)
       html += "it '#{group[:column]}が空欄でも登録できる' do"
@@ -378,7 +373,7 @@ module ModelsHelper
       html += 'end'
       html += '<br>'
     end
-    return html
+    html
   end
 
   # RSpecの異常系テストコードを作成するメソッド
@@ -395,17 +390,17 @@ module ModelsHelper
       html += "@#{group[:model]}.valid?"
       html += '<br>'
       html += insert_space(8)
-      if japanese
-        html += "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column_ja]}#{group[:message_ja]}')"
-      else
-        html += "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
-      end
+      html += if japanese
+                "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column_ja]}#{group[:message_ja]}')"
+              else
+                "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
+              end
       html += '<br>'
       html += insert_space(6)
       html += 'end'
       html += '<br>'
     end
-    return html
+    html
   end
 
   # references_groupを基に、紐付けに関するexampleの組み合わせを作成するメソッド
@@ -465,22 +460,23 @@ module ModelsHelper
       html += "another_#{group[:model]}.valid?"
       html += '<br>'
       html += insert_space(8)
-      if japanese
-        html += "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_ja]}')"
-      else
-        html += "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
-      end
+      html += if japanese
+                "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_ja]}')"
+              else
+                "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
+              end
       html += '<br>'
       html += insert_space(6)
       html += 'end'
       html += '<br>'
     end
-    return html
+    html
   end
 
   # FactoryBotで使用するFaker及びGimeiのHTMLを作成するメソッド
   def make_factorybot_html(column)
     return '' if column.data_type_id == 12
+
     html = "#{insert_space(4)}#{column.name} { "
     case column.data_type_id
     when 1 # 'string'
@@ -504,7 +500,7 @@ module ModelsHelper
       end
     when 2 # 'text'
       html += 'Faker::Lorem.sentence }'
-    when 3 #'integer'
+    when 3 # 'integer'
       if column.options.length != 0
         column.options.each do |option|
           case option.option_type.info
@@ -512,18 +508,18 @@ module ModelsHelper
             html += 'Faker::Number(digits: 8) }'
           when '上限下限を設定する'
             html += 'Faker::Number.within(range: '
-            html += option.input2 if option.input2 != nil
+            html += option.input2 unless option.input2.nil?
             html += '..'
-            html += option.input1 if option.input1 != nil
+            html += option.input1 unless option.input1.nil?
             html += ') }'
           when '上限のみを設定する'
             html += 'Faker::Number.within(range: '
             html += '0..'
-            html += option.input1 if option.input1 != nil
+            html += option.input1 unless option.input1.nil?
             html += ') }'
           when '下限のみを設定する'
             html += 'Faker::Number.within(range: '
-            html += option.input2 if option.input2 != nil
+            html += option.input2 unless option.input2.nil?
             html += '..10000000'
             html += ') }'
           when '未選択状態での禁止'
@@ -549,7 +545,7 @@ module ModelsHelper
       html += 'Faker::Number.non_zero_digit }'
     end
     html += '<br>'
-    return html
+    html
   end
 
   # FactoryBotのアソシエーションを作成するメソッド
@@ -561,7 +557,7 @@ module ModelsHelper
       html += group[:name]
       html += '<br>'
     end
-    return html
+    html
   end
 
   # ActiveHashのHTMLを作成するメソッド
@@ -593,11 +589,9 @@ module ModelsHelper
     html += 'include ActiveHash::Associations'
     html += insert_space(2)
     html += make_has(columns, model)
-    return html
+    html
   end
 
-
-  
   # Formオブジェクトパターンに関するHTMLを記載するメソッド
   def make_formobject_html(model, gemfile)
     target_models = []
@@ -627,16 +621,14 @@ module ModelsHelper
 
     # 取得したカラムごとに文章を作成していきます。eachメソッドは一回で済むようにします。
     all_columns.each do |column|
-
       # データ型とmust_existによって、追加先の配列を選択します。
-      content = {name: column.name}
-      #optionの表記が必要なグループを、さらにpresence: trueが必要かで追加先の配列を決めます
+      content = { name: column.name }
+      # optionの表記が必要なグループを、さらにpresence: trueが必要かで追加先の配列を決めます
+      content[:options] = make_options_html(column, gemfile.rails_i18n)
       if column.data_type_id <= 10
-        content[:options] = make_options_html(column, gemfile.rails_i18n)
         presence_true << content if column.must_exist
         presence_false << content if !column.must_exist && content[:options] != ''
       else
-        content[:options] = make_options_html(column, gemfile.rails_i18n)
         case column.data_type_id
         when 11
           boolean_group << content
@@ -647,7 +639,7 @@ module ModelsHelper
           activehash_group << content
         end
       end
-      
+
       # RSpecのための配列を作成します
       make_group_exist(model, column, abnormal_groups, normal_groups)
       make_group_options(model, column, abnormal_groups, overlapping_groups)
@@ -658,7 +650,7 @@ module ModelsHelper
     # ここまでで作られた配列を基に、RSpecのグループへさらに追加する。
     make_group_references(references_group, model, abnormal_groups)
     make_activehash_example_html(activehash_group, model, abnormal_groups)
-    #/ ここまでで配列が完成しました。
+    # / ここまでで配列が完成しました。
 
     # ここから実際のHTMLをmake_validation_htmlメソッドを使用し作成します
     common = 'presence: true'
@@ -681,9 +673,8 @@ module ModelsHelper
     abnormal_example_html = make_abnormal_example_html(abnormal_groups, gemfile.rails_i18n)
     abnormal_example_html += make_overlapping_example_html(overlapping_groups, gemfile.rails_i18n)
 
-    
     # 作成したHTMLをハッシュにしてビューファイルへ返します
-    contents_html = {
+    {
       validation_html: validation_html,
       normal_example_html: normal_example_html,
       abnormal_example_html: abnormal_example_html,
@@ -691,7 +682,6 @@ module ModelsHelper
       attr_accessor_html: make_attr_accessor_html(all_columns),
       save_html: make_save_html(target_models)
     }
-    return contents_html
   end
 
   def make_attr_accessor_html(all_columns)
@@ -702,7 +692,7 @@ module ModelsHelper
       html += " :#{column.name}"
       count += 1
     end
-    return html
+    html
   end
 
   def make_save_html(target_models)
@@ -713,17 +703,17 @@ module ModelsHelper
       html += "#{model.name.classify}.create("
       model.columns.each do |column|
         html += ', ' if count != 0
-        if column.data_type_id != 12
-          html += "#{column.name}: #{column.name}"
-        else
-          html += "#{column.name}_id: #{column.name}_id"
-        end
+        html += if column.data_type_id != 12
+                  "#{column.name}: #{column.name}"
+                else
+                  "#{column.name}_id: #{column.name}_id"
+                end
         count += 1
       end
       html += ')'
       html += '<br>'
     end
-    return html
+    html
   end
 
   def make_group_exist_exception(abnormal_groups, references_group)

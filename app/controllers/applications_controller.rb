@@ -2,7 +2,7 @@ class ApplicationsController < ApplicationController
   before_action :find_application, only: [:edit, :update, :destroy]
 
   def index
-    @applications = Application.where(user_id: current_user.id )
+    @applications = Application.where(user_id: current_user.id)
   end
 
   def show
@@ -39,6 +39,7 @@ class ApplicationsController < ApplicationController
   end
 
   private
+
   def application_params
     params.require(:application).permit(:name, :description).merge(user_id: current_user.id)
   end
@@ -47,5 +48,4 @@ class ApplicationsController < ApplicationController
     @application = Application.find(params[:id])
     redirect_to root_path if current_user.id != @application.user_id
   end
-
 end

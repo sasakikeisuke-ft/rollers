@@ -44,8 +44,10 @@ class ModelsController < ApplicationController
   end
 
   private
+
   def model_params
-    params.require(:model).permit(:name, :model_type_id, :not_only, :attached_image).merge(application_id: params[:application_id])
+    params.require(:model).permit(:name, :model_type_id, :not_only,
+                                  :attached_image).merge(application_id: params[:application_id])
   end
 
   def find_model
