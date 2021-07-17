@@ -43,6 +43,24 @@
         <%= f.radio_button :option_type_id, 14 %>
         <%= OptionType.find(14)[:info] %>
         <br>
+        <%= f.radio_button :option_type_id, 15 %>
+        <%= OptionType.find(15)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 16 %>
+        <%= OptionType.find(16)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 17 %>
+        <%= OptionType.find(17)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 18 %>
+        <%= OptionType.find(18)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 19 %>
+        <%= OptionType.find(19)[:info] %>
+        <br>
+        <%= f.radio_button :option_type_id, 20 %>
+        <%= OptionType.find(20)[:info] %>
+        <br>
     </div>
 
 
@@ -107,7 +125,12 @@
     <%= f.submit "オプション追加" %>
   </div>
 <% end %>
-
+<br>
+<div>
+  正規表現を作成、チェックをする場合は以下のリンクを参考にしてください<br>
+  <%= link_to '正規表現チェッカー', 'https://weblabo.oscasierra.net/tools/regex/' %>
+</div>
+<br>
 <%= link_to 'カラム新規作成へ戻る', new_application_model_column_path(params[:application_id], params[:model_id]) %><br>
 <%= link_to 'モデル一覧へ戻る', application_models_path %><br>
 <%= link_to 'アプリケーション一覧へ戻る', root_path %>
