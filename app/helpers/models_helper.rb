@@ -286,35 +286,49 @@ module ModelsHelper
       case option.option_type.type
       when 'format'
         # 数字が含まれる場合に対するexample
-        if [11, 12, 13].include?(option.option_type_id)
+        if [11, 12, 13, 15, 16, 17].include?(option.option_type_id)
           content = group_of_base(model, column, option)
           content[:info] = 'に数字が含まれていると保存できない'
           content[:change] = "'12345678'"
           abnormal_groups << content
         end
         # 英字が含まれる場合に対するexample
-        if [11, 12, 13].include?(option.option_type_id)
+        if [11, 12, 13, 14, 20].include?(option.option_type_id)
           content = group_of_base(model, column, option)
           content[:info] = 'に英字が含まれていると保存できない'
+          content[:change] = "'abcdEFGH'"
+          abnormal_groups << content
+        end
+        # 英字小文字が含まれる場合に対するexample
+        if [17].include?(option.option_type_id)
+          content = group_of_base(model, column, option)
+          content[:info] = 'に英字小文字が含まれていると保存できない'
           content[:change] = "'abcdefgh'"
           abnormal_groups << content
         end
+        # 英字大文字が含まれる場合に対するexample
+        if [16].include?(option.option_type_id)
+          content = group_of_base(model, column, option)
+          content[:info] = 'に英字大文字が含まれていると保存できない'
+          content[:change] = "'ABCDEFGH'"
+          abnormal_groups << content
+        end
         # 漢字が含まれる場合に対するexample
-        if [12, 13, 19].include?(option.option_type_id)
+        if [12, 13, 14, 15, 16, 17, 18, 19, 20].include?(option.option_type_id)
           content = group_of_base(model, column, option)
           content[:info] = 'に漢字が含まれていると保存できない'
           content[:change] = "'漢字漢字漢字漢字'"
           abnormal_groups << content
         end
         # ひらがなが含まれる場合に対するexample
-        if [13, 19].include?(option.option_type_id)
+        if [13, 14, 15, 16, 17, 18, 19, 20].include?(option.option_type_id)
           content = group_of_base(model, column, option)
           content[:info] = 'にひらがなが含まれていると保存できない'
           content[:change] = "'ひらがなひらがな'"
           abnormal_groups << content
         end
         # カタカナが含まれる場合に対するexample
-        if [12, 19].include?(option.option_type_id)
+        if [12, 14, 15, 16, 17, 18, 19, 20].include?(option.option_type_id)
           content = group_of_base(model, column, option)
           content[:info] = 'にカタカナが含まれていると保存できない'
           content[:change] = "'カタカナカタカナ'"
