@@ -555,7 +555,6 @@ module ModelsHelper
   # FactoryBotのアソシエーションを作成するメソッド
   def make_association_html(groups)
     html = ''
-    puts groups
     groups.each do |group|
       html += insert_space(4)
       html += 'association :'
@@ -598,7 +597,142 @@ module ModelsHelper
   end
 
 
+  
+  # Formオブジェクトパターンに関するHTMLを記載するメソッド
+  def make_formobject_html(model, gemfile)
+    target_models = []
+    all_columns = []
+
+    model.columns.each do |column|
+      target_model = Model.includes(columns: :options).find_by(name: column.name)
+      target_models << target_model
+    end
+    target_models.each do |target_model|
+      target_model.columns.each do |column|
+        all_columns << column
+      end
+    end
+
+    validation_html = ''
+    factorybot_html = ''
+    presence_true = []
+    presence_false = []
+    boolean_group = []
+    references_group = []
+    valid_regerences_group = []
+    activehash_group = []
+    normal_groups = []
+    abnormal_groups = []
+    overlapping_groups = []
+
+    # 取得したカラムごとに文章を作成していきます。eachメソッドは一回で済むようにします。
+    all_columns.each do |column|
+
+      # データ型とmust_existによって、追加先の配列を選択します。
+      content = {name: column.name}
+      #optionの表記が必要なグループを、さらにpresence: trueが必要かで追加先の配列を決めます
+      if column.data_type_id <= 10
+        content[:options] = make_options_html(column, gemfile.rails_i18n)
+        presence_true << content if column.must_exist
+        presence_false << content if !column.must_exist && content[:options] != ''
+      else
+        content[:options] = make_options_html(column, gemfile.rails_i18n)
+        case column.data_type_id
+        when 11
+          boolean_group << content
+        when 12
+          references_group << content
+          valid_regerences_group << content if content[:options] != ''
+        when 13
+          activehash_group << content
+        end
+      end
+      
+      # RSpecのための配列を作成します
+      make_group_exist(model, column, abnormal_groups, normal_groups)
+      make_group_options(model, column, abnormal_groups, overlapping_groups)
+
+      # FactoryBotのためのHTMLを作成します。
+      factorybot_html += make_factorybot_html(column)
+    end
+    # ここまでで作られた配列を基に、RSpecのグループへさらに追加する。
+    make_group_references(references_group, model, abnormal_groups)
+    make_activehash_example_html(activehash_group, model, abnormal_groups)
+    #/ ここまでで配列が完成しました。
+
+    # ここから実際のHTMLをmake_validation_htmlメソッドを使用し作成します
+    common = 'presence: true'
+    validation_html += make_validation_html(presence_true, common)
+
+    common = 'inclusion: { in: [true, false] }'
+    validation_html += make_validation_html(boolean_group, common)
+
+    common = 'numericality: { other_than: 0, message: "'
+    common += "can't be blank"
+    common += '"}'
+    validation_html += make_validation_html(activehash_group, common)
+
+    common = ''
+    validation_html += make_validation_html(presence_false, common)
+    validation_html += make_validation_html(valid_regerences_group, common)
+
+    # RSpecのexampleに関するHTMLを作成します
+    normal_example_html = make_normal_examples_html(normal_groups)
+    abnormal_example_html = make_abnormal_example_html(abnormal_groups, gemfile.rails_i18n)
+    abnormal_example_html += make_overlapping_example_html(overlapping_groups, gemfile.rails_i18n)
+
+    
+    # 作成したHTMLをハッシュにしてビューファイルへ返します
+    contents_html = {
+      validation_html: validation_html,
+      normal_example_html: normal_example_html,
+      abnormal_example_html: abnormal_example_html,
+      factorybot_html: factorybot_html,
+      attr_accessor_html: make_attr_accessor_html(all_columns),
+      save_html: make_save_html(target_models)
+    }
+    return contents_html
+  end
+
+  def make_attr_accessor_html(all_columns)
+    html = 'attr_accessor :'
+    count = 0
+    all_columns.each do |column|
+      html += ',' if count != 0
+      html += " :#{column.name}"
+      count += 1
+    end
+    return html
+  end
+
+  def make_save_html(target_models)
+    html = ''
+    target_models.each do |model|
+      count = 0
+      html += insert_space(4)
+      html += "#{model.name.classify}.create("
+      model.columns.each do |column|
+        html += ', ' if count != 0
+        if column.data_type_id != 12
+          html += "#{column.name}: #{column.name}"
+        else
+          html += "#{column.name}_id: #{column.name}_id"
+        end
+        count += 1
+      end
+      html += ')'
+      html += '<br>'
+    end
+    return html
+  end
+
+  def make_group_exist_exception(abnormal_groups, references_group)
+    references_group.each do |content|
+      content[:info] = 'が空欄だと登録できない'
+      content[:change] = "''"
+      content[:message_ja] = 'を入力してください'
+      content[:message_en] = "is can't be blank"
+      abnormal_groups << content
+    end
+  end
 end
-
-
-# 重複があり登録できない -> 例外処理が必要
