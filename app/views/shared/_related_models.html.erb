@@ -6,7 +6,7 @@
     <% column.options.each do |option| %>
       <%= option.option_type.info %>  
     <% end %><br>
-    <%= link_to 'カラムを編集', edit_application_model_column_path(id: column) %><br>
+    <%= link_to 'カラムを編集', edit_application_model_column_path(id: column) %> 
     <%= link_to 'カラムを削除', application_model_column_path(id: column), method: :delete %><br>
   <% end %><br>
   <% if model.model_type_id == 5 %>

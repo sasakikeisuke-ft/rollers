@@ -22,7 +22,7 @@
 
 <% elsif @model.model_type_id == 2 %><%# ActiveHashを登録する場合 %>
   <div>
-    class = <%= model.name.classify %> < ActiveHash::Base<br>
+    class = <%= @model.name.classify %> < ActiveHash::Base<br>
     <% insert_space(2) %>{ id = 0,
     <% @model.columns.each do |column| %>
       <%= column.name + ": '--', " %>

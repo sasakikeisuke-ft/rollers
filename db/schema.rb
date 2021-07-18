@@ -25,8 +25,8 @@ ActiveRecord::Schema.define(version: 2021_06_24_020324) do
     t.string "name", null: false
     t.string "name_ja"
     t.integer "data_type_id", null: false
-    t.boolean "must_exist", default: true, null: false
-    t.boolean "unique", default: false, null: false
+    t.boolean "must_exist", null: false
+    t.boolean "unique", null: false
     t.bigint "application_id"
     t.bigint "model_id"
     t.datetime "created_at", precision: 6, null: false

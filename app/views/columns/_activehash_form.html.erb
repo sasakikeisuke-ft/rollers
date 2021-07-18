@@ -1,13 +1,6 @@
 <%= form_with(model: [application, model, column], local: true) do |f| %>
   <%= render 'shared/error_messages', model: f.object %>
 
-  <div>
-    class = <%= model.name.classify %> < ActiveHash::Base<br>
-    <% insert_space(2) %>{ id = 0,
-    <% @model.columns.each do |column| %>
-      <%= column.name + ": '--', " %>
-    <% end %><- この次を登録 }
-  </div>
   <div class="field">
     <%= f.label :name, '要素名' %>
     <%= f.text_field :name, autofocus: true, placeholder: 'nameなど' %><br>

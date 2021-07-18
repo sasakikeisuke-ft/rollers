@@ -40,12 +40,12 @@
   </div>
 
   <div class="field">
-    <%= f.check_box :must_exist ,{}, true, false %>
+    <%= f.check_box :must_exist ,{checked: true}, 1, 0 %>
     <%= f.label :must_exist, '空欄を禁止する。' %>
   </div>
 
   <div class="field">
-    <%= f.check_box :unique ,{}, true, false %>
+    <%= f.check_box :unique ,{}, 1, 0 %>
     <%= f.label :unique, 'テーブル内での重複を禁止する' %>
   </div>
 
