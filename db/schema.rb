@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_24_020324) do
+ActiveRecord::Schema.define(version: 2021_07_18_102925) do
 
   create_table "applications", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -33,6 +33,23 @@ ActiveRecord::Schema.define(version: 2021_06_24_020324) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["application_id"], name: "index_columns_on_application_id"
     t.index ["model_id"], name: "index_columns_on_model_id"
+  end
+
+  create_table "controllers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "parent"
+    t.bigint "application_id"
+    t.string "target"
+    t.integer "index", null: false
+    t.integer "new", null: false
+    t.integer "create", null: false
+    t.integer "edit", null: false
+    t.integer "update", null: false
+    t.integer "destroy", null: false
+    t.integer "show", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["application_id"], name: "index_controllers_on_application_id"
   end
 
   create_table "gemfiles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -89,6 +106,7 @@ ActiveRecord::Schema.define(version: 2021_06_24_020324) do
   add_foreign_key "applications", "users"
   add_foreign_key "columns", "applications"
   add_foreign_key "columns", "models"
+  add_foreign_key "controllers", "applications"
   add_foreign_key "gemfiles", "applications"
   add_foreign_key "models", "applications"
   add_foreign_key "options", "columns"
