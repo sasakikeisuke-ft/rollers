@@ -42,7 +42,7 @@
       <br>
       <div class="code-field">
         class Create<%= @model.name.pluralize.camelize %> < ActiveRecord::Migration[6.0]<br>
-        <%= insert_space(2) %>def chande<br>
+        <%= insert_space(2) %>def change<br>
         <%= insert_space(4) %>create_table :<%= @model.name.tableize %> do |t|<br>
         
         <%# ヘルパーメソッドより作成 %>
