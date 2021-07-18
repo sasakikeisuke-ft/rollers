@@ -495,20 +495,24 @@ module ModelsHelper
     case column.data_type_id
     when 1 # 'string'
       if column.options.length != 0
+        done = false
         column.options.each do |option|
           case option.option_type.info
           when '漢字かなカナで登録可'
             html += 'Gimei.kanji }'
+            done = true
           when 'ひらがなのみで登録可'
             html += 'Gimei.hiragana }'
+            done = true
           when 'カタカナのみで登録可'
             html += 'Gimei.katakana }'
+            done = true
           when '郵便番号形式で登録可'
             html += "'123-4567'}"
-          when '対象モデル内での重複禁止', '複数のモデルでの重複禁止'
-            unique_count = true
+            done = true
           end
         end
+        html += 'Faker::Lorem.characters(number: 8) }' unless done
       else
         html += 'Faker::Lorem.characters(number: 8) }'
       end
