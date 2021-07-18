@@ -1,4 +1,4 @@
-<%= form_with model: column, url: application_model_columns_path, local: true do |f| %>
+<%= form_with(model: [application, model, column], local: true) do |f| %>
   <%= render 'shared/error_messages', model: f.object %>
 
   <div class="field">
