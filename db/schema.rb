@@ -40,13 +40,13 @@ ActiveRecord::Schema.define(version: 2021_07_18_102925) do
     t.string "parent"
     t.bigint "application_id"
     t.string "target"
-    t.integer "index", null: false
-    t.integer "new", null: false
-    t.integer "create", null: false
-    t.integer "edit", null: false
-    t.integer "update", null: false
-    t.integer "destroy", null: false
-    t.integer "show", null: false
+    t.integer "index_select", null: false
+    t.integer "new_select", null: false
+    t.integer "create_select", null: false
+    t.integer "edit_select", null: false
+    t.integer "update_select", null: false
+    t.integer "destroy_select", null: false
+    t.integer "show_select", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["application_id"], name: "index_controllers_on_application_id"
