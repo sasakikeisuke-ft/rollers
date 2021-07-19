@@ -350,13 +350,21 @@ module ModelsHelper
       when 'uniqueness'
         content = group_of_base(model, column, option)
         content[:info] = 'の重複があり登録できない'
-        content[:change] = option.input1
+        case option.option_type_id
+        when 41
+          content[:change] = ''
+        when 42
+          content[:change] = ", #{option.input1}: @#{model.name}.#{option.input1}"
+        when 43
+          content[:change] = ", #{option.input1}: @#{model.name}.#{option.input1}"
+          content[:change] += ", #{option.input2}: @#{model.name}.#{option.input2}"
+        end
         overlapping_groups << content
       end
     end
   end
 
-  # combination_of_optionの重複部分をまとめるメソッド
+  # make_group_optionsの重複部分をまとめるメソッド
   def group_of_base(model, column, option)
     {
       model: model.name,
@@ -405,9 +413,9 @@ module ModelsHelper
       html += '<br>'
       html += insert_space(8)
       html += if japanese
-                "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column_ja]}#{group[:message_ja]}')"
+                "expect(@#{group[:model]}.errors.full_messages).to include('#{group[:column_ja]}#{group[:message_ja]}')"
               else
-                "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
+                "expect(@#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
               end
       html += '<br>'
       html += insert_space(6)
@@ -426,7 +434,7 @@ module ModelsHelper
       content[:column_ja] = group[:name]
       content[:info] = 'が紐づけられていないと登録できない'
       content[:change] = 'nil'
-      content[:message_ja] = ' must exist'
+      content[:message_ja] = 'を入力してください'
       content[:message_en] = ' must exist'
       abnormal_groups << content
     end
@@ -462,22 +470,18 @@ module ModelsHelper
     html = ''
     overlapping_groups.each do |group|
       html += insert_space(6)
-      html += "it '#{group[:column]}#{group[:info]}' do"
-      html += '<br>'
+      html += "it '#{group[:column]}#{group[:info]}' do<br>"
       html += insert_space(8)
-      html += "@#{group[:model]}.save"
-      html += '<br>'
+      html += "@#{group[:model]}.save<br>"
       html += insert_space(8)
-      html += "another_#{group[:model]} = FactoryBot.build(:#{group[:model]}, #{group[:column]}: @#{group[:model]}.#{group[:column]})"
-      html += '<br>'
+      html += "another_#{group[:model]} = FactoryBot.build(:#{group[:model]}, #{group[:column]}: @#{group[:model]}.#{group[:column]}#{group[:change]})<br>"
       html += insert_space(8)
-      html += "another_#{group[:model]}.valid?"
-      html += '<br>'
+      html += "another_#{group[:model]}.valid?<br>"
       html += insert_space(8)
       html += if japanese
-                "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_ja]}')"
+                "expect(@#{group[:model]}.errors.full_messages).to include('#{group[:column_ja]}#{group[:message_ja]}')"
               else
-                "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
+                "expect(@#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
               end
       html += '<br>'
       html += insert_space(6)
