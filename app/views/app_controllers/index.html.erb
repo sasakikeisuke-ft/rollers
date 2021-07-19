@@ -1,0 +1,18 @@
+<h1><%= @application.name %>のコントローラー一覧</h1>
+<div>
+  <% if @app_controllers.length == 0 %>
+    コントローラーはまだ登録されていません。
+  <% else %>
+    <% @app_controllers.each do |controller| %>
+      <div>
+        <%= controller.name %>コントローラー<br>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+<br>
+<div>
+<%= link_to 'コントローラー作成へ', new_application_app_controller_path %><br>
+<%= link_to 'アプリケーション詳細へ戻る', application_path(@application) %><br>
+<%= link_to 'トップページへ戻る', root_path %>
+</div>
