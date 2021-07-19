@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :controller do
+  factory :app_controller do
     name { Faker::Lorem.characters(number: 8) }
     parent { Faker::Lorem.characters(number: 8) }
     target { Faker::Lorem.characters(number: 8) }

@@ -1,6 +1,6 @@
-class CreateControllers < ActiveRecord::Migration[6.0]
+class CreateAppControllers < ActiveRecord::Migration[6.0]
   def change
-    create_table :controllers do |t|
+    create_table :app_controllers do |t|
       t.string :name, null: false
       t.string :parent
       t.references :application, foreign_key: true
