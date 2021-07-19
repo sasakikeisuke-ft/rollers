@@ -255,7 +255,7 @@
   <br>
   <div class="terminal-field">
     <p>ターミナル：対象ファイルへジャンプ</p>
-    <p>code spec/factories/<%= @model.name %>.rb</p>
+    <p>code spec/factories/<%= @model.name.tableize %>.rb</p>
   </div>
   <%# FactoryBotに関するコード %>
   <div class="code-field">
@@ -352,6 +352,7 @@
   <div class="terminal-field">
     <p>ターミナル：関連ファイルの作成</p>
     <p>rails g rspec:model <%= @model.name %></p>
+    <p>注意：事前準備が全て行われている場合、上記ファイルはすでに作成されています。</p>
   </div>
   <div class="terminal-field">
     <p>ターミナル：対象ファイルへジャンプ</p>
@@ -394,7 +395,7 @@
   <br>
   <div class="terminal-field">
     <p>ターミナル：対象ファイルへジャンプ</p>
-    <p>code spec/factories/<%= @model.name %>.rb</p>
+    <p>code spec/factories/<%= @model.name.tableize %>.rb</p>
   </div>
   <br>
   <div class="code-field">
@@ -418,6 +419,14 @@
   <div>
   <%= render partial: "factorybot_sample" %>
   </div>
+  <div class="terminal-field">
+    <p>ターミナル：テストコードの実行</p>
+    <p>bundle exec rspec spec/models/<%= @model.name %>_spec.rb </p>
+  </div>
+  <div>
+  <p>これでモデルに関するファイルの記述は終了です。</p>
+  </div>
+
 <% end %>
 <br>
 <div class="link">
