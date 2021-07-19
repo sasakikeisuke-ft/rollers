@@ -8,5 +8,6 @@ Rails.application.routes.draw do
         resources :options, only: [:new, :create]
       end
     end
+    resources :controllers
   end
 end
