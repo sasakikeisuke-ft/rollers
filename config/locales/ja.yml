@@ -2,9 +2,30 @@ ja:
   activerecord:
     attributes:
       user:
-        nickname: ニックネーム
+        nickname: 名前
+      controller:
+        name: コントローラー名
+        parent: 親コントローラー名
+        application: application
+        target: 編集対象モデル
+        index_select: index
+        new_select: new
+        create_select: create
+        edit_select: edit
+        update_select: update
+        destroy_select: destroy
+        show_select: show
       application:
         name: アプリケーション名
-        description: 概要
-      # model名:
-      #   カラム名: 翻訳＝表示文字列
+        description: 説明文
+        user: user
+      action_type:
+        name: name
+      action:
+        action_type: action_type
+        target: 対象モデル名
+        aciton_code: aciton_code
+        controller: controller
+      aciton_code:
+        info: info
+        sample: sample
