@@ -93,21 +93,20 @@ module ModelsHelper
 
   # マイグレーションに記載する項目のHTMLを作成するメソッド。
   def make_migration_html(column)
-    if column.data_type_id == 13
-      ''
+    html = ''
+    html += insert_space(6)
+    case column.data_type.type
+    when 'references'
+      html += "t.#{column.data_type.type} :#{column.name}, foreign_key: true"
+    when 'ActiveHash'
+      html += "t.integer :#{column.name}_id, null: false"
     else
-      html = ''
-      html += insert_space(6)
       html += "t.#{column.data_type.type} :#{column.name}"
-      if column.data_type.type == 'references'
-        html += ', foreign_key: true'
-      else
-        html += ', null: false' if column.must_exist
-        html += ', unique: true' if column.unique
-      end
-      html += '<br>'
-      html
+      html += ', null: false' if column.must_exist
+      html += ', unique: true' if column.unique
     end
+    html += '<br>'
+    html
   end
 
   # バリデーションにおけるoptionのHTMLを作成するメソッド
