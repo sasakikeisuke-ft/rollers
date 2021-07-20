@@ -1,6 +1,106 @@
 コード表示機能<br>
 コントローラーに関するコードを表示する
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<% name = @app_controller.name %>
+<% names = @app_controller.name.tableize %>
+<% contents = make_controller_html(@app_controller) %>
 
+<div class="terminal-field">
+  <p>ターミナル：関連ファイルの作成</p>
+  <p>rails g controller <%= names %></p>
+</div>
+<div class="terminal-field">
+  <p>ターミナル：対象ファイルへジャンプ</p>
+  <p>app/controllers/<%= names %>_controller.rb -> command + クリック</p>
+</div>
+
+<h2><%= names %>コントローラーの編集</h2>
+<div class="code-field">
+class <%= name.classify %> < ApplicationController<br>
+<%== insert_space(2) %>before_action :find_<%= name %>
+, only: [:edit, :update, :destroy, :show]<br>
+<br>
+
+<% if @app_controller.index_select %>
+  <%== insert_space(2) %>def index<br>
+  <%#== contents[:action_index] %>
+  <%== insert_space(2) %>end<br>
+  <br>
+<% end %>
+
+<% if @app_controller.new_select %>
+  <%== insert_space(2) %>def new<br>
+  <%#== contents[:action_new] %>
+  <%== insert_space(2) %>end<br>
+  <br>
+<% end %>
+
+<% if @app_controller.create_select %>
+  <%== insert_space(2) %>def create<br>
+  <%== insert_space(4) %>@<%= name %> = <%= name.classify %>.new(<%= name %>_params)<br>
+  <%== insert_space(4) %>if @<%= name %>.save<br>
+  <%== insert_space(6) %>redirect_to root_path<br>
+  <%== insert_space(4) %>else<br>
+  <%#== contents[:action_create] %>追加予定<br>
+  <%== insert_space(6) %>render :new<br>
+  <%== insert_space(4) %>end<br>
+  <%== insert_space(2) %>end<br>
+  <br>
+<% end %>
+
+<% if @app_controller.edit_select %>
+  <%== insert_space(2) %>def edit<br>
+  <%#== contents[:action_edit] %>
+  <%== insert_space(2) %>end<br>
+  <br>
+<% end %>
+
+<% if @app_controller.update_select %>
+  <%== insert_space(2) %>def update<br>
+  <%== insert_space(4) %>if @<%= name %>.update<br>
+  <%== insert_space(6) %>redirect_to root_path<br>
+  <%== insert_space(4) %>else<br>
+  <%#== contents[:action_update] %>追加予定<br>
+  <%== insert_space(6) %>render :edit<br>
+  <%== insert_space(4) %>end<br>
+  <%== insert_space(2) %>end<br>
+  <br>
+<% end %>
+
+<% if @app_controller.destroy_select %>
+  <%== insert_space(2) %>def destroy<br>
+  <%== insert_space(4) %>@<%= name %>.destroy<br>
+  <%== insert_space(4) %>redirect_to root_path
+  <%== insert_space(2) %>end<br>
+  <br>
+<% end %>
+
+<% if @app_controller.show_select %>
+  <%== insert_space(2) %>def show<br>
+  <%#== contents[:action_show] %>
+  <%== insert_space(2) %>end<br>
+  <br>
+<% end %>
+
+<%# if private_count != 0 %><%# privateメソッドが必要なら以下を記述する %>
+  <%== insert_space(2) %>private<br>
+  <br>
+  <%#== content[:get_common] %>
+  <%#== content[:model_params] %>
+  <%#== content[:find_model] %>
+  <%# end %>
+</div>
+end
+
+
+<br>
+<br>
+<br>
 <div>
 <%= link_to 'コントローラー一覧へ', application_app_controllers_path %><br>
 <%= link_to 'アプリケーション詳細へ戻る', application_path(params[:application_id]) %><br>

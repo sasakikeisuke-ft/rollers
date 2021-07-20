@@ -1,6 +1,6 @@
 class AppControllersController < ApplicationController
   before_action :get_common_matter, only: [:new, :edit]
-  before_action :find_app_controller, only: [:edit, :update, :destroy]
+  before_action :find_app_controller, only: [:edit, :update, :destroy, :show]
 
   def index
     @application = Application.find(params[:application_id])
@@ -30,7 +30,7 @@ class AppControllersController < ApplicationController
       redirect_to application_app_controllers_path
     else
       get_common_matter
-      render :new
+      render :edit
     end
   end
   
@@ -40,7 +40,6 @@ class AppControllersController < ApplicationController
   end
 
   def show
-    
   end
 
   private
