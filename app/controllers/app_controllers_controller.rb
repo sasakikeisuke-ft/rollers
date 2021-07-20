@@ -38,6 +38,11 @@ class AppControllersController < ApplicationController
     @app_controller.destroy
     redirect_to application_app_controllers_path
   end
+
+  def show
+    
+  end
+
   private
 
   def get_common_matter

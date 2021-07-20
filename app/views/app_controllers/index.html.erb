@@ -8,6 +8,7 @@
         <%= controller.name %>コントローラー<br>
         <%= link_to '編集へ', edit_application_app_controller_path(id: controller) %>
         <%= link_to '削除', application_app_controller_path(id: controller), method: :delete %><br>
+        <%= link_to 'コード表示', application_app_controller_path(id: controller) %>
       </div>
     <% end %>
   <% end %>
@@ -15,6 +16,6 @@
 <br>
 <div>
 <%= link_to 'コントローラー作成へ', new_application_app_controller_path %><br>
-<%= link_to 'アプリケーション詳細へ戻る', application_path(@application) %><br>
+<%= link_to 'アプリケーション詳細へ戻る', application_path(params[:application_id]) %><br>
 <%= link_to 'トップページへ戻る', root_path %>
 </div>
