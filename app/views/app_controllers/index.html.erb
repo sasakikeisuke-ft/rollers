@@ -6,6 +6,7 @@
     <% @app_controllers.each do |controller| %>
       <div>
         <%= controller.name %>コントローラー<br>
+        <%= link_to '編集へ', edit_application_app_controller_path(id: controller) %><br>
       </div>
     <% end %>
   <% end %>

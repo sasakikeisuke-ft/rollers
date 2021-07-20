@@ -1,9 +1,6 @@
 <%= form_with(model: [@application, @app_controller], local: true) do |f| %>
   <%= render 'shared/error_messages', model: f.object %>
-  <p>
-    関連するモデル名をからコントローラー名を作成します。<br>
-    モデルと関連しないコントローラー名を作成する場合、下のフォームから作成してください。
-  </p>
+  
   <div class="field">
     <%= f.label :name, 'コントローラー名' %>
     <%= f.collection_select(:name, @models, :name, :name) %>

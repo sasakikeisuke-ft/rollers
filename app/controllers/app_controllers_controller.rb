@@ -22,6 +22,18 @@ class AppControllersController < ApplicationController
     end
   end
 
+  def edit
+  end
+
+  def update
+    if @app_controller.update(app_controller_params)
+      redirect_to application_app_controllers_path
+    else
+      get_common_matter
+      render :new
+    end
+  end
+
   private
 
   def get_common_matter
@@ -33,6 +45,10 @@ class AppControllersController < ApplicationController
   def app_controller_params
     params.require(:app_controller).permit(:name, :parent, :index_select, :new_select, :create_select, :edit_select, :update_select, 
                                        :destroy_select, :show_select).merge(application_id: params[:application_id])
+  end
+
+  def find_app_controller
+    @app_controller = AppController.find(params[:id])
   end
 
 end
