@@ -33,7 +33,11 @@ class AppControllersController < ApplicationController
       render :new
     end
   end
-
+  
+  def destroy
+    @app_controller.destroy
+    redirect_to application_app_controllers_path
+  end
   private
 
   def get_common_matter
