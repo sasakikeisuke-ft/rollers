@@ -1,14 +1,8 @@
-コード表示機能<br>
-コントローラーに関するコードを表示する
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
 <% name = @app_controller.name %>
 <% names = @app_controller.name.tableize %>
 <% contents = make_controller_html(@app_controller) %>
+
+<h2><%= names %>コントローラーの編集</h2>
 
 <div class="terminal-field">
   <p>ターミナル：関連ファイルの作成</p>
@@ -19,7 +13,6 @@
   <p>app/controllers/<%= names %>_controller.rb -> command + クリック</p>
 </div>
 
-<h2><%= names %>コントローラーの編集</h2>
 <div class="code-field">
 class <%= name.classify %> < ApplicationController<br>
 <%== insert_space(2) %>before_action :find_<%= name %>
@@ -75,7 +68,7 @@ class <%= name.classify %> < ApplicationController<br>
 <% if @app_controller.destroy_select %>
   <%== insert_space(2) %>def destroy<br>
   <%== insert_space(4) %>@<%= name %>.destroy<br>
-  <%== insert_space(4) %>redirect_to root_path
+  <%== insert_space(4) %>redirect_to root_path<br>
   <%== insert_space(2) %>end<br>
   <br>
 <% end %>
@@ -90,9 +83,9 @@ class <%= name.classify %> < ApplicationController<br>
 <%# if private_count != 0 %><%# privateメソッドが必要なら以下を記述する %>
   <%== insert_space(2) %>private<br>
   <br>
-  <%#== content[:get_common] %>
-  <%#== content[:model_params] %>
-  <%#== content[:find_model] %>
+  <%#== contents[:get_common] %>
+  <%== contents[:params] %>
+  <%== contents[:find_model] %>
   <%# end %>
 </div>
 end
