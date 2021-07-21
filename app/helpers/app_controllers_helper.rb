@@ -64,19 +64,18 @@ module AppControllersHelper
   end
 
   def make_find_html(app_controller, contents)
-    parents = @app_controller.application.app_controllers
-    array = []
-    make_find_array(app_controller, parents, array)
-    
     html = "#{insert_space(2)}def find_#{app_controller.name}<br>"
     html += "#{insert_space(4)}@#{app_controller.name} = #{app_controller.name.classify}.find(params[:id])<br>"
-    array.each do |element|
-      html += "#{insert_space(4)}@#{element[:parent]} = @#{element[:child]}.#{element[:parent]}<br>"
-    end
     html += "#{insert_space(2)}end<br><br>"
     contents[:find_model] = html
   end
 
+  # parents = @app_controller.application.app_controllers
+  # array = []
+  # make_find_array(app_controller, parents, array)
+  # array.each do |element|
+  #   html += "#{insert_space(4)}@#{element[:parent]} = @#{element[:child]}.#{element[:parent]}<br>"
+  # end
   def make_find_array(app_controller, parents, array)
     unless app_controller.parent == ''
       parents.each do |parent|
