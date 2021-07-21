@@ -22,11 +22,13 @@ module AppControllersHelper
 
 
   def make_params_html(app_controller, contents)
-    target = app_controller.application.models.includes(:columns).find_by(name: app_controller.name)
+    models = app_controller.application.models
+    model = models.includes(:columns).find_by(name: app_controller.name)
+    devise = models.find_by(model_type_id: 5) # devise対応のモデル
     references_array = []
     activehash_array = []
     normarl_array = []
-    target.columns.each do |column|
+    model.columns.each do |column|
       case column.data_type_id
       when 12
         references_array << column.name
@@ -37,7 +39,7 @@ module AppControllersHelper
       end
     end
     html = "#{insert_space(2)}def #{app_controller.name}_params<br>"
-    html += "#{insert_space(4)}params.require(:#{target.name}).permit("
+    html += "#{insert_space(4)}params.require(:#{model.name}).permit("
     first = true
     normarl_array.each do |element|
       html += ', ' unless first
@@ -50,13 +52,18 @@ module AppControllersHelper
       first = false
     end
     html += ')'
-    first = true
     if references_array.length != 0
+      first = true
       html += '.merge('
       references_array.each do |element|
         html += ', ' unless first
-        html += "#{element}: params[:#{element}]"
-        first = false
+        if element != devise.name
+          html += "#{element}_id: params[:#{element}]"
+          first = false
+        else
+          html += "#{element}_id: current_user.id"
+          first = false
+        end
       end
     end
     html += ")<br>#{insert_space(2)}end<br><br>"
