@@ -98,23 +98,39 @@
   </div>
 </div> <%# /read_me %>
 
-<div class="terminal-field">
-  <p>ターミナル：対象ファイルの作成</p>
-  <p>touch config/locales/ja.yml</p>
+<%# ルーティングに関するHTML %>
+<div class="rooting">
+  <div class="terminal-field">
+    <p>ターミナル：対象ファイルへのジャンプ</p>
+    <p>code config/routes.rb</p>
+  </div>
+  <div class="code-field">
+    Rails.application.routes.draw do
+    <%== "<br>#{insert_space(2)}devise_for :#{@devise.name}" if @gemfile.rails_i18n %>
+    <%== make_rooting_html(@app_controllers) %><br>
+    end
+  </div>
 </div>
-<div class="terminal-field">
-  <p>ターミナル：対象ファイルへのジャンプ</p>
-  <p>code config/locales/ja.yml</p>
-</div>
-<div class="code-field">
-ja:<br>
-<%== insert_space(2) %>activerecord:<br>
-<%== insert_space(4) %>attributes:<br>
 
-<%# ヘルパーメソッドを使用し、各モデルごとに必要なHTMLを作成 %>
-<%== make_japanise_html(@models) %>
+<div class="japanese">
+  <div class="terminal-field">
+    <p>ターミナル：対象ファイルの作成</p>
+    <p>touch config/locales/ja.yml</p>
+  </div>
+  <div class="terminal-field">
+    <p>ターミナル：対象ファイルへのジャンプ</p>
+    <p>code config/locales/ja.yml</p>
+  </div>
+  <div class="code-field">
+  ja:<br>
+  <%== insert_space(2) %>activerecord:<br>
+  <%== insert_space(4) %>attributes:<br>
 
+  <%# ヘルパーメソッドを使用し、各モデルごとに必要なHTMLを作成 %>
+  <%== make_japanise_html(@models) %>
+  </div>
 </div>
+
 <%= link_to 'モデル一覧へ', application_models_path %><br>
 <%= link_to 'アプリケーション詳細ページへ戻る', application_path %><br>
 <%= link_to 'トップページに戻る', root_path %>

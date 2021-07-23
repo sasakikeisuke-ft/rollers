@@ -31,7 +31,10 @@ class GemfilesController < ApplicationController
   def show
     @application = Application.includes(models: :columns).find(params[:id])
     @models = @application.models
-    @columns = Column.where(application_id: @application)
+    @columns = Column.includes(:model).where(application_id: @application)
+    @gemfile = @application.gemfile
+    @devise = @models.find_by(model_type_id: 5)
+    @app_controllers = @application.app_controllers
   end
 
   private
