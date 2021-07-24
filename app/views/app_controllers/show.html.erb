@@ -15,12 +15,13 @@
 
 <div class="code-field">
   class <%= name.classify %> < ApplicationController<br>
+  <%== contents[:authenticate] %>
   <%== contents[:before_find] %>
   <br>
 
   <% if @app_controller.index_select >= 2 %>
     <%== insert_space(2) %>def index<br>
-    <%#== contents[:action_index] %>
+    <%== contents[:action_index] %>
     <%== insert_space(2) %>end<br>
     <br>
   <% end %>
@@ -38,7 +39,7 @@
     <%== insert_space(4) %>if @<%= name %>.save<br>
     <%== insert_space(6) %>redirect_to root_path<br>
     <%== insert_space(4) %>else<br>
-    <%#== contents[:action_create] %>追加予定<br>
+    <%== contents[:action_create] %>
     <%== insert_space(6) %>render :new<br>
     <%== insert_space(4) %>end<br>
     <%== insert_space(2) %>end<br>
@@ -57,7 +58,7 @@
     <%== insert_space(4) %>if @<%= name %>.update<br>
     <%== insert_space(6) %>redirect_to root_path<br>
     <%== insert_space(4) %>else<br>
-    <%#== contents[:action_update] %>追加予定<br>
+    <%== contents[:action_update] %><br>
     <%== insert_space(6) %>render :edit<br>
     <%== insert_space(4) %>end<br>
     <%== insert_space(2) %>end<br>
@@ -74,7 +75,7 @@
 
   <% if @app_controller.show_select >= 2 %>
     <%== insert_space(2) %>def show<br>
-    <%#== contents[:action_show] %>
+    <%== contents[:action_show] %>
     <%== insert_space(2) %>end<br>
     <br>
   <% end %>
@@ -83,11 +84,10 @@
   <%== insert_space(2) %>private<br>
   <br>
   <%#== contents[:get_common] %>
-  <%== contents[:params] %>
-  <%== contents[:find_model] %>
-  <%== contents[:form] %>
+  <%== contents[:params] %><br>
+  <%== contents[:find_model] %><br>
+  <%== contents[:form] %><br>
   <%# end %>
-<br>
 end
 </div>
 

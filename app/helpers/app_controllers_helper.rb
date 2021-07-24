@@ -6,34 +6,48 @@ module AppControllersHelper
 
   # コントローラーのHTMLを作成するメソッドを起動するメソッド。
   def make_controller_html(app_controller)
-    contents = {
-      before_find_count: 0,
-      before_common_count: 0,
-      action_index: '',
-      action_new: '',
-      action_create: '',
-      action_edit: '',
-      action_update: '',
-      action_destroy: '',
-      action_show: ''
-    }
+    contents = {}
 
-    # app_controller.actions.each do |action|
 
     if app_controller.create_select || app_controller.update
       contents[:params] = true
     end
-    before_find_html(app_controller, contents)
+    
+    before_authenticate_html(app_controller, contents)
+    before_find_html(app_controller, contents) 
     make_params_html(app_controller, contents) if contents[:params]
-    make_find_html(app_controller, contents)
     make_form_html(app_controller, contents)
+
+    # app_controller.actions.each do |action|
+    # end
     contents
   end
 
-  def count_action(app_controller)
-    
+  # before_actionにおけるauthenticate_user!のHTMLを作成するメソッド
+  def before_authenticate_html(app_controller, contents)
+    contents[:authenticate] = "#{insert_space(2)}before_action :authenticate_user!"
+    action_html = ', only: ['
+    first = true
+    action_count = 0
+    actions = ['index', 'new', 'create', 'edit', 'update', 'destroy', 'show']
+    actions.each do |action|
+      if app_controller["#{action}_select".to_sym] >= 3
+        action_html += ', ' unless first
+        action_html += ":#{action}"
+        first = false
+        action_count += 1
+      end  
+    end
+    case action_count
+    when 7
+      contents[:authenticate] += '<br>'
+    when 0
+      contents[:authenticate] = ''
+    else
+      action_html += ']<br>'
+      contents[:authenticate] += action_html
+    end
   end
-
 
   # ストロングパラメーター取得メソッドに関するHTMLを作成するメソッド
   def make_params_html(app_controller, contents)
@@ -84,7 +98,7 @@ module AppControllersHelper
         end
       end
     end
-    html += ")<br>#{insert_space(2)}end<br><br>"
+    html += ")<br>#{insert_space(2)}end<br>"
     contents[:params] = html
   end
 
@@ -92,7 +106,7 @@ module AppControllersHelper
   def make_find_html(app_controller, contents)
     html = "#{insert_space(2)}def find_#{app_controller.name}<br>"
     html += "#{insert_space(4)}@#{app_controller.name} = #{app_controller.name.classify}.find(params[:id])<br>"
-    html += "#{insert_space(2)}end<br><br>"
+    html += "#{insert_space(2)}end<br>"
     contents[:find_model] = html
   end
 
@@ -108,12 +122,22 @@ module AppControllersHelper
         contents[:before_find] += ":#{action}"
         first = false
         action_count += 1
+        contents["#{action}_exist".to_sym] = true
       end  
     end
-    if action_count == 0
+    case action_count
+    when 0
       contents[:before_find] = ''
+    when 1
+      contents[:before_find] = ''
+      actions.each do |action|
+        if contents["#{action}_exist".to_sym]
+          contents["action_#{action}".to_sym] = "#{insert_space(4)}@#{app_controller.name} = #{app_controller.name.classify}.find(params[:id])<br>"
+        end
+      end
     else
-      contents[:before_find] += ']'
+      contents[:before_find] += ']<br>'
+      make_find_html(app_controller, contents)
     end
   end
 
@@ -126,8 +150,8 @@ module AppControllersHelper
       contents[:form] = "#{insert_space(2)}def instance_variable_for_form<br>"
       make_form_code(relations, contents)
       contents[:form] += "#{insert_space(2)}end<br>"
-      contents[:action_new] += "#{insert_space(4)}instance_variable_for_form<br>"
-      contents[:action_edit] += "#{insert_space(4)}instance_variable_for_form<br>"
+      contents[:action_new] = "#{insert_space(4)}instance_variable_for_form<br>"
+      contents[:action_edit] = "#{insert_space(4)}instance_variable_for_form<br>"
     end
   end
   
