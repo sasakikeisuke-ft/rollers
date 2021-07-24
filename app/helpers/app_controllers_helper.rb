@@ -23,7 +23,7 @@ module AppControllersHelper
     if app_controller.create_select || app_controller.update
       contents[:params] = true
     end
-
+    before_find_html(app_controller, contents)
     make_params_html(app_controller, contents) if contents[:params]
     make_find_html(app_controller, contents)
     make_form_html(app_controller, contents)
@@ -94,6 +94,27 @@ module AppControllersHelper
     html += "#{insert_space(4)}@#{app_controller.name} = #{app_controller.name.classify}.find(params[:id])<br>"
     html += "#{insert_space(2)}end<br><br>"
     contents[:find_model] = html
+  end
+
+  # 上記find_modelメソッドをbefore_actionとして機能するHTMLを作成するメソッド
+  def before_find_html(app_controller, contents)
+    contents[:before_find] = "#{insert_space(2)}before_action :find_#{app_controller.name}, only: ["
+    first = true
+    action_count = 0
+    actions = ['edit', 'update', 'destroy', 'show']
+    actions.each do |action|
+      if app_controller["#{action}_select".to_sym] >= 2
+        contents[:before_find] += ', ' unless first
+        contents[:before_find] += ":#{action}"
+        first = false
+        action_count += 1
+      end  
+    end
+    if action_count == 0
+      contents[:before_find] = ''
+    else
+      contents[:before_find] += ']'
+    end
   end
 
   # フォームの部分テンプレートに必要なインスタンス変数を取得するメソッド

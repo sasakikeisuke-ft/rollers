@@ -15,8 +15,7 @@
 
 <div class="code-field">
   class <%= name.classify %> < ApplicationController<br>
-  <%== insert_space(2) %>before_action :find_<%= name %>
-  , only: [:edit, :update, :destroy, :show]<br>
+  <%== contents[:before_find] %>
   <br>
 
   <% if @app_controller.index_select >= 2 %>
