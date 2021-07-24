@@ -8,7 +8,14 @@ module AppControllersHelper
   def make_controller_html(app_controller)
     contents = {
       before_find_count: 0,
-      before_common_count: 0
+      before_common_count: 0,
+      action_index: '',
+      action_new: '',
+      action_create: '',
+      action_edit: '',
+      action_update: '',
+      action_destroy: '',
+      action_show: ''
     }
 
     # app_controller.actions.each do |action|
@@ -19,6 +26,7 @@ module AppControllersHelper
 
     make_params_html(app_controller, contents) if contents[:params]
     make_find_html(app_controller, contents)
+    make_form_html(app_controller, contents)
     contents
   end
 
@@ -80,7 +88,7 @@ module AppControllersHelper
     contents[:params] = html
   end
 
-  # create/edit/update/showで共通するfindを作成するメソッド
+  # create/edit/update/showで共通するfind_modelメソッドを作成するメソッド
   def make_find_html(app_controller, contents)
     html = "#{insert_space(2)}def find_#{app_controller.name}<br>"
     html += "#{insert_space(4)}@#{app_controller.name} = #{app_controller.name.classify}.find(params[:id])<br>"
@@ -88,13 +96,21 @@ module AppControllersHelper
     contents[:find_model] = html
   end
 
-  # parents = @app_controller.application.app_controllers
-  # array = []
-  # make_find_array(app_controller, parents, array)
-  # array.each do |element|
-  #   html += "#{insert_space(4)}@#{element[:parent]} = @#{element[:child]}.#{element[:parent]}<br>"
-  # end
-  def make_find_array(app_controller, parents, array)
+  # フォームの部分テンプレートに必要なインスタンス変数を取得するメソッド
+  def make_form_html(app_controller, contents)
+    parents = app_controller.application.app_controllers
+    relations = []
+    make_form_relations(app_controller, parents, relations)
+    unless relations.length == 0
+      contents[:form] = "#{insert_space(2)}def instance_variable_for_form<br>"
+      make_form_code(relations, contents)
+      contents[:form] += "#{insert_space(2)}end<br>"
+      contents[:action_new] += "#{insert_space(4)}instance_variable_for_form<br>"
+      contents[:action_edit] += "#{insert_space(4)}instance_variable_for_form<br>"
+    end
+  end
+  
+  def make_form_relations(app_controller, parents, relations)
     unless app_controller.parent == ''
       parents.each do |parent|
         if parent.name == app_controller.parent
@@ -102,22 +118,16 @@ module AppControllersHelper
             child: app_controller.name,
             parent: parent.name
           }
-          array << content
-          make_find_array(parent, parents, array)
+          relations << content
+          make_form_relations(parent, parents, relations)
         end
       end
     end
   end
 
-  # 失敗作。スコープの問題だと思うが原因がわかっていない。後学のため残してく。
-  def add_find_html(app_controller, parents, html)
-    if app_controller.parent != ''
-      parents.each do |parent|
-        if parent.name == app_controller.parent
-          html += "#{insert_space(4)}@#{parent.name} = @#{app_controller.name}.#{parent.name}<br>"
-         add_find_html(parent, parents, html) 
-        end
-      end
+  def make_form_code(relations, contents)
+    relations.each do |relation|
+      contents[:form] += "#{insert_space(4)}@#{relation[:parent]} = @#{relation[:child]}.#{relation[:parent]}<br>"
     end
   end
 
