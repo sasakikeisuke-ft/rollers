@@ -102,47 +102,14 @@ module GemfilesHelper
     action_html = ', only: ['
     first = true
     action_count = 0
-    if relation[:index_select] >= 2
-      action_html += ', ' unless first
-      action_html += ':index'
-      first = false
-      action_count += 1
-    end
-    if relation[:new_select] >= 2
-      action_html += ', ' unless first
-      action_html += ':new'
-      first = false
-      action_count += 1
-    end
-    if relation[:create_select] >= 2
-      action_html += ', ' unless first
-      action_html += ':create'
-      first = false
-      action_count += 1
-    end
-    if relation[:edit_select] >= 2
-      action_html += ', ' unless first
-      action_html += ':edit'
-      first = false
-      action_count += 1
-    end
-    if relation[:update_select] >= 2
-      action_html += ', ' unless first
-      action_html += ':update'
-      first = false
-      action_count += 1
-    end
-    if relation[:destroy_select] >= 2
-      action_html += ', ' unless first
-      action_html += ':destroy'
-      first = false
-      action_count += 1
-    end
-    if relation[:show_select] >= 2
-      action_html += ', ' unless first
-      action_html += ':show'
-      first = false
-      action_count += 1
+    actions = ['index', 'new', 'create', 'edit', 'update', 'destroy', 'show']
+    actions.each do |action|
+      if relation["#{action}_select".to_sym] >= 2
+        action_html += ', ' unless first
+        action_html += ":#{action}"
+        first = false
+        action_count += 1
+      end  
     end
     if action_count == 7
       action_html = ''
@@ -151,5 +118,6 @@ module GemfilesHelper
     end
     action_html
   end
+
 
 end
