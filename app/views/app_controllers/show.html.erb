@@ -19,21 +19,21 @@ class <%= name.classify %> < ApplicationController<br>
 , only: [:edit, :update, :destroy, :show]<br>
 <br>
 
-<% if @app_controller.index_select %>
+<% if @app_controller.index_select >= 2 %>
   <%== insert_space(2) %>def index<br>
   <%#== contents[:action_index] %>
   <%== insert_space(2) %>end<br>
   <br>
 <% end %>
 
-<% if @app_controller.new_select %>
+<% if @app_controller.new_select >= 2 %>
   <%== insert_space(2) %>def new<br>
   <%#== contents[:action_new] %>
   <%== insert_space(2) %>end<br>
   <br>
 <% end %>
 
-<% if @app_controller.create_select %>
+<% if @app_controller.create_select >= 2 %>
   <%== insert_space(2) %>def create<br>
   <%== insert_space(4) %>@<%= name %> = <%= name.classify %>.new(<%= name %>_params)<br>
   <%== insert_space(4) %>if @<%= name %>.save<br>
@@ -46,14 +46,14 @@ class <%= name.classify %> < ApplicationController<br>
   <br>
 <% end %>
 
-<% if @app_controller.edit_select %>
+<% if @app_controller.edit_select >= 2 %>
   <%== insert_space(2) %>def edit<br>
   <%#== contents[:action_edit] %>
   <%== insert_space(2) %>end<br>
   <br>
 <% end %>
 
-<% if @app_controller.update_select %>
+<% if @app_controller.update_select >= 2 %>
   <%== insert_space(2) %>def update<br>
   <%== insert_space(4) %>if @<%= name %>.update<br>
   <%== insert_space(6) %>redirect_to root_path<br>
@@ -65,7 +65,7 @@ class <%= name.classify %> < ApplicationController<br>
   <br>
 <% end %>
 
-<% if @app_controller.destroy_select %>
+<% if @app_controller.destroy_select >= 2 %>
   <%== insert_space(2) %>def destroy<br>
   <%== insert_space(4) %>@<%= name %>.destroy<br>
   <%== insert_space(4) %>redirect_to root_path<br>
@@ -73,7 +73,7 @@ class <%= name.classify %> < ApplicationController<br>
   <br>
 <% end %>
 
-<% if @app_controller.show_select %>
+<% if @app_controller.show_select >= 2 %>
   <%== insert_space(2) %>def show<br>
   <%#== contents[:action_show] %>
   <%== insert_space(2) %>end<br>
