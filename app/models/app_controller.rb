@@ -14,4 +14,5 @@ class AppController < ApplicationRecord
   end
 
   belongs_to :application
+  has_many :actions
 end
