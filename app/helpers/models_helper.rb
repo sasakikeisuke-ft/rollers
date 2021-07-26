@@ -583,25 +583,30 @@ module ModelsHelper
   def make_activehash_html(model, columns)
     html = "class = #{model.name.classify}<br>"
     html += "#{insert_space(2)}self.data = [<br>"
-    before = "#{insert_space(4)}{ id: "
-    center = ''
-    model.columns.each do |column|
-      center += ', '
-      center += column.name
-      center += ": "
-    end
-    after = ' }'
-    content = "'--'"
+    content = ''
     6.times do |i|
-      content = "'内容'" if i >= 1
-      content = "'最後'" if i == 5
-      html += "#{before}#{i}#{center}#{content}#{after}"
-      html += ',' if i != 5
-      html += '<br>'
+      content += "#{insert_space(4)}{ id: #{i}"
+      model.columns.each do |column|
+        content += ", #{column.name}: "
+        case i
+        when 0
+          content += "'----'"
+        when 5
+          content += "'最後'"
+        else
+          content += "'内容'"
+        end
+      end
+      if i !=5
+        content += ' },<br>'
+      else
+        content += ' }<br>'
+      end
     end
+    html += content
     html += "#{insert_space(2)}]<br>"
     html += "#{insert_space(2)}include ActiveHash::Associations<br>"
-    html += make_has(columns, model)
+    html += "#{make_has(columns, model)}"
     html
   end
 
