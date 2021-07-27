@@ -14,7 +14,7 @@
 </div>
 
 <div class="code-field">
-  class <%= name.classify %> < ApplicationController<br>
+  class <%= name.pluralize.camelize %>Controller < ApplicationController<br>
   <%== contents[:authenticate] %>
   <%== contents[:before_find] %>
   <br>
@@ -58,7 +58,7 @@
     <%== insert_space(4) %>if @<%= name %>.update<br>
     <%== insert_space(6) %>redirect_to root_path<br>
     <%== insert_space(4) %>else<br>
-    <%== contents[:action_update] %><br>
+    <%== contents[:action_update] %>
     <%== insert_space(6) %>render :edit<br>
     <%== insert_space(4) %>end<br>
     <%== insert_space(2) %>end<br>
