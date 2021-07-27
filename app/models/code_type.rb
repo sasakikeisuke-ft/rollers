@@ -1,4 +1,4 @@
-class Code < ActiveHash::Base
+class CodeType < ActiveHash::Base
   self.data = [
 
     # インスタンスを作成
