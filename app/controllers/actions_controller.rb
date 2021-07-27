@@ -7,7 +7,6 @@ class ActionsController < ApplicationController
   end
 
   def create
-    binding.pry
     @action = Action.new(action_params)
     if @action.save
       redirect_to new_application_app_controller_action_path

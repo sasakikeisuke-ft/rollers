@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_26_065023) do
+ActiveRecord::Schema.define(version: 2021_07_27_125700) do
 
   create_table "actions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "action_type_id", null: false
@@ -23,6 +23,19 @@ ActiveRecord::Schema.define(version: 2021_07_26_065023) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["app_controller_id"], name: "index_actions_on_app_controller_id"
+  end
+
+  create_table "app_actions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "action_type_id", null: false
+    t.string "target", null: false
+    t.integer "code_type_id", null: false
+    t.bigint "app_controller_id"
+    t.string "input1"
+    t.string "input2"
+    t.string "input3"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["app_controller_id"], name: "index_app_actions_on_app_controller_id"
   end
 
   create_table "app_controllers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -117,6 +130,7 @@ ActiveRecord::Schema.define(version: 2021_07_26_065023) do
   end
 
   add_foreign_key "actions", "app_controllers"
+  add_foreign_key "app_actions", "app_controllers"
   add_foreign_key "app_controllers", "applications"
   add_foreign_key "applications", "users"
   add_foreign_key "columns", "applications"
