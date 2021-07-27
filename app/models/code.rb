@@ -1,4 +1,4 @@
-class AcitonCode < ActiveHash::Base
+class Code < ActiveHash::Base
   self.data = [
     { id: 0, info: '------', sample: '------' },
 
