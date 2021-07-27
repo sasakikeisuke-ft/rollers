@@ -7,9 +7,10 @@ class ActionsController < ApplicationController
   end
 
   def create
+    binding.pry
     @action = Action.new(action_params)
     if @action.save
-      redirect_to root_path
+      redirect_to new_application_app_controller_action_path
     else
       render :new
     end
@@ -34,7 +35,7 @@ class ActionsController < ApplicationController
   private
 
   def action_params
-    params.require(:action).permit(:target, :input1, :input2, :input3, :action_type_id, :aciton_code_id).merge(app_controller_id: params[:app_controller])
+    params.require(:action).permit(:target, :input1, :input2, :input3, :action_type_id, :aciton_code_id).merge(app_controller_id: params[:app_controller_id])
   end
 
   def find_action

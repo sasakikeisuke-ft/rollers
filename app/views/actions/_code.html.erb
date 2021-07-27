@@ -1,5 +1,20 @@
 <div class="field">
-
+  <% case code.id %>
+  <% when 1 %>
+    <p>インスタンスを作成する。</p>
+  <%  when 11 %>
+    <p>一つのレコードを取得する。</p>
+  <% when 21 %>
+    <p>複数のレコードを取得する。</p>
+  <% when 41 %>
+    <p>複数のレコードと関連するテーブルを取得</p>
+  <% when 61 %>
+    <p>上記以外のレコード取得方法</p>
+  <% when 81 %>
+    <p>アソシエーションを利用してレコードを取得</p>
+  <% when 91 %>
+    <p>オリジナルアクションを作成する場合、collection/memberを選択してください。</p>
+  <% end %>
   <%= f.radio_button :action_code_id, :id %><%== code.sample %>
 
 </div>
