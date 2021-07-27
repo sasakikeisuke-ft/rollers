@@ -1,0 +1,26 @@
+<%= form_with(model: [@application, @app_controller, @action], local: true) do |f| %>
+  <div class="field">
+    <%= f.label :action_type_id, 'アクションの選択' %>
+    <%= f.collection_select(:action_type_id, ActionType.all, :name, :name) %>
+  </div>
+
+  <div class="field">
+    <%= f.label :target, '対象のモデル名を選択' %>
+    <%= f.collection_select(:target, @models, :name, :name) %>
+  </div>
+
+  <%= render partial: "code", collection: Code.all, locals: {f: f} %>
+
+  <div class="field">
+    <%= f.label :input1, '条件式1' %>
+    <%= f.text_field :input1 %>
+  </div>
+  <div class="field">
+    <%= f.label :input2, '条件式2' %>
+    <%= f.text_field :input2 %>
+  </div>
+  <div class="field">
+    <%= f.label :input3, '条件式3' %>
+    <%= f.text_field :input3 %>
+  </div>
+<% end %>

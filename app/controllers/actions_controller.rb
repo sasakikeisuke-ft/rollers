@@ -42,8 +42,9 @@ class ActionsController < ApplicationController
   end
 
   def instance_variable_for_form
-    @app_controller = @action.app_controller
+    @app_controller = AppController.find(params[:app_controller_id])
     @application = @app_controller.application
+    @models = @application.models
   end
 
 end
