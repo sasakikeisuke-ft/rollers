@@ -18,8 +18,8 @@ class OptionType < ActiveHash::Base
       message_ja: 'は英数字のみで入力してください', message_en: 'is invalid. Input harf-width numbers and characters' },
     { id: 19, type: 'format', info: '英字数字記号で登録可', code: ', format: { with: /\A[a-zA-Z0-9!-/:-@¥[-`{-~]+\z/, message: ',
       message_ja: 'は英数字および記号のみで入力してください', message_en: 'is invalid.' },
-    { id: 20, type: 'format', info: '郵便番号形式で登録可', code: ', format: { with: /\A\d{3}-\d{4}\z/, message: ',
-      message_ja: 'を入力してください。例：123-4567', message_en: ' is invalid. Enter it as follows (e.g. 123-4567)' },
+    # { id: 20, type: 'format', info: '郵便番号形式で登録可', code: ', format: { with: /\A\d{3}-\d{4}\z/, message: ',
+    #   message_ja: 'を入力してください。例：123-4567', message_en: ' is invalid. Enter it as follows (e.g. 123-4567)' },
 
     { id: 21, type: 'numericality', info: '数値のみで登録する', code: 'numericality: { only_integer: true }, message: ',
       message_ja: 'は半角数字を入力してください', message_en: ' is invalid. Input harf-width numbers' },
