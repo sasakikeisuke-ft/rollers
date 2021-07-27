@@ -1,8 +1,8 @@
 class AppController < ApplicationRecord
   with_options presence: true do
-    validates :name, uniqueness: { case_sensitive: false, scope: :application_id, message: "はすでに存在します" }
+    validates :name, uniqueness: { case_sensitive: false, scope: :application_id, message: 'はすでに存在します' }
     with_options format: { with: /\A[0-9]+\z/, message: 'は半角数字を入力してください' },
-                           numericality: { other_than: 0, message: "を選択してください" } do
+                 numericality: { other_than: 0, message: 'を選択してください' } do
       validates :index_select
       validates :new_select
       validates :create_select

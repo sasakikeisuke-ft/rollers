@@ -56,22 +56,22 @@ module GemfilesHelper
   # コントローラーの親子関係とアクションの内容をまとめた配列を作成するメソッド
   def make_rooting_relations(app_controllers, relations, parent, deep)
     app_controllers.each do |app_controller|
-      if app_controller.parent == parent
-        content = {
-          child: app_controller.name,
-          parent: parent,
-          deep: deep + 2,
-          index_select: app_controller.index_select,
-          new_select: app_controller.new_select,
-          create_select: app_controller.create_select,
-          edit_select: app_controller.edit_select,
-          update_select: app_controller.update_select,
-          destroy_select: app_controller.destroy_select,
-          show_select: app_controller.show_select
-        }
-        relations << content
-        make_rooting_relations(app_controllers, relations, app_controller.name, deep + 2)
-      end
+      next unless app_controller.parent == parent
+
+      content = {
+        child: app_controller.name,
+        parent: parent,
+        deep: deep + 2,
+        index_select: app_controller.index_select,
+        new_select: app_controller.new_select,
+        create_select: app_controller.create_select,
+        edit_select: app_controller.edit_select,
+        update_select: app_controller.update_select,
+        destroy_select: app_controller.destroy_select,
+        show_select: app_controller.show_select
+      }
+      relations << content
+      make_rooting_relations(app_controllers, relations, app_controller.name, deep + 2)
     end
   end
 
@@ -81,7 +81,7 @@ module GemfilesHelper
     relations.each do |relation|
       if relation[:deep] > deep
         deep = relation[:deep]
-        contents[:html] += " do"
+        contents[:html] += ' do'
       elsif relation[:deep] < deep
         while deep - 2 >= relation[:deep]
           deep -= 2
@@ -102,14 +102,14 @@ module GemfilesHelper
     action_html = ', only: ['
     first = true
     action_count = 0
-    actions = ['index', 'new', 'create', 'edit', 'update', 'destroy', 'show']
+    actions = %w[index new create edit update destroy show]
     actions.each do |action|
-      if relation["#{action}_select".to_sym] >= 2
-        action_html += ', ' unless first
-        action_html += ":#{action}"
-        first = false
-        action_count += 1
-      end  
+      next unless relation["#{action}_select".to_sym] >= 2
+
+      action_html += ', ' unless first
+      action_html += ":#{action}"
+      first = false
+      action_count += 1
     end
     if action_count == 7
       action_html = ''
@@ -118,6 +118,4 @@ module GemfilesHelper
     end
     action_html
   end
-
-
 end

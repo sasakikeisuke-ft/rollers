@@ -1,6 +1,6 @@
 class Action < ApplicationRecord
   validates :target, presence: true
-  with_options numericality: { other_than: 0, message: " can't be blank"} do
+  with_options numericality: { other_than: 0, message: " can't be blank" } do
     validates :action_type_id
     validates :aciton_code_id
   end

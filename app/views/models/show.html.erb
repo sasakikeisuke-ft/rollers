@@ -271,9 +271,9 @@
     <%== contents_html[:factorybot_html] %>
     
     <% if @model.model_type_id == 5 %>
-      <%== insert_space(4) %>email {Faker::Internet.free_email}<br>
-      <%== insert_space(4) %>password {Faker::Internet.password(min_length: 6)}<br>
-      <%== insert_space(4) %>password_confirmation {password}<br>
+      <%== insert_space(4) %>email { Faker::Internet.free_email }<br>
+      <%== insert_space(4) %>password { Faker::Internet.password(min_length: 6) }<br>
+      <%== insert_space(4) %>password_confirmation { password }<br>
     <% end %>
 
     <%# ヘルパーメソッドを使用し、FactoryBotのアソシエーションに関するHTMLを作成する %>

@@ -59,7 +59,7 @@ module ModelsHelper
 
     common = 'numericality: { other_than: 0, message: "'
     common += " can't be blank"
-    common += '"}'
+    common += '" }'
     validation_html += make_validation_html(activehash_group, common)
 
     common = ''
@@ -246,6 +246,7 @@ module ModelsHelper
       html += '<br>'
       # 中間テーブルの場合、
       next unless target.model_type_id == 3
+
       target_columns = target.columns.where.not(name: model.name)
       target_columns.each do |tie|
         html += insert_space(2)
@@ -588,20 +589,20 @@ module ModelsHelper
       content += "#{insert_space(4)}{ id: #{i}"
       model.columns.each do |column|
         content += ", #{column.name}: "
-        case i
-        when 0
-          content += "'----'"
-        when 5
-          content += "'最後'"
-        else
-          content += "'内容'"
-        end
+        content += case i
+                   when 0
+                     "'----'"
+                   when 5
+                     "'最後'"
+                   else
+                     "'内容'"
+                   end
       end
-      if i !=5
-        content += ' },<br>'
-      else
-        content += ' }<br>'
-      end
+      content += if i != 5
+                   ' },<br>'
+                 else
+                   ' }<br>'
+                 end
     end
     html += content
     html += "#{insert_space(2)}]<br>"

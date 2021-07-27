@@ -68,7 +68,8 @@ RSpec.describe AppController, type: :model do
       end
       it 'nameの重複があり登録できない' do
         @app_controller.save
-        another_app_controller = FactoryBot.build(:app_controller, name: @app_controller.name, application_id: @app_controller.application_id)
+        another_app_controller = FactoryBot.build(:app_controller, name: @app_controller.name,
+                                                                   application_id: @app_controller.application_id)
         another_app_controller.valid?
         expect(@app_controller.errors.full_messages).to include('コントローラー名はすでに存在します')
       end

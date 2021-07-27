@@ -6,5 +6,4 @@ class Application < ApplicationRecord
   has_many :models, dependent: :destroy
   has_many :columns, dependent: :destroy
   has_many :app_controllers, dependent: :destroy
-  
 end

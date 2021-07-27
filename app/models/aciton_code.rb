@@ -16,7 +16,7 @@ class AcitonCode < ActiveHash::Base
     { id: 13, info: '内容', sample: '@model = Model.where(条件式1).find_by(条件式2)' },
     { id: 14, info: '内容', sample: '@model = Model.where(条件式1, 条件式2).find_by(条件式3)' },
     { id: 15, info: '内容', sample: '@model = Model.where(条件式1).where.not(条件式2).find_by(条件式3)' },
-    
+
     # 複数のレコードを取得
     { id: 21, info: '内容', sample: '@models = Model.all' },
     { id: 22, info: '内容', sample: '@models = Model.where(条件式1)' },
@@ -61,7 +61,7 @@ class AcitonCode < ActiveHash::Base
     { id: 82, info: '内容', sample: '@B_model = @A_models.B_model' },
     { id: 83, info: '内容', sample: '@B_models = @A_model.B_models' },
     { id: 84, info: '内容', sample: '@B_models = @A_model.B_models' },
-    
+
     { id: 91, info: '内容', sample: 'collection' },
     { id: 92, info: '内容', sample: 'member' }
   ]
