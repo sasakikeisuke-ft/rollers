@@ -1,4 +1,4 @@
-class = AcitonCode
+class AcitonCode < ActiveHash::Base
   self.data = [
     { id: 0, info: '------', sample: '------' },
 
@@ -67,3 +67,4 @@ class = AcitonCode
   ]
   include ActiveHash::Associations
   has_many :actions
+end

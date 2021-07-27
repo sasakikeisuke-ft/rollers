@@ -58,7 +58,7 @@ module ModelsHelper
     validation_html += make_validation_html(boolean_group, common)
 
     common = 'numericality: { other_than: 0, message: "'
-    common += "can't be blank"
+    common += " can't be blank"
     common += '"}'
     validation_html += make_validation_html(activehash_group, common)
 
@@ -445,7 +445,7 @@ module ModelsHelper
       content[:column] = group[:name]
       content[:column_ja] = group[:name]
       content[:info] = 'が空欄だと登録できない'
-      content[:change] = ''
+      content[:change] = "''"
       content[:message_ja] = ' must exist'
       content[:message_en] = ' must exist'
       abnormal_groups << content
@@ -492,7 +492,7 @@ module ModelsHelper
   def make_factorybot_html(column)
     return '' if column.data_type_id == 12
 
-    html = "#{insert_space(4)}#{column.name} { "
+    html = "#{insert_space(4)}#{column.name}"
     case column.data_type_id
     when 1 # 'string'
       if column.options.length != 0
@@ -500,68 +500,68 @@ module ModelsHelper
         column.options.each do |option|
           case option.option_type.info
           when '漢字かなカナで登録可'
-            html += 'Gimei.kanji }'
+            html += ' { Gimei.kanji }'
             done = true
           when 'ひらがなのみで登録可'
-            html += 'Gimei.hiragana }'
+            html += ' { Gimei.hiragana }'
             done = true
           when 'カタカナのみで登録可'
-            html += 'Gimei.katakana }'
+            html += ' { Gimei.katakana }'
             done = true
           when '郵便番号形式で登録可'
-            html += "'123-4567'}"
+            html += " { '123-4567'}"
             done = true
           end
         end
-        html += 'Faker::Lorem.characters(number: 8) }' unless done
+        html += ' { Faker::Lorem.characters(number: 8) }' unless done
       else
-        html += 'Faker::Lorem.characters(number: 8) }'
+        html += ' { Faker::Lorem.characters(number: 8) }'
       end
     when 2 # 'text'
-      html += 'Faker::Lorem.sentence }'
+      html += ' { Faker::Lorem.sentence }'
     when 3 # 'integer'
       if column.options.length != 0
         column.options.each do |option|
           case option.option_type.info
           when '数値のみで登録する'
-            html += 'Faker::Number(digits: 8) }'
+            html += ' { Faker::Number(digits: 8) }'
           when '上限下限を設定する'
-            html += 'Faker::Number.within(range: '
+            html += ' { Faker::Number.within(range: '
             html += option.input2 unless option.input2.nil?
             html += '..'
             html += option.input1 unless option.input1.nil?
             html += ') }'
           when '上限のみを設定する'
-            html += 'Faker::Number.within(range: '
+            html += ' { Faker::Number.within(range: '
             html += '0..'
             html += option.input1 unless option.input1.nil?
             html += ') }'
           when '下限のみを設定する'
-            html += 'Faker::Number.within(range: '
+            html += ' { Faker::Number.within(range: '
             html += option.input2 unless option.input2.nil?
             html += '..10000000'
             html += ') }'
           when '未選択状態での禁止'
-            html += 'Faker::Number.non_zero_digit }'
+            html += ' { Faker::Number.non_zero_digit }'
           else
-            html += 'Faker::Number(digits: 8) }'
+            html += ' { Faker::Number(digits: 8) }'
           end
         end
       else
-        html += 'Faker::Number(digits: 8) }'
+        html += ' { Faker::Number(digits: 8) }'
       end
     when 4, 5 # 'decimal', 'float'
-      html += 'Faker::Number.decimal(l_digits: 3, r_digits: 3) }'
+      html += ' { Faker::Number.decimal(l_digits: 3, r_digits: 3) }'
     when 6 # 'date'
-      html += 'Faker::Date.between(from: 50.years.ago, to: Date.today) }'
+      html += ' { Faker::Date.between(from: 50.years.ago, to: Date.today) }'
     when 7 # 'time'
-      html += 'Faker::Time.between(DateTime.now - 1, DateTime.now).strftime("%H:%M:%S") }'
+      html += ' { Faker::Time.between(DateTime.now - 1, DateTime.now).strftime("%H:%M:%S") }'
     when 8 # 'datetime'
-      html += 'Faker::Time.between(DateTime.now - 1, DateTime.now) }'
+      html += ' { Faker::Time.between(DateTime.now - 1, DateTime.now) }'
     when 11 # 'boolean'
-      html += 'Faker::Boolean.boolean }'
+      html += ' { Faker::Boolean.boolean }'
     when 13 # 'ActiveHash' refarences型はここでは記載不要だがassociationに記載が必要
-      html += 'Faker::Number.non_zero_digit }'
+      html += '_id { Faker::Number.non_zero_digit }'
     end
     html += '<br>'
     html
@@ -581,7 +581,7 @@ module ModelsHelper
 
   # ActiveHashのHTMLを作成するメソッド
   def make_activehash_html(model, columns)
-    html = "class = #{model.name.classify}<br>"
+    html = "class #{model.name.classify} < ActiveHash::Base<br>"
     html += "#{insert_space(2)}self.data = [<br>"
     content = ''
     6.times do |i|
@@ -606,7 +606,7 @@ module ModelsHelper
     html += content
     html += "#{insert_space(2)}]<br>"
     html += "#{insert_space(2)}include ActiveHash::Associations<br>"
-    html += "#{make_has(columns, model)}"
+    html += "#{make_has(columns, model)}end<br>"
     html
   end
 

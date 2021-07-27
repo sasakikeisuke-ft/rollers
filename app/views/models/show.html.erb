@@ -127,6 +127,10 @@
   <h2><%= @model.name.classify %>モデルのRSpecの編集</h2>
 
   <div class="terminal-field">
+    <p>
+    RSpecを途中から導入した場合、下記の作成から作業が必要となります。<br>
+    事前準備で導入していた場合は対象ファイルの編集から始めてください。
+    </p>
     <p>ターミナル：関連ファイルの作成</p>
     <p>rails g rspec:model <%= @model.name %></p>
   </div>
@@ -137,6 +141,7 @@
 
   <div class="code-field">
     require 'rails_helper'<br>
+    <br>
     RSpec.describe <%= @model.name.classify %>, type: :model do<br>
     <%# FactoryBotを使用 %>
     <%== insert_space(2) %>before do<br>

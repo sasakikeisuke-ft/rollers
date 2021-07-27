@@ -1,4 +1,4 @@
-class = ActionType
+class ActionType < ActiveHash::Base
   self.data = [
     { id:  0, original: ''          , name: '-----'   },
     { id:  1, original: 'collection', name: 'index'   },
@@ -14,3 +14,4 @@ class = ActionType
   ]
   include ActiveHash::Associations
   has_many :actions
+end
