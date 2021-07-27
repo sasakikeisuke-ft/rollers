@@ -21,15 +21,15 @@ ja:
         user: user
       action_type:
         name: name
-      action:
+      app_action:
         action_type: action_type
         target: 対象モデル名
-        aciton_code: aciton_code
+        code_type: code_type
         app_controller: app_controller
         input1: 条件式1
         input2: 条件式2
         input3: 条件式3
-      aciton_code:
+      code_type:
         info: info
         sample: sample
       model:
