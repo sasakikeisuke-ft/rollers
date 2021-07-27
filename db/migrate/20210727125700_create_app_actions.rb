@@ -1,7 +1,7 @@
 class CreateAppActions < ActiveRecord::Migration[6.0]
   def change
     create_table :app_actions do |t|
-      t.integer :action_type_id, null: false
+      t.string :action_type_id, null: false
       t.string :target, null: false
       t.integer :code_type_id, null: false
       t.references :app_controller, foreign_key: true

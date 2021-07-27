@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 2021_07_27_125700) do
   end
 
   create_table "app_actions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "action_type_id", null: false
+    t.string "action_type_id", null: false
     t.string "target", null: false
     t.integer "code_type_id", null: false
     t.bigint "app_controller_id"

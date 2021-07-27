@@ -9,5 +9,5 @@ class Action < ApplicationRecord
 
   extend ActiveHash::Associations::ActiveRecordExtensions
   belongs_to :action_type
-  belongs_to :code
+  belongs_to :code_type
 end

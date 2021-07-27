@@ -9,7 +9,7 @@ Rails.application.routes.draw do
       end
     end
     resources :app_controllers do
-      resources :actions, only: [:new, :create, :edit, :update, :destroy]
+      resources :app_actions, only: [:new, :create, :edit, :update, :destroy]
     end
   end
 end

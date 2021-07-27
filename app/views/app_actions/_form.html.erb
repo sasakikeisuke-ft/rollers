@@ -1,4 +1,6 @@
-<%= form_with(model: [@application, @app_controller, @action], local: true) do |f| %>
+<%= form_with(model: [@application, @app_controller, @app_action], local: true) do |f| %>
+  <%= render 'shared/error_messages', model: f.object %>
+  
   <div class="field">
     <%= f.label :action_type_id, 'アクションの選択' %>
     <%= f.collection_select(:action_type_id, ActionType.all, :name, :name) %>
@@ -9,7 +11,7 @@
     <%= f.collection_select(:target, @models, :name, :name) %>
   </div>
 
-  <%= render partial: "code", collection: Code.all, locals: {f: f} %>
+  <%= render partial: "code", collection: CodeType.all, locals: {f: f} %>
 
   <p>
   上記コード内の条件式を入力してください。<br>
