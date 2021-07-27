@@ -297,6 +297,12 @@
     <p>ターミナル：テストコードの実行</p>
     <p>bundle exec rspec spec/models/<%= @model.name %>_spec.rb </p>
   </div>
+  <% if @gemfile.rubocop %>
+    <div class="terminal-field">
+      <p>ターミナル：Rubocopの実行</p>
+      <p>bundle exec rubocop -a </p>
+    </div>
+  <% end %>  
   <div>
   <p>これでモデルに関するファイルの記述は終了です。</p>
   </div>
@@ -428,6 +434,12 @@
     <p>ターミナル：テストコードの実行</p>
     <p>bundle exec rspec spec/models/<%= @model.name %>_spec.rb </p>
   </div>
+  <% if @gemfile.rubocop %>
+    <div class="terminal-field">
+      <p>ターミナル：Rubocopの実行</p>
+      <p>bundle exec rubocop -a </p>
+    </div>
+  <% end %>
   <div>
   <p>これでモデルに関するファイルの記述は終了です。</p>
   </div>

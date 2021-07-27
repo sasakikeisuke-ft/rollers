@@ -40,6 +40,7 @@ class AppControllersController < ApplicationController
   end
 
   def show
+    @gemfile = Gemfile.find_by(application_id: params[:application_id])
   end
 
   private

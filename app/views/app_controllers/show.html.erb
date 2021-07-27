@@ -95,6 +95,12 @@ end
 <br>
 <br>
 <br>
+<% if @gemfile.rubocop %>
+  <div class="terminal-field">
+    <p>ターミナル：Rubocopの実行</p>
+    <p>bundle exec rubocop -a </p>
+  </div>
+<% end %>
 <div>
 <%= link_to 'コントローラー一覧へ', application_app_controllers_path %><br>
 <%= link_to 'アプリケーション詳細へ戻る', application_path(params[:application_id]) %><br>
