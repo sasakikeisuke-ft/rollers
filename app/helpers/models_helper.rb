@@ -410,15 +410,15 @@ module ModelsHelper
       html += "@#{group[:model]}.valid?"
       html += '<br>'
       html += insert_space(8)
-      html += if japanese
-                "expect(@#{group[:model]}.errors.full_messages).to include('#{group[:column_ja]}#{group[:message_ja]}')"
-              else
-                "expect(@#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
-              end
-      html += '<br>'
-      html += insert_space(6)
-      html += 'end'
-      html += '<br>'
+      if japanese
+        html += "expect(@#{group[:model]}.errors.full_messages).to include(" + '"'
+        html += group[:column_ja].gsub(/_id/,'').gsub(/_/,' ').capitalize + group[:message_ja]
+      else
+        html += "expect(@#{group[:model]}.errors.full_messages).to include(" + '"'
+        html += group[:column].gsub(/_/,' ').capitalize + group[:message_en]
+      end
+      html += '")<br>'
+      html += "#{insert_space(6)}end<br>"
     end
     html
   end
@@ -443,22 +443,22 @@ module ModelsHelper
     activehash_group.each do |group|
       content = {}
       content[:model] = model.name
-      content[:column] = group[:name]
-      content[:column_ja] = group[:name]
+      content[:column] = "#{group[:name]}_id"
+      content[:column_ja] = "#{group[:name]}_id"
       content[:info] = 'が空欄だと登録できない'
       content[:change] = "''"
-      content[:message_ja] = ' must exist'
-      content[:message_en] = ' must exist'
+      content[:message_ja] = " can't be blank"
+      content[:message_en] = " can't be blank"
       abnormal_groups << content
 
       content = {}
       content[:model] = model.name
-      content[:column] = group[:name]
-      content[:column_ja] = group[:name]
+      content[:column] = "#{group[:name]}_id"
+      content[:column_ja] = "#{group[:name]}_id"
       content[:info] = 'が未選択だと登録できない'
       content[:change] = 0
-      content[:message_ja] = ' must exist'
-      content[:message_en] = ' must exist'
+      content[:message_ja] = " can't be blank"
+      content[:message_en] = " can't be blank"
       abnormal_groups << content
     end
   end
