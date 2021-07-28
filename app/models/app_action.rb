@@ -1,10 +1,10 @@
 class AppAction < ApplicationRecord
-  validates :target, presence: true
-  validates :action_type_id, presence: true
-
-  with_options numericality: { other_than: 0, message: " can't be blank" } do
-    validates :code_type_id
+  with_options presence: true do
+    validates :target
+    validates :action_select
   end
+  
+  validates :code_type_id, numericality: { other_than: 0, message: " can't be blank" }
 
   belongs_to :app_controller
 
