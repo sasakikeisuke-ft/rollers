@@ -1,4 +1,16 @@
 <h1><%= @app_controller.name %>コントローラーのアクション新規登録</h1>
+<% contents = actions_index(@app_actions) %>
 
+<div>
+  <p>アクション内容の一覧</p>
+  <% actions = %w[index new create edit update destroy show] %>
+  <% actions.each do |action| %>
+    <% next if contents[action.to_sym] == '' %>
+
+    <div class="action-title"><%= action %></div>
+    <div class="action-contents"><%== contents[action.to_sym] %></div>
+  <% end %>
+</div>
+<br>
 <%= render partial: "form" %>
 <%= render partial: "shared/link_index" %>
