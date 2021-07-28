@@ -2,6 +2,11 @@ class AppActionsController < ApplicationController
   before_action :find_app_action, only: [:edit, :update, :destroy]
   before_action :instance_variable_for_form, only: [:new, :edit]
 
+  def index
+    @app_controller = AppController.find(params[:app_controller_id])
+    @app_actions = @app_controller.app_actions
+  end
+
   def new
     @app_action = AppAction.new
   end

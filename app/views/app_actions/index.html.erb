@@ -1,0 +1,19 @@
+<% contents = actions_index(@app_actions) %>
+
+<%= @app_controller.name %>のアクション一覧
+<div>
+ここに一覧を表示する。
+</div>
+
+<div>
+  <p>アクション内容の一覧</p>
+  <% actions = %w[index new create edit update destroy show] %>
+  <% actions.each do |action| %>
+    <% next if contents[action.to_sym] == '' %>
+
+    <div class="action-title"><%= action %></div>
+    <div class="action-contents"><%== contents[action.to_sym] %></div>
+  <% end %>
+</div>
+<%= link_to 'テスト アクション新規作成へ',  new_application_app_controller_app_action_path %><br>
+<%= render partial: "shared/link_index" %>
