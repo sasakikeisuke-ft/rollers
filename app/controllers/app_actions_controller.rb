@@ -12,10 +12,9 @@ class AppActionsController < ApplicationController
   end
 
   def create
-    binding.pry
     @app_action = AppAction.new(app_action_params)
     if @app_action.save
-      redirect_to new_application_app_controller_app_action_path
+      redirect_to application_app_controller_app_actions_path
     else
       instance_variable_for_form
       render :new
@@ -26,8 +25,8 @@ class AppActionsController < ApplicationController
   end
 
   def update
-    if @app_action.update
-      redirect_to root_path
+    if @app_action.update(app_action_params)
+      redirect_to application_app_controller_app_actions_path
     else
       instance_variable_for_form
       render :edit
@@ -36,7 +35,7 @@ class AppActionsController < ApplicationController
 
   def destroy
     @app_action.destroy
-    redirect_to root_path
+    redirect_to application_app_controller_app_actions_path
   end
 
   private
