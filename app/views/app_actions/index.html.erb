@@ -1,19 +1,34 @@
-<% contents = actions_index(@app_actions) %>
-
-<%= @app_controller.name %>のアクション一覧
+<% contents = actions_index(@app_controller, @app_actions) %>
 <div>
-ここに一覧を表示する。
+<h1><%= @app_controller.name %>のアクション一覧</h1>
+<p>コントローラーの内容を表示します。</p>
 </div>
+<p>アクション内容の一覧</p>
 
 <div>
-  <p>アクション内容の一覧</p>
   <% actions = %w[index new create edit update destroy show] %>
   <% actions.each do |action| %>
-    <% next if contents[action.to_sym] == '' %>
+    <div class="action-title"><%== action %></div>
+    <div class="action-contents">
+    <% @app_actions.each do |app_action| %>
+      <% next unless app_action.action_select == action %>
 
-    <div class="action-title"><%= action %></div>
-    <div class="action-contents"><%== contents[action.to_sym] %></div>
+      <%== make_action_code_single(app_action, action) %>
+      <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action) %>
+      <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete %>
+    <% end %>
+    </div>
   <% end %>
 </div>
+----------------------------------------------
+<%= render partial: "shared/controller", locals: {links: true} %>
+<div>
+  <%# <p>アクション内容の一覧</p> %>
+  <%# <% actions = %w[index new create edit update destroy show] %>
+  <%# <% actions.each do |action| %> 
+    <%# <div class="action-contents"><%== contents[action.to_sym] %>
+  <%# <% end %>
+</div>
+
 <%= link_to 'テスト アクション新規作成へ',  new_application_app_controller_app_action_path %><br>
 <%= render partial: "shared/link_index" %>

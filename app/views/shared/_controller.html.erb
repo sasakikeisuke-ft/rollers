@@ -1,0 +1,51 @@
+
+<div>
+  class <%= @app_controller.name.pluralize.camelize %>Controller < ApplicationController<br>
+    <%#== contents[:authenticate] %>
+    <%#== contents[:before_find] %>
+    <br>
+
+
+    <% actions = %w[index new create edit update destroy show] %>
+    <% actions.each do |action| %>
+      <% if @app_controller["#{action}_select"] >= 2 %>
+        <%== "#{insert_space(2)}def #{action}<br>" %>
+        <% if action == 'new' || action == 'create' %>
+          <%== "#{insert_space(4)}@#{@app_controller.name} = " %>
+          <%== "#{@app_controller.name.classify}.new" %>
+          <%== "(#{@app_controller.name}_params)" if action == 'create' %>
+          <%== '<br>' %>
+        <% end %>
+        <% if action == 'create' || action == 'update' %>
+          <%== "#{insert_space(4)}if @#{@app_controller.name}.save" if action == 'create' %>
+          <%== "#{insert_space(4)}if @#{@app_controller.name}.update" if action == 'create' %>
+          <%== "#{insert_space(6)}redirect_to root_path" %>
+          <%== "#{insert_space(4)}else<br>" %>
+        <% end %>
+
+        <% @app_actions.each do |app_action| %>
+          <% next unless app_action.action_select == action %>
+          <%== make_action_code_single(app_action, action) %>
+          <% if links %>
+            <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action) %>
+            <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete %>
+          <% end %>
+          <br>
+        <% end %>
+        <% if action == 'create' || action == 'update' %>
+          <%== "#{insert_space(6)}render :" %>
+          <%== 'new<br>' if action == 'create' %>
+          <%== 'edit<br>' if action == 'update' %>
+          <%== "#{insert_space(4)}end<br>" %>
+        <% end %>
+        <%== "#{insert_space(2)}end<br><br>"  %>
+
+      <% end %>
+    <% end %>
+  </div>
+
+    <br>
+
+
+  end
+</div>

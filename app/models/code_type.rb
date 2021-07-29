@@ -2,7 +2,7 @@ class CodeType < ActiveHash::Base
   self.data = [
 
     # インスタンスを作成
-    { id: 1, info: '内容', sample: '@model.new' },
+    { id: 1, info: '内容', sample: '@model = Model.new' },
     # { id: 2, info: '内容', sample: '@model.new(model_params)' },
     # { id: 3, info: '内容', sample: '@model.create' },
     # { id: 3, info: '内容', sample: '' },
