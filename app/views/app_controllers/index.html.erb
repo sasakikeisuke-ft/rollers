@@ -9,7 +9,7 @@
         <%= link_to '編集へ', edit_application_app_controller_path(id: app_controller) %>
         <%= link_to '削除', application_app_controller_path(id: app_controller), method: :delete %>
         <%= link_to 'コード表示', application_app_controller_path(id: app_controller) %><br>
-        <%= link_to 'アクション編集へ', application_app_controller_app_actions_path(app_controller_id: app_controller) %>
+        <%= link_to 'アクション一覧へ', application_app_controller_app_actions_path(app_controller_id: app_controller) %>
       </div>
     <% end %>
   <% end %>
