@@ -9,6 +9,5 @@ class AppAction < ApplicationRecord
   belongs_to :app_controller
 
   extend ActiveHash::Associations::ActiveRecordExtensions
-  belongs_to :action_type
   belongs_to :code_type
 end
