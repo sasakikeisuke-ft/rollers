@@ -3,7 +3,7 @@
   
   <div class="field">
     <%= f.label :action_select, 'アクションの選択' %>
-    <%= f.collection_select(:action_select, ActionType.all, :name, :name) %>
+    <%= f.select(:action_select, make_selects(@app_controller)) %>
   </div>
 
   <div class="field">

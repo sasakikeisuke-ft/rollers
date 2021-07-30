@@ -42,6 +42,7 @@ module AppActionsHelper
     contents
   end
 
+  # 登録内容からsampleコードを編集し、アクションのコードを作成するメソッド
   def make_action_code(app_actions, action)
     code = ''
     app_actions.each do |app_action|
@@ -72,6 +73,35 @@ module AppActionsHelper
     code = code.gsub(/条件式2/, "#{app_action.input2}") unless app_action.input2 == ''
     code = code.gsub(/条件式3/, "#{app_action.input3}") unless app_action.input3 == ''
     code
+  end
+
+  def make_selects(app_controller)
+    actions = %w[index new create edit update destroy show]
+    selects = []
+    find_count = 0
+    form_count = 0
+    actions.each do |action|
+      if app_controller["#{action}_select".to_sym] >= 2
+        select = ["#{action}", "#{action}"]
+        selects << select
+
+        case action
+        when 'create' 
+          form_count += 1
+        when 'edit', 'update'
+          find_count += 1
+          form_count += 1
+        when 'destroy'
+          find_count += 1
+        when 'show'
+          find_count += 1
+        end
+      end
+    end
+    selects << ['find_model', 'find_mode'] if find_count >= 2
+    selects << ['instance_variable_for_form', 'instance_variable_for_form'] if form_count >= 2
+
+    selects 
   end
 
   def sort_sentence(sentence_array, space)

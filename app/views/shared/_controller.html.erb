@@ -17,9 +17,9 @@
           <%== '<br>' %>
         <% end %>
         <% if action == 'create' || action == 'update' %>
-          <%== "#{insert_space(4)}if @#{@app_controller.name}.save" if action == 'create' %>
-          <%== "#{insert_space(4)}if @#{@app_controller.name}.update" if action == 'create' %>
-          <%== "#{insert_space(6)}redirect_to root_path" %>
+          <%== "#{insert_space(4)}if @#{@app_controller.name}.save<br>" if action == 'create' %>
+          <%== "#{insert_space(4)}if @#{@app_controller.name}.update<br>" if action == 'update' %>
+          <%== "#{insert_space(6)}redirect_to root_path<br>" %>
           <%== "#{insert_space(4)}else<br>" %>
         <% end %>
 
@@ -43,9 +43,5 @@
       <% end %>
     <% end %>
   </div>
-
-    <br>
-
-
   end
 </div>
