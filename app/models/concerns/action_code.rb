@@ -1,4 +1,4 @@
-class CodeType < ActiveHash::Base
+class ActionCode < ActiveHash::Base
   self.data = [
 
     # データベースへの登録関連
@@ -72,14 +72,14 @@ class CodeType < ActiveHash::Base
     { id: 91, keyword: '内容', sample: 'redirect_to root_path' },
     { id: 92, keyword: '内容', sample: 'redirect_to 条件式1_path' },
     { id: 93, keyword: '内容', sample: 'redirect_to 条件式1_path(params[:id])' },
-    { id: 93, keyword: '内容', sample: 'redirect_to 条件式1_path(params[条件式2_id])' },
-    { id: 93, keyword: '内容', sample: 'redirect_to 条件式1_path(条件式2_id: params[条件式2_id])' },
-    { id: 94, keyword: '内容', sample: 'render 条件式1' },
+    { id: 94, keyword: '内容', sample: 'redirect_to 条件式1_path(params[条件式2_id])' },
+    { id: 95, keyword: '内容', sample: 'redirect_to 条件式1_path(条件式2_id: params[条件式2_id])' },
+    { id: 96, keyword: '内容', sample: 'render 条件式1' },
 
     # オリジナルアクションの雛形設定
     { id: 98, keyword: '内容', sample: 'collection' },
     { id: 99, keyword: '内容', sample: 'member' }
   ]
   include ActiveHash::Associations
-  has_many :actions
+  has_many :app_actions
 end

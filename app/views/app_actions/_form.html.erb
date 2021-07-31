@@ -11,7 +11,7 @@
     <%= f.collection_select(:target, @models, :name, :name) %>
   </div>
 
-  <%= render partial: "code", collection: CodeType.all, locals: {f: f} %>
+  <%= render partial: "code", collection: ActionCode.all, locals: {f: f} %>
 
   <p>
   上記コード内の条件式を入力してください。<br>

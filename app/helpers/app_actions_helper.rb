@@ -50,7 +50,7 @@ module AppActionsHelper
 
       space = 4
       code = insert_space(space)
-      code += app_action.code_type.sample
+      code += app_action.action_code.sample
       code = code.gsub(/models/, "#{app_action.target.tableize}")
       code = code.gsub(/model/, "#{app_action.target}")
       code = code.gsub(/Model/, "#{app_action.target.classify}")
@@ -65,7 +65,7 @@ module AppActionsHelper
   def make_action_code_single(app_action, action)
     space = 4
     code = insert_space(space)
-    code += app_action.code_type.sample
+    code += app_action.action_code.sample
     code = code.gsub(/models/, "#{app_action.target.tableize}")
     code = code.gsub(/model/, "#{app_action.target}")
     code = code.gsub(/Model/, "#{app_action.target.classify}")

@@ -15,7 +15,7 @@ ActiveRecord::Schema.define(version: 2021_07_27_125700) do
   create_table "app_actions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "action_select", null: false
     t.string "target", null: false
-    t.integer "code_type_id", null: false
+    t.integer "action_code_id", null: false
     t.bigint "app_controller_id"
     t.string "input1"
     t.string "input2"
