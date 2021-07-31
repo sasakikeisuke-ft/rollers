@@ -13,34 +13,44 @@
   <% when 81 %>
     <p>アソシエーションを利用してレコードを取得</p>
   <% when 91 %>
+    <p>ページ遷移及びページ表示</p>
+  <% when 98 %>
     <p>オリジナルアクションを作成する場合、collection/memberを選択してください。</p>
   <% end %>
   <%= f.radio_button :code_type_id, code.id %><%== code.sample %>
   
   <% case code.id%>
   <% when 5 %>
-    <br>
+    <p>
     <%== insert_space(4) %>@model = Model.new(model_params)<br>
     <%== insert_space(4) %>if @model.save<br>
     <%== insert_space(6) %>redirect_to root_path<br>
     <%== insert_space(4) %>else<br>
     <%== insert_space(6) %>他の登録アクションのコード<br>
     <%== insert_space(6) %>render :new<br>
-    <%== insert_space(4) %>end<br>
+    <%== insert_space(4) %>end
+    </p>
   <% when 7 %>
-    <br>
+    <p>
     <%== insert_space(4) %>if @model.update(model_params)<br>
     <%== insert_space(6) %>redirect_to root_path<br>
     <%== insert_space(4) %>else<br>
     <%== insert_space(6) %>他の登録アクションのコード<br>
     <%== insert_space(6) %>render :edit<br>
-    <%== insert_space(4) %>end<br>
+    <%== insert_space(4) %>end
+    </p>
   <% when 6, 8 %>
-    <br>
+    <p>
     <%== insert_space(4) %>上記のレイアウト(固定)を編集<br>
     <%== insert_space(4) %>redirect_to 条件式1<br>
     <%== insert_space(4) %>render 条件式2<br>
-    <br>
+    </p>
+  <% when 94 %>
+    <p>
+    上記を編集
+    A_model -> 条件式1
+    B_model -> 条件式2
+    </p>
   <% end %>
 
 </div>

@@ -10,6 +10,7 @@ class CodeType < ActiveHash::Base
     { id: 6, keyword: '内容', sample: 'create向けのレイアウト(編集)' },
     { id: 7, keyword: '内容', sample: 'update向けのレイアウト(固定)' },
     { id: 8, keyword: '内容', sample: 'update向けのレイアウト(編集)' },
+    { id: 9, keyword: '内容', sample: '@model.destroy' },
 
     # 一つのレコードを取得
     { id: 11, keyword: '内容', sample: '@model = Model.find(params[:id])' },
@@ -23,14 +24,16 @@ class CodeType < ActiveHash::Base
     { id: 21, keyword: '内容', sample: '@models = Model.all' },
     { id: 22, keyword: '内容', sample: '@models = Model.where(条件式1_id: params[条件式_id])' },
     { id: 23, keyword: '内容', sample: '@models = Model.where(条件式1)' },
-    { id: 24, keyword: '内容', sample: '@models = Model.where(条件式1, 条件式2)' },
-    { id: 25, keyword: '内容', sample: '@models = Model.where(条件式1, 条件式2, 条件式3)' },
-    { id: 26, keyword: '内容', sample: '@models = Model.where.not(条件式1)' },
-    { id: 27, keyword: '内容', sample: '@models = Model.where.not(条件式1, 条件式2)' },
-    { id: 28, keyword: '内容', sample: '@models = Model.where.not(条件式1, 条件式2, 条件式3)' },
-    { id: 29, keyword: '内容', sample: '@models = Model.where.(条件式1).where.not(条件式2)' },
-    { id: 30, keyword: '内容', sample: '@models = Model.where.(条件式1, 条件式2).where.not(条件式3)' },
-    { id: 31, keyword: '内容', sample: '@models = Model.where.(条件式1).where.not(条件式2,条件式3)' },
+    { id: 24, keyword: '内容', sample: '@models = Model.where(条件式1: [条件式2])' },
+    { id: 25, keyword: '内容', sample: '@models = Model.where(条件式1, 条件式2)' },
+    { id: 26, keyword: '内容', sample: '@models = Model.where(条件式1, 条件式2, 条件式3)' },
+    { id: 27, keyword: '内容', sample: '@models = Model.where.not(条件式1)' },
+    { id: 28, keyword: '内容', sample: '@models = Model.where.not(条件式1: [条件式2])' },
+    { id: 29, keyword: '内容', sample: '@models = Model.where.not(条件式1, 条件式2)' },
+    { id: 30, keyword: '内容', sample: '@models = Model.where.not(条件式1, 条件式2, 条件式3)' },
+    { id: 31, keyword: '内容', sample: '@models = Model.where.(条件式1).where.not(条件式2)' },
+    { id: 32, keyword: '内容', sample: '@models = Model.where.(条件式1, 条件式2).where.not(条件式3)' },
+    { id: 33, keyword: '内容', sample: '@models = Model.where.(条件式1).where.not(条件式2,条件式3)' },
 
     # 複数のレコードと関連するテーブルを取得
     { id: 41, keyword: '内容', sample: '@models = Model.includes(:条件式1)' },
@@ -65,8 +68,17 @@ class CodeType < ActiveHash::Base
     { id: 83, keyword: '内容', sample: '@A_models = @B_model.A_models' },
     { id: 84, keyword: '内容', sample: '@A_models = @B_model.A_models' },
 
-    { id: 91, keyword: '内容', sample: 'collection' },
-    { id: 92, keyword: '内容', sample: 'member' }
+    # redirect_toの設定
+    { id: 91, keyword: '内容', sample: 'redirect_to root_path' },
+    { id: 92, keyword: '内容', sample: 'redirect_to 条件式1_path' },
+    { id: 93, keyword: '内容', sample: 'redirect_to 条件式1_path(params[:id])' },
+    { id: 93, keyword: '内容', sample: 'redirect_to 条件式1_path(params[条件式2_id])' },
+    { id: 93, keyword: '内容', sample: 'redirect_to 条件式1_path(条件式2_id: params[条件式2_id])' },
+    { id: 94, keyword: '内容', sample: 'render 条件式1' },
+
+    # オリジナルアクションの雛形設定
+    { id: 98, keyword: '内容', sample: 'collection' },
+    { id: 99, keyword: '内容', sample: 'member' }
   ]
   include ActiveHash::Associations
   has_many :actions

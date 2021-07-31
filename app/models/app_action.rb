@@ -11,12 +11,25 @@ class AppAction < ApplicationRecord
   extend ActiveHash::Associations::ActiveRecordExtensions
   belongs_to :code_type
 
-  # コントローラー登録時にアクションのデフォルト設定を登録するメソッド。サービスクラスに切り出すべき。
+  # コントローラー登録時にアクションのデフォルト設定を登録するメソッド。サービスクラスに切り出すべきか
   def self.set(app_controller)
-    default_action = {action_select: "index", target: app_controller.name, code_type_id: 21, app_controller_id: app_controller.id}
-    
-    app_action = AppAction.create(default_action)
+    default_actions = []
+    if app_controller.new_select
+      default_actions << {action_select: 'new', target: app_controller.name, code_type_id: 1, app_controller_id: app_controller.id}
+    end
+    if app_controller.create_select
+      default_actions << {action_select: 'create', target: app_controller.name, code_type_id: 5, app_controller_id: app_controller.id}
+    end
+    if app_controller.update_select
+      default_actions << {action_select: 'update', target: app_controller.name, code_type_id: 7, app_controller_id: app_controller.id}
+    end
+    if app_controller.destroy_select
+      default_actions << {action_select: 'destroy', target: app_controller.name, code_type_id: 9, app_controller_id: app_controller.id}
+      default_actions << {action_select: 'destroy', target: app_controller.name, code_type_id: 91, app_controller_id: app_controller.id}
+    end
+    default_actions.each do |default_action|
+      AppAction.create(default_action)
+    end
   end
-  # id: nil, action_select: "destroy", target: "app_action", code_type_id: 11, app_controller_id: 15, 
 
 end
