@@ -42,6 +42,52 @@ module AppActionsHelper
     contents
   end
 
+  # app_actions.each文の中で、登録アクションに関するHTMLを作成するメソッド。レイアウトを使う場合は別処理を行う。
+  def make_action_code_remake(app_action, links, content)
+    case app_action.action_code_id
+    when 5, 6, 7, 8 # レイアウトを使用する場合
+      create_action_template(app_action, content)
+      content[:main] += "#{insert_space(6)}#{app_action.action_code.sample}" if links
+      
+      case app_action.action_code_id
+      when 5, 6 # createのレイアウトの場合
+        content[:first] += "#{insert_space(4)}@#{app_action.target} = "
+        content[:first] += "#{app_action.target.classify}.new(#{app_action.target}_params)<br>"
+      else # 7, 8 updateのレイアウトの場合
+        content[:before] = content[:before].gsub(/save/, "update(#{app_action.target}_params)")
+      end
+      
+      case app_action.action_code_id
+      when 7
+        content[:after] = content[:after].gsub(/:new/, ":edit")
+      when 6, 8
+        content[:before] = content[:before].gsub(/root_path/, "#{input1}") unless app_action.input1 == ''
+        content[:after] = content[:after].gsub(/:new/, "#{input2}") unless app_action.input2 == ''
+      end
+    else
+      code = insert_space(4)
+      code += app_action.action_code.sample
+      code = code.gsub(/models/, "#{app_action.target.tableize}")
+      code = code.gsub(/model/, "#{app_action.target}")
+      code = code.gsub(/Model/, "#{app_action.target.classify}")
+      code = code.gsub(/条件式1/, "#{app_action.input1}") unless app_action.input1 == ''
+      code = code.gsub(/条件式2/, "#{app_action.input2}") unless app_action.input2 == ''
+      code = code.gsub(/条件式3/, "#{app_action.input3}") unless app_action.input3 == ''
+      content[:main] = code
+    end
+  end
+
+  # createに使用するレイアウトでHTMLを作成するメソッド
+  def create_action_template(app_action, content)
+    content[:before] += "#{insert_space(4)}if @#{app_action.target}.save<br>"
+    content[:before] += "#{insert_space(6)}redirect_to root_path<br>"
+    content[:before] += "#{insert_space(4)}else<br>"
+    content[:after] +=  "#{insert_space(6)}render :new<br>"
+    content[:after] +=  "#{insert_space(4)}end<br>"
+  end
+
+
+
   # 登録内容からsampleコードを編集し、アクションのコードを作成するメソッド
   def make_action_code(app_actions, action)
     code = ''
@@ -62,6 +108,7 @@ module AppActionsHelper
     code
   end
 
+
   def make_action_code_single(app_action, action)
     space = 4
     code = insert_space(space)
@@ -74,6 +121,8 @@ module AppActionsHelper
     code = code.gsub(/条件式3/, "#{app_action.input3}") unless app_action.input3 == ''
     code
   end
+
+
 
   def make_selects(app_controller)
     actions = %w[index new create edit update destroy show]

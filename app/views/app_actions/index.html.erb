@@ -1,34 +1,39 @@
 <% contents = actions_index(@app_controller, @app_actions) %>
-<div>
 <h1><%= @app_controller.name %>のアクション一覧</h1>
-<p>コントローラーの内容を表示します。</p>
-</div>
-<p>アクション内容の一覧</p>
-
+<p>
+コントローラーのコードを表示します。<br>
+一部アクションは初期設定として登録されています。必要に応じ編集または削除してください。<br>
+</p>
+<h5>自動で作成されるメソッドについての補足説明</h5>
 <div>
-  <% actions = %w[index new create edit update destroy show] %>
-  <% actions.each do |action| %>
-    <div class="action-title"><%== action %></div>
-    <div class="action-contents">
-    <% @app_actions.each do |app_action| %>
-      <% next unless app_action.action_select == action %>
-
-      <%== make_action_code_single(app_action, action) %>
-      <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action) %>
-      <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete %>
-    <% end %>
-    </div>
-  <% end %>
+  コントローラーの登録内容により、一部メソッドが初期から作成されることがあります。<br>
+  以下は作成されるメソッドに関する説明です。
 </div>
-----------------------------------------------
+<div>
+  1, <%= @app_controller.name %>_params<br>
+  DBへの保存の際に必要なストロングパラメーターを取得するためのメソッドです。<br>
+  コントローラー名と同名のモデルを対象に作成されます。
+</div>
+<div>
+  2, find_<%= @app_controller.name %><br>
+  コントローラー名と同名のモデルを取得するメソッドが作成されます。<br>
+  対象アクションはedit, update, destroy, showの４つです。<br>
+  上記アクションに共通して追加を行いたい場合、このメソッドに追加することも可能です。
+</div>
+<div>
+  3, instance_variable_for_form<br>
+  登録されたコントローラーのネスト構造から、フォームに必要なインスタンス変数を取得します。<br>
+  コントローラー名と同名のモデルを対象とします。<br>
+  ネスト構造がない場合は作成されません。<br>
+  find_<%= @app_controller.name %>と同様に、このメソッドにアクションを追加することも可能です。
+</div>
+<br>
+<%= link_to 'テスト アクション新規作成へ',  new_application_app_controller_app_action_path %><br>
+<br>
+
+<br>
+<%# 部分テンプレートを使用し、コントローラーのコードを表示します。また編集削除のリンクは表示されます。 %>
 <%= render partial: "shared/controller", locals: {links: true} %>
-<div>
-  <%# <p>アクション内容の一覧</p> %>
-  <%# <% actions = %w[index new create edit update destroy show] %>
-  <%# <% actions.each do |action| %> 
-    <%# <div class="action-contents"><%== contents[action.to_sym] %>
-  <%# <% end %>
-</div>
-
+<br>
 <%= link_to 'テスト アクション新規作成へ',  new_application_app_controller_app_action_path %><br>
 <%= render partial: "shared/link_index" %>
