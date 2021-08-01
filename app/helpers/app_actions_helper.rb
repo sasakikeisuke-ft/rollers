@@ -1,27 +1,24 @@
 module AppActionsHelper
-  def actions_index(app_controller, app_actions)
-    contents = make_actions_template
-    actions = %w[index new create edit update destroy show]
-    actions.each do |action|
-      next unless app_controller["#{action}_select".to_sym] >= 2
 
-      contents[action.to_sym] = make_action_code(app_actions, action)
-      html = "#{insert_space(2)}def #{action}<br>"
-      if action == 'create' || action == 'update'
-        html += "#{insert_space(4)}if @#{app_controller.name}.save<br>"
-        html += "#{insert_space(6)}redirect_to root_path<br>"
-        html += "#{insert_space(4)}else<br>"
-        html += "#{insert_space(6)}instance_variable_for_form<br>"
-      else
-        html += contents[action.to_sym]
-      end
-      case action
-      when 'create'
-        html += "#{insert_space(6)}render :new"
-        html += "#{insert_space(4)}end<br>"
-      when 'update'
-        html += "#{insert_space(6)}render :edit"
-        html += "#{insert_space(4)}end<br>"
+  # アクション新規登録画面における、アクションタイプの選択肢を作成するメソッド
+  def make_selects(app_controller)
+    actions = %w[index new create edit update destroy show]
+    selects = []
+    find_count = 0
+    form_count = 0
+    actions.each do |action|
+      if app_controller["#{action}_select".to_sym] >= 2
+        select = ["#{action}", "#{action}"]
+        selects << select
+
+        case action
+        when 'create' 
+          form_count += 1
+        when 'edit', 'update'
+          find_count += 1
+          form_count += 1
+        when 'destroy'
+          find_count += 1
       end
       html += "#{insert_space(2)}end<br><br>"
       contents[action.to_sym] = html
@@ -77,6 +74,56 @@ module AppActionsHelper
     end
   end
 
+      else
+        normarl_columns << column.name
+      end
+    end
+    # 振り分けられた配列をもとにHTMLを作成
+    html = "#{insert_space(2)}def #{app_action.target}_params<br>"
+    html += "#{insert_space(4)}params.require(:#{model.name}).permit("
+    first = true
+    normarl_columns.each do |column|
+      html += ', ' unless first
+      html += ":#{column}"
+      first = false
+    end
+    activehash_columns.each do |column|
+      html += ', ' unless first
+      html += ":#{column}_id"
+      first = false
+    end
+    if references_columns.length != 0
+      first = true
+      html += ').merge('
+      references_columns.each do |column|
+        html += ', ' unless first
+        html += if column != devise.name
+                  "#{column}_id: params[:#{column}]"
+                else
+                  "#{column}_id: current_user.id"
+                end
+        first = false
+      end
+    end
+    html += ")<br>#{insert_space(2)}end<br>"
+    contents[:params] = html 
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   # createに使用するレイアウトでHTMLを作成するメソッド
   def create_action_template(app_action, content)
     content[:before] += "#{insert_space(4)}if @#{app_action.target}.save<br>"
@@ -86,6 +133,49 @@ module AppActionsHelper
     content[:after] +=  "#{insert_space(4)}end<br>"
   end
 
+
+  def actions_index(app_controller, app_actions)
+    contents = make_actions_template
+    actions = %w[index new create edit update destroy show]
+    actions.each do |action|
+      next unless app_controller["#{action}_select".to_sym] >= 2
+
+      contents[action.to_sym] = make_action_code(app_actions, action)
+      html = "#{insert_space(2)}def #{action}<br>"
+      if action == 'create' || action == 'update'
+        html += "#{insert_space(4)}if @#{app_controller.name}.save<br>"
+        html += "#{insert_space(6)}redirect_to root_path<br>"
+        html += "#{insert_space(4)}else<br>"
+        html += "#{insert_space(6)}instance_variable_for_form<br>"
+      else
+        html += contents[action.to_sym]
+      end
+      case action
+      when 'create'
+        html += "#{insert_space(6)}render :new"
+        html += "#{insert_space(4)}end<br>"
+      when 'update'
+        html += "#{insert_space(6)}render :edit"
+        html += "#{insert_space(4)}end<br>"
+      end
+      html += "#{insert_space(2)}end<br><br>"
+      contents[action.to_sym] = html
+    end
+    contents
+  end
+
+  def make_actions_template
+    contents = {
+      index: [],
+      new: [],
+      create: [],
+      edit: [],
+      update: [],
+      destroy: [],
+      show: []
+    }
+    contents
+  end
 
 
   # 登録内容からsampleコードを編集し、アクションのコードを作成するメソッド
@@ -124,34 +214,6 @@ module AppActionsHelper
 
 
 
-  def make_selects(app_controller)
-    actions = %w[index new create edit update destroy show]
-    selects = []
-    find_count = 0
-    form_count = 0
-    actions.each do |action|
-      if app_controller["#{action}_select".to_sym] >= 2
-        select = ["#{action}", "#{action}"]
-        selects << select
-
-        case action
-        when 'create' 
-          form_count += 1
-        when 'edit', 'update'
-          find_count += 1
-          form_count += 1
-        when 'destroy'
-          find_count += 1
-        when 'show'
-          find_count += 1
-        end
-      end
-    end
-    selects << ['find_model', 'find_mode'] if find_count >= 2
-    selects << ['instance_variable_for_form', 'instance_variable_for_form'] if form_count >= 2
-
-    selects 
-  end
 
   def sort_sentence(sentence_array, space)
     html = ''
