@@ -19,25 +19,17 @@ module AppActionsHelper
           form_count += 1
         when 'destroy'
           find_count += 1
+        when 'show'
+          find_count += 1
+        end
       end
-      html += "#{insert_space(2)}end<br><br>"
-      contents[action.to_sym] = html
     end
-    contents
+    selects << ['find_model', 'find_model'] if find_count >= 2
+    selects << ['instance_variable_for_form', 'instance_variable_for_form'] if form_count >= 2
+
+    selects 
   end
 
-  def make_actions_template
-    contents = {
-      index: [],
-      new: [],
-      create: [],
-      edit: [],
-      update: [],
-      destroy: [],
-      show: []
-    }
-    contents
-  end
 
   # app_actions.each文の中で、登録アクションに関するHTMLを作成するメソッド。レイアウトを使う場合は別処理を行う。
   def make_action_code_remake(app_action, links, content)
@@ -74,6 +66,27 @@ module AppActionsHelper
     end
   end
 
+  # ストロングパラメーターに関するHTMLを作成するメソッド
+  ## app_controller_helperの既存メソッドを引用し編集中。引数を登録actionで作成する形を検討
+  ## linksにより編集/削除へのリンクを表示するか切り替えられるように実装したい。
+  def make_strong_parameter(app_action, contents, links)
+    # next unless app_action.action_code_id == ?
+
+    # modelモデルが関連する箇所がここだけなので、メソッド内で動作
+    models = Model.where(application_id: params[application_id])
+    model = models.includes(:columns).find_by(name: app_action.target)
+    devise = models.find_by(model_type_id: 5) # devise対応のモデルを取得
+
+    # データ型によって配列を振り分ける。
+    normarl_columns = []
+    activehash_columns = []
+    references_columns = []
+    model.columns.each do |column|
+      case column.data_type_id
+      when 12 # references型のカラム
+        references_columns << column.name
+      when 13 # ActiveHashを参照するカラム
+        activehash_columns << column.name
       else
         normarl_columns << column.name
       end
@@ -112,7 +125,262 @@ module AppActionsHelper
 
 
 
+  # 上記のストロングパラメーターを自動で作成するメソッド
+  ## createとupdateがある場合は必要となるため、引数から決定する必要はないのではないか？。
+  ## 対象のモデルを選出する必要がある。targetsを作る専用のメソッドと併用する可能性を考慮しつつ、まずは単体で完結するメソッドを考える。
+  def make_strong_parameter_proto1(app_actions)
+    # ストロングパラメーターが必要なアクションからターゲットとなるモデル名を選出する。
+    params_targets = []
+    app_actions.each do |app_action|
+      if %w[2 3 4 5 6 7 8].include?(app_action.action_code_id) 
+        params_targets << app_action.target unless params_targets.include?(app_action.target)
+      end
+    end
 
+    # 選出したモデルからストロングパラメーター取得メソッドを作成する。今のところは上記メソッドを引用する。
+    params_targets.each do |target|
+      models = Model.where(application_id: params[application_id])
+      model = models.includes(:columns).find_by(name: app_action.target)
+      devise = models.find_by(model_type_id: 5) # devise対応のモデルを取得
+
+      # データ型によって配列を振り分ける。
+      normarl_columns = []
+      activehash_columns = []
+      references_columns = []
+      model.columns.each do |column|
+        case column.data_type_id
+        when 12 # references型のカラム
+          references_columns << column.name
+        when 13 # ActiveHashを参照するカラム
+          activehash_columns << column.name
+        else
+          normarl_columns << column.name
+        end
+      end
+      # 振り分けられた配列をもとにHTMLを作成
+      html = "#{insert_space(2)}def #{app_action.target}_params<br>"
+      html += "#{insert_space(4)}params.require(:#{model.name}).permit("
+      first = true
+      normarl_columns.each do |column|
+        html += ', ' unless first
+        html += ":#{column}"
+        first = false
+      end
+      activehash_columns.each do |column|
+        html += ', ' unless first
+        html += ":#{column}_id"
+        first = false
+      end
+      if references_columns.length != 0
+        first = true
+        html += ').merge('
+        references_columns.each do |column|
+          html += ', ' unless first
+          html += if column != devise.name
+                    "#{column}_id: params[:#{column}]"
+                  else
+                    "#{column}_id: current_user.id"
+                  end
+          first = false
+        end
+      end
+      html += ")<br>#{insert_space(2)}end<br><br>"
+      contents[:params] = html 
+    end
+  end
+
+  # 登録されているアクションから必要となるプライベートメソッドを作成するメソッド。
+  # 配列を作成した後に、各プライベートメソッドを作成するメソッドを呼び出す。
+  def make_contents_of_controller(app_actions)
+    contents = {before: ''}
+    params_targets = []
+    
+    app_actions.each do |app_action|
+      if [2, 3, 4, 5, 6, 7, 8].include?(app_action.action_code_id) 
+        params_targets << app_action.target unless params_targets.include?(app_action.target)
+      end
+    end
+
+    make_strong_parameter_proto2(params_targets, contents)
+
+    contents
+  end
+
+  def make_strong_parameter_proto2(params_targets, contents)
+    models = Model.where(application_id: params[:application_id])
+    devise = models.find_by(model_type_id: 5) # devise対応のモデルを取得
+
+    params_targets.each do |target|
+      model = models.includes(:columns).find_by(name: target)
+
+      # データ型によって配列を振り分ける。
+      normarl_columns = []
+      activehash_columns = []
+      references_columns = []
+      model.columns.each do |column|
+        case column.data_type_id
+        when 12 # references型のカラム
+          references_columns << column.name
+        when 13 # ActiveHashを参照するカラム
+          activehash_columns << column.name
+        else
+          normarl_columns << column.name
+        end
+      end
+      # 振り分けられた配列をもとにHTMLを作成
+      html = "#{insert_space(2)}def #{model.name}_params<br>"
+      html += "#{insert_space(4)}params.require(:#{model.name}).permit("
+      first = true
+      normarl_columns.each do |column|
+        html += ', ' unless first
+        html += ":#{column}"
+        first = false
+      end
+      activehash_columns.each do |column|
+        html += ', ' unless first
+        html += ":#{column}_id"
+        first = false
+      end
+      if references_columns.length != 0
+        first = true
+        html += ').merge('
+        references_columns.each do |column|
+          html += ', ' unless first
+          html += if column != devise.name
+                    "#{column}_id: params[:#{column}_id]"
+                  else
+                    "#{column}_id: current_user.id"
+                  end
+          first = false
+        end
+      end
+      html += ")<br>#{insert_space(2)}end<br><br>"
+      contents[:params] = html 
+    end
+  end
+
+
+
+
+
+
+  # 新しいプランの範囲----------------------------------------------------
+
+
+  # 新しいプラン。contentsにハッシュ構造を持たせ、引数として使用することで複数のメソッドに渡って受け渡すことができるようにする。
+  ## contents[:各アクション名] -> app_actionを対象とするアクションごとに分配し格納する。ここから各アクション内のコードを作成する。
+  ## contents[:params_targets] -> ストロングパラメーターを取得する必要のあるモデル名(string)を格納する。ここからmodel_paramsを作成する。
+  ## contents[:form_targets] -> フォームの対象となるモデル名(string)を格納する。ここからmodel_form_variableを作成する
+  ## contents[:アクション名_form_group] -> model_form_variableを使用するアクションを格納する。ここからbefore_actionを作成する。
+
+  # コントローラーに登録されたアクションを配列に分配するメソッド
+  def make_controller_array(app_actions)
+    contents = { actions: %w[
+      index new create edit update destroy show
+      get_common_before1 get_common_before2 get_common_before3
+      params_targets form_targets
+    ]}
+    contents[:actions].each do |action|
+      contents[action.to_sym] = []
+    end
+
+    app_actions.each do |app_action|
+      if contents["#{app_action.action_select}".to_sym].nil?
+        contents["#{app_action.action_select}".to_sym] = []
+      end
+
+      contents["#{app_action.action_select}".to_sym] << app_action
+
+      # ストロングパラメーターを必要とするアクションから、対象となるモデル名を格納する
+      if [2, 3, 4, 5, 6, 7, 8].include?(app_action.action_code_id) 
+        contents[:params_targets] << app_action.target unless contents[:params_targets].include?(app_action.target)
+      end
+      # formに関連するモデル名(string)と、対象モデル名とアクションの組み合わせをそれぞれ格納する
+      if app_action.action_code_id <= 8
+        contents[:form_targets] << app_action.target unless contents[:form_targets].include?(app_action.target)
+      end
+      
+
+    end
+    puts '---------------'
+    puts contents[:form_targets]
+    puts '---------------'
+    
+    contents
+  end
+
+  # contents[:params_targets]をもとにストロングパラメーター取得メソッドを作成するメソッド
+  def make_strong_parameter_proto3(contents)
+    models = Model.includes(:columns).where(application_id: params[:application_id])
+    target_model = '' # 初期化
+    devise_name = '' # 初期化
+    html = '' # 初期化
+    contents[:form_targets].each do |target|
+      models.each do |model|
+        target_model = model if model.name == target
+        devise_name = model.name if model.model_type_id == 5
+      end
+
+      # データ型によって配列を振り分ける。
+      normarl_columns = []
+      activehash_columns = []
+      references_columns = []
+      target_model.columns.each do |column|
+        case column.data_type_id
+        when 12 # references型のカラム
+          references_columns << column.name
+        when 13 # ActiveHashを参照するカラム
+          activehash_columns << column.name
+        else
+          normarl_columns << column.name
+        end
+      end
+      # 振り分けられた配列をもとにHTMLを作成
+      html += "#{insert_space(2)}def #{target_model.name}_params<br>"
+      html += "#{insert_space(4)}params.require(:#{target_model.name}).permit("
+      first = true
+      normarl_columns.each do |column|
+        html += ', ' unless first
+        html += ":#{column}"
+        first = false
+      end
+      activehash_columns.each do |column|
+        html += ', ' unless first
+        html += ":#{column}_id"
+        first = false
+      end
+      if references_columns.length != 0
+        first = true
+        html += ').merge('
+        references_columns.each do |column|
+          html += ', ' unless first
+          html += if column != devise_name
+                    "#{column}_id: params[:#{column}_id]"
+                  else
+                    "#{column}_id: current_user.id"
+                  end
+          first = false
+        end
+      end
+      html += ")<br>#{insert_space(2)}end<br><br>"
+    end
+    html
+  end
+
+  # formで使用するインスタンス変数を取得するメソッドである、model_form_variableを作成するメソッド
+  def make_model_form_variable(target, app_controllers, contents)
+    app_controllers.each do |app_controller|
+      if app_controller.name == target
+        parent = app_controller.parent
+        next if parent == ''
+
+        contents[:model_form_variable] += "#{insert_space(4)}@#{parent} = #{parent.classify}.find(params[:#{parent}_id])<br>"
+        make_model_form_variable(parent, app_controllers, contents)
+      end  
+    end
+  end
+
+  #/////////// 新しいプランの範囲----------------------------------------------------
 
 
 

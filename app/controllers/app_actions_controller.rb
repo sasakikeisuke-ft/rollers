@@ -4,6 +4,7 @@ class AppActionsController < ApplicationController
 
   def index
     @app_controller = AppController.find(params[:app_controller_id])
+    @app_controllers = AppController.where(application_id: params[:application_id])
     @app_actions = @app_controller.app_actions
   end
 

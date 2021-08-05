@@ -1,7 +1,8 @@
-
+<% contents = make_contents_of_controller(@app_actions) %>
+<% contents_remake = make_controller_array(@app_actions) %>
 <div>
   class <%= @app_controller.name.pluralize.camelize %>Controller < ApplicationController<br>
-    <%#== contents[:authenticate] %>
+    <%== contents[:before] %>
     <%#== contents[:before_find] %>
     <br>
 
@@ -31,6 +32,79 @@
         <%== "#{insert_space(2)}end<br><br>"  %>
       <% end %>
     <% end %>
+
+    <% if contents[:params] != nil  %>
+      <%== "#{insert_space(2)}privete<br><br>" %>
+      <%== contents[:params] %>
+
+    <% end %>
+    
+
+  </div>
+  end<br>
+</div>
+-------------------------------------------------------------------------------------------------------<br>
+上が既存のもの、下がremake<br>
+-------------------------------------------------------------------------------------------------------
+
+<div>
+  class <%= @app_controller.name.pluralize.camelize %>Controller < ApplicationController<br>
+    <br>
+
+    <% seven_actions = %w[index new create edit update destroy show] %>
+    <% seven_actions.each do |action| %>
+      <% if @app_controller["#{action}_select"] >= 2 %>
+      
+        <%== "#{insert_space(2)}def #{action}<br>"  %>
+        <% contents_remake[action.to_sym].each do |app_action| %>
+          <% content = {first: '', before: '', main: '', after: ''} %>
+          <% make_action_code_remake(app_action, links, content) %>
+
+          <%== content[:first] %>
+          <%== content[:before] %>
+          <%== content[:main] %>
+          <% if links %>
+            <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action) %>
+            <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete %>
+            <br>
+          <% end %>
+          <%== content[:after] %>
+        <% end %>
+        <%== "#{insert_space(2)}end<br><br>"  %>
+      <% end %>
+    <% end %>
+
+    <%== "#{insert_space(2)}private<br><br>" %>
+
+    <%== make_strong_parameter_proto3(contents_remake) %>
+    
+    <%# フォームのために必要なインスタンス変数を取得するコード %>
+    <% contents_remake[:params_targets].each do |target| %>
+      <% contents_remake[:model_form_variable] = '' %>
+      <% make_model_form_variable(target, @app_controllers, contents_remake) %>
+      
+      <%== "#{insert_space(2)}def #{target}_form_variable<br>" %>
+      <%== contents_remake[:model_form_variable] %>
+      <%== "#{insert_space(4)}(上記は自動生成)<br>" %>
+      ここに登録した追加アクションが表示される。<br>
+      <% unless contents_remake["#{target}_form_variable".to_sym].nil? %>
+        <% contents_remake["#{target}_form_variable".to_sym].each do |app_action| %>
+          <% content = {first: '', before: '', main: '', after: ''} %>
+          <% make_action_code_remake(app_action, links, content) %>
+
+          <%== content[:first] %>
+          <%== content[:before] %>
+          <%== content[:main] %>
+          <% if links %>
+            <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action) %>
+            <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete %>
+            <br>
+          <% end %>
+        <% end %>
+      <% end %>
+      <%== "#{insert_space(2)}end<br><br>" %>
+    <% end %>
+    
   </div>
   end<br>
 </div>
