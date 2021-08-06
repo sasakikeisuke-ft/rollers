@@ -264,6 +264,13 @@ module AppActionsHelper
 
 
 
+
+
+
+
+
+
+
   # 新しいプランの範囲----------------------------------------------------
 
 
@@ -271,7 +278,7 @@ module AppActionsHelper
   ## contents[:各アクション名] -> app_actionを対象とするアクションごとに分配し格納する。ここから各アクション内のコードを作成する。
   ## contents[:params_targets] -> ストロングパラメーターを取得する必要のあるモデル名(string)を格納する。ここからmodel_paramsを作成する。
   ## contents[:form_targets] -> フォームの対象となるモデル名(string)を格納する。ここからmodel_form_variableを作成する
-  ## contents[:アクション名_form_group] -> model_form_variableを使用するアクションを格納する。ここからbefore_actionを作成する。
+  ## contents[:モデル名_form_actions] -> model_form_variableを使用するアクションを格納する。ここからbefore_actionを作成する。
 
   # コントローラーに登録されたアクションを配列に分配するメソッド
   def make_controller_array(app_actions)
@@ -295,15 +302,24 @@ module AppActionsHelper
       if [2, 3, 4, 5, 6, 7, 8].include?(app_action.action_code_id) 
         contents[:params_targets] << app_action.target unless contents[:params_targets].include?(app_action.target)
       end
-      # formに関連するモデル名(string)と、対象モデル名とアクションの組み合わせをそれぞれ格納する
+      # formに関連するモデル名(string)と、model_form_variableを使用するアクションをそれぞれ格納する
       if app_action.action_code_id <= 8
         contents[:form_targets] << app_action.target unless contents[:form_targets].include?(app_action.target)
+        if contents["#{app_action.target}_form_actions".to_sym].nil?
+          contents["#{app_action.target}_form_actions".to_sym] = []
+        end
+        unless contents["#{app_action.target}_form_actions".to_sym].include?(app_action.action_select)
+          contents["#{app_action.target}_form_actions".to_sym] << 'edit' if app_action.action_select == 'update'
+          contents["#{app_action.target}_form_actions".to_sym] << app_action.action_select if app_action.action_code_id == 1
+        end
       end
       
 
     end
+    # contentsの内容確認
     puts '---------------'
-    puts contents[:form_targets]
+    puts "対象モデル：#{contents[:form_targets]} -> optionなら成功"
+    puts "対象アクション: #{contents[:option_form_actions]}"
     puts '---------------'
     
     contents
@@ -315,7 +331,7 @@ module AppActionsHelper
     target_model = '' # 初期化
     devise_name = '' # 初期化
     html = '' # 初期化
-    contents[:form_targets].each do |target|
+    contents[:params_targets].each do |target|
       models.each do |model|
         target_model = model if model.name == target
         devise_name = model.name if model.model_type_id == 5
@@ -378,6 +394,23 @@ module AppActionsHelper
         make_model_form_variable(parent, app_controllers, contents)
       end  
     end
+  end
+
+  def make_before_action_model_form_variable(contents)
+    html = ''
+    contents[:form_targets].each do |target|
+      next unless contents["#{target}_form_actions".to_sym].length >= 2
+
+      html += "#{insert_space(2)}before_action :#{target}_form_variable, only: ["
+      first = true
+      contents["#{target}_form_actions".to_sym].each do |element|
+        html += ', ' unless first
+        html += ":#{element.to_s}"
+        first = false
+      end
+      html += ']<br>'
+    end
+    html
   end
 
   #/////////// 新しいプランの範囲----------------------------------------------------

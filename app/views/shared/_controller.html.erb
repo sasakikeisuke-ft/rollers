@@ -49,8 +49,10 @@
 
 <div>
   class <%= @app_controller.name.pluralize.camelize %>Controller < ApplicationController<br>
+  <%== make_before_action_model_form_variable(contents_remake) %>
     <br>
 
+    <%# 基本の７つのアクションに関する記載を行う。 %>
     <% seven_actions = %w[index new create edit update destroy show] %>
     <% seven_actions.each do |action| %>
       <% if @app_controller["#{action}_select"] >= 2 %>
@@ -86,7 +88,7 @@
       <%== "#{insert_space(2)}def #{target}_form_variable<br>" %>
       <%== contents_remake[:model_form_variable] %>
       <%== "#{insert_space(4)}(上記は自動生成)<br>" %>
-      ここに登録した追加アクションが表示される。<br>
+      ここに登録した追加アクションが表示される。追加実装予定場所<br>
       <% unless contents_remake["#{target}_form_variable".to_sym].nil? %>
         <% contents_remake["#{target}_form_variable".to_sym].each do |app_action| %>
           <% content = {first: '', before: '', main: '', after: ''} %>
