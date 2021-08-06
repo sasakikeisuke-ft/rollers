@@ -92,10 +92,35 @@
 
     <%== "#{insert_space(2)}private<br><br>" %>
 
-    <%# ストロングパラメーター取得メソッド %>
+    <%# model_params: ストロングパラメーター取得メソッド %>
     <%== make_strong_parameter_proto3(contents_remake) %>
     
-    <%# フォームのために必要なインスタンス変数を取得するメソッドを作成 %>
+    <%# get_common_variable1-3: 各アクションの共通となるインスタンス変数を取得するメソッド %>
+    <% private_actions = %w[get_common_variable1 get_common_variable2 get_common_variable3] %>
+    <% private_actions.each do |action| %>
+      <% unless contents_remake[action.to_sym].nil? %>
+      
+        <%== "#{insert_space(2)}def #{action}<br>"  %>
+        <% contents_remake[action.to_sym].each do |app_action| %>
+          <% content = {first: '', before: '', main: '', after: ''} %>
+          <% make_action_code_remake(app_action, links, content) %>
+
+          <%== content[:first] %>
+          <%== content[:before] %>
+          <%== content[:main] %>
+          <% if links %>
+            <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action) %>
+            <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete %>
+          <% end %>
+          <br>
+          <%== content[:after] %>
+        <% end %>
+        <%== "#{insert_space(2)}end<br><br>"  %>
+      <% end %>
+    <% end %>
+
+
+    <%# model_form_variable: フォームのために必要なインスタンス変数を取得するメソッドを作成 %>
     <% contents_remake[:params_targets].each do |target| %>
       <% next unless contents_remake["#{target}_form_actions".to_sym].length >= 2 %>
 
@@ -104,7 +129,6 @@
       
       <%== "#{insert_space(2)}def #{target}_form_variable<br>" %>
       <%== contents_remake[:model_form_variable] %>
-      ここに登録した追加アクションが表示される。追加実装予定場所<br>
       <% unless contents_remake["#{target}_form_variable".to_sym].nil? %>
         <% contents_remake["#{target}_form_variable".to_sym].each do |app_action| %>
           <% content = {first: '', before: '', main: '', after: ''} %>
