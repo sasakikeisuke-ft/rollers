@@ -50,7 +50,7 @@ class AppActionsController < ApplicationController
   end
 
   def instance_variable_for_form
-    @app_controller = AppController.find(params[:app_controller_id])
+    @app_controller = AppController.includes(:app_actions).find(params[:app_controller_id])
     @application = @app_controller.application
     @models = @application.models.where(model_type_id: [1, 3, 5])
   end

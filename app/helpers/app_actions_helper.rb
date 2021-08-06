@@ -2,30 +2,32 @@ module AppActionsHelper
 
   # アクション新規登録画面における、アクションタイプの選択肢を作成するメソッド
   def make_selects(app_controller)
-    actions = %w[index new create edit update destroy show]
+    # 基本の７つのアクション
+    seven_actions = %w[index new create edit update destroy show]
     selects = []
-    find_count = 0
-    form_count = 0
-    actions.each do |action|
+    targets = []
+    array = {}
+    seven_actions.each do |action|
       if app_controller["#{action}_select".to_sym] >= 2
-        select = ["#{action}", "#{action}"]
-        selects << select
+        selects << ["#{action}", "#{action}"]
+      end
+    end
 
-        case action
-        when 'create' 
-          form_count += 1
-        when 'edit', 'update'
-          find_count += 1
-          form_count += 1
-        when 'destroy'
-          find_count += 1
-        when 'show'
-          find_count += 1
+    # フォーム専用のメソッドが作成されるされる対象とメソッド名
+    app_controller.app_actions.each do |app_action|
+      if app_action.action_code_id <= 8
+        targets << app_action.target unless targets.include?(app_action.target)
+        array["#{app_action.target}".to_sym] = [] if array["#{app_action.target}".to_sym].nil?
+        unless array["#{app_action.target}".to_sym].include?(app_action.action_select)
+          array["#{app_action.target}".to_sym] << app_action.action_select
         end
       end
     end
-    selects << ['find_model', 'find_model'] if find_count >= 2
-    selects << ['instance_variable_for_form', 'instance_variable_for_form'] if form_count >= 2
+    targets.each do |target|
+      if array["#{target}".to_sym].length >= 2
+        selects << ["#{target}_form_variable", "#{target}_form_variable"]
+      end
+    end
 
     selects 
   end
