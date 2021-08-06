@@ -68,8 +68,22 @@
           <% if links %>
             <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action) %>
             <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete %>
-            <br>
           <% end %>
+          <br>
+          <%# レイアウトを使用する場合、create/updateのためmodel_form_variableの内容に合わせて挿入が必要。 %>
+          <% if [1, 2, 3, 4, 5, 6, 7, 8].include?(app_action.action_code_id) && !contents_remake["#{app_action.target}_form_actions".to_sym].nil? %>
+            <% if contents_remake["#{app_action.target}_form_actions".to_sym].length == 1 %>
+              <% contents_remake[:model_form_variable] = '' %>
+              <% make_model_form_variable(app_action.target, @app_controllers, contents_remake, links) %>
+              <%== contents_remake[:model_form_variable] %>
+            <% elsif [5, 6, 7, 8].include?(app_action.action_code_id) && contents_remake["#{app_action.target}_form_actions".to_sym].length >= 2 %>
+              <%== "#{insert_space(6)}#{app_action.target}_form_variable" %>
+              <%== ' <- 自動生成' if links %>
+              <%== '<br>' %>
+            <% end %>
+          <% end %>
+          <%#/ レイアウトを使用する場合の挿入%>
+
           <%== content[:after] %>
         <% end %>
         <%== "#{insert_space(2)}end<br><br>"  %>
@@ -78,16 +92,18 @@
 
     <%== "#{insert_space(2)}private<br><br>" %>
 
+    <%# ストロングパラメーター取得メソッド %>
     <%== make_strong_parameter_proto3(contents_remake) %>
     
-    <%# フォームのために必要なインスタンス変数を取得するコード %>
+    <%# フォームのために必要なインスタンス変数を取得するメソッドを作成 %>
     <% contents_remake[:params_targets].each do |target| %>
+      <% next unless contents_remake["#{target}_form_actions".to_sym].length >= 2 %>
+
       <% contents_remake[:model_form_variable] = '' %>
-      <% make_model_form_variable(target, @app_controllers, contents_remake) %>
+      <% make_model_form_variable(target, @app_controllers, contents_remake, links) %>
       
       <%== "#{insert_space(2)}def #{target}_form_variable<br>" %>
       <%== contents_remake[:model_form_variable] %>
-      <%== "#{insert_space(4)}(上記は自動生成)<br>" %>
       ここに登録した追加アクションが表示される。追加実装予定場所<br>
       <% unless contents_remake["#{target}_form_variable".to_sym].nil? %>
         <% contents_remake["#{target}_form_variable".to_sym].each do |app_action| %>

@@ -279,6 +279,7 @@ module AppActionsHelper
   ## contents[:params_targets] -> ストロングパラメーターを取得する必要のあるモデル名(string)を格納する。ここからmodel_paramsを作成する。
   ## contents[:form_targets] -> フォームの対象となるモデル名(string)を格納する。ここからmodel_form_variableを作成する
   ## contents[:モデル名_form_actions] -> model_form_variableを使用するアクションを格納する。ここからbefore_actionを作成する。
+  ## contents[:model_form_variable] -> model_form_variableに実際に記載するインスタンス変数取得に関するコードを格納する。
 
   # コントローラーに登録されたアクションを配列に分配するメソッド
   def make_controller_array(app_actions)
@@ -319,7 +320,7 @@ module AppActionsHelper
     # contentsの内容確認
     puts '---------------'
     puts "対象モデル：#{contents[:form_targets]} -> optionなら成功"
-    puts "対象アクション: #{contents[:option_form_actions]}"
+    puts "対象アクション: #{contents[:app_controller_form_actions]}"
     puts '---------------'
     
     contents
@@ -384,14 +385,16 @@ module AppActionsHelper
   end
 
   # formで使用するインスタンス変数を取得するメソッドである、model_form_variableを作成するメソッド
-  def make_model_form_variable(target, app_controllers, contents)
+  def make_model_form_variable(target, app_controllers, contents, links)
     app_controllers.each do |app_controller|
       if app_controller.name == target
         parent = app_controller.parent
         next if parent == ''
 
-        contents[:model_form_variable] += "#{insert_space(4)}@#{parent} = #{parent.classify}.find(params[:#{parent}_id])<br>"
-        make_model_form_variable(parent, app_controllers, contents)
+        contents[:model_form_variable] += "#{insert_space(4)}@#{parent} = #{parent.classify}.find(params[:#{parent}_id])"
+        contents[:model_form_variable] += ' <- 自動生成' if links
+        contents[:model_form_variable] += '<br>'
+        make_model_form_variable(parent, app_controllers, contents, links)
       end  
     end
   end
