@@ -4,6 +4,8 @@ module AppActionsHelper
   def make_selects(app_controller)
     # 基本の７つのアクション
     seven_actions = %w[index new create edit update destroy show]
+    # 共通する内容を登録するプライベートアクション
+    common_actions = %w[get_common_variable1 get_common_variable2 get_common_variable3]
     selects = []
     targets = []
     array = {}
@@ -11,6 +13,9 @@ module AppActionsHelper
       if app_controller["#{action}_select".to_sym] >= 2
         selects << ["#{action}", "#{action}"]
       end
+    end
+    common_actions.each do |action|
+      selects << ["#{action}", "#{action}"]
     end
 
     # フォーム専用のメソッドが作成されるされる対象とメソッド名
