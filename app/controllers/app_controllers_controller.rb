@@ -15,7 +15,7 @@ class AppControllersController < ApplicationController
   def create
     @app_controller = AppController.new(app_controller_params)
     if @app_controller.save
-      AppAction.set(@app_controller)
+      SetDefaultActionService.set(@app_controller)
       redirect_to application_app_controller_app_actions_path(app_controller_id: @app_controller)
     else
       get_common_matter
