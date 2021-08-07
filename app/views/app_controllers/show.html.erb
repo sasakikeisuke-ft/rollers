@@ -1,99 +1,23 @@
-<% name = @app_controller.name %>
-<% names = @app_controller.name.tableize %>
-<% contents = make_controller_html(@app_controller) %>
+<h2><%= @app_controller.name.tableize %>コントローラーの作成と編集</h2>
 
-<h2><%= names %>コントローラーの編集</h2>
+<p><%= @app_controller.name.tableize %>コントローラーを作成します。</p>
+
+<h2><%= @app_controller.name.tableize %>コントローラー関連ファイルの作成</h2>
 
 <div class="terminal-field">
   <p>ターミナル：関連ファイルの作成</p>
-  <p>rails g controller <%= names %></p>
+  <p>rails g controller <%= @app_controller.name.tableize %></p>
 </div>
 <div class="terminal-field">
   <p>ターミナル：対象ファイルへジャンプ</p>
-  <p>app/controllers/<%= names %>_controller.rb -> command + クリック</p>
+  <p>app/controllers/<%= @app_controller.name.tableize %>_controller.rb -> command + クリック</p>
 </div>
 
-<div class="code-field">
-  class <%= name.pluralize.camelize %>Controller < ApplicationController<br>
-  <%== contents[:authenticate] %>
-  <%== contents[:before_find] %>
-  <br>
+<h2><%= @app_controller.name.tableize %>コントローラーの編集</h2>
 
-  <% if @app_controller.index_select >= 2 %>
-    <%== insert_space(2) %>def index<br>
-    <%== contents[:action_index] %>
-    <%== insert_space(2) %>end<br>
-    <br>
-  <% end %>
+<%# 部分テンプレートを使用し、コントローラーのコードを表示します。また編集削除のリンクは表示されません。 %>
+<%= render partial: "shared/controller", locals: {links: false} %>
 
-  <% if @app_controller.new_select >= 2 %>
-    <%== insert_space(2) %>def new<br>
-    <%== contents[:action_new] %>
-    <%== insert_space(2) %>end<br>
-    <br>
-  <% end %>
-
-  <% if @app_controller.create_select >= 2 %>
-    <%== insert_space(2) %>def create<br>
-    <%== insert_space(4) %>@<%= name %> = <%= name.classify %>.new(<%= name %>_params)<br>
-    <%== insert_space(4) %>if @<%= name %>.save<br>
-    <%== insert_space(6) %>redirect_to root_path<br>
-    <%== insert_space(4) %>else<br>
-    <%== contents[:action_create] %>
-    <%== insert_space(6) %>render :new<br>
-    <%== insert_space(4) %>end<br>
-    <%== insert_space(2) %>end<br>
-    <br>
-  <% end %>
-
-  <% if @app_controller.edit_select >= 2 %>
-    <%== insert_space(2) %>def edit<br>
-    <%== contents[:action_edit] %>
-    <%== insert_space(2) %>end<br>
-    <br>
-  <% end %>
-
-  <% if @app_controller.update_select >= 2 %>
-    <%== insert_space(2) %>def update<br>
-    <%== insert_space(4) %>if @<%= name %>.update<br>
-    <%== insert_space(6) %>redirect_to root_path<br>
-    <%== insert_space(4) %>else<br>
-    <%== contents[:action_update] %>
-    <%== insert_space(6) %>render :edit<br>
-    <%== insert_space(4) %>end<br>
-    <%== insert_space(2) %>end<br>
-    <br>
-  <% end %>
-
-  <% if @app_controller.destroy_select >= 2 %>
-    <%== insert_space(2) %>def destroy<br>
-    <%== insert_space(4) %>@<%= name %>.destroy<br>
-    <%== insert_space(4) %>redirect_to root_path<br>
-    <%== insert_space(2) %>end<br>
-    <br>
-  <% end %>
-
-  <% if @app_controller.show_select >= 2 %>
-    <%== insert_space(2) %>def show<br>
-    <%== contents[:action_show] %>
-    <%== insert_space(2) %>end<br>
-    <br>
-  <% end %>
-
-  <%# if private_count != 0 %><%# privateメソッドが必要なら以下を記述する %>
-  <%== insert_space(2) %>private<br>
-  <br>
-  <%#== contents[:get_common] %>
-  <%== contents[:params] %><br>
-  <%== contents[:find_model] %><br>
-  <%== contents[:form] %><br>
-  <%# end %>
-end
-</div>
-
-
-<br>
-<br>
 <br>
 <% if @gemfile.rubocop %>
   <div class="terminal-field">

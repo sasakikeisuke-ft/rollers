@@ -42,6 +42,8 @@ class AppControllersController < ApplicationController
 
   def show
     @gemfile = Gemfile.find_by(application_id: params[:application_id])
+    @app_controllers = AppController.where(application_id: params[:application_id])
+    @app_actions = AppAction.where(app_controller_id: params[:id])
   end
 
   private

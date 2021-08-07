@@ -68,7 +68,7 @@
           <%== content[:after] %>
         <% end %>
         <%== "#{insert_space(2)}end<br>" %>
-        <% if links || !contents["#{action}_targets".to_sym].nil? %>
+        <% if links && !contents["#{action}_targets".to_sym].nil? %>
           <%== "#{insert_space(2)}＜#{action}を適応しているアクション＞<br>" %>
           <% contents["#{action}_targets".to_sym].each do |target| %>
             <%== "#{insert_space(4)}#{target.action_select}" %>
