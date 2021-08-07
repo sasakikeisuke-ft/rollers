@@ -447,6 +447,32 @@ module AppActionsHelper
     html
   end
 
+  # before_action: authenticate_user!のHTMLを作成するメソッド
+  def before_action_authenticate_user(app_controller)
+    html = "#{insert_space(2)}before_action :authenticate_user!"
+    action_html = ', only: ['
+    first = true
+    action_count = 0
+    actions = %w[index new create edit update destroy show]
+    actions.each do |action|
+      next unless app_controller["#{action}_select".to_sym] >= 3
+
+      action_html += ', ' unless first
+      action_html += ":#{action}"
+      first = false
+      action_count += 1
+    end
+    case action_count
+    when 7
+      html += '<br>'
+    when 0
+      html = ''
+    else
+      html += action_html + ']<br>'
+    end
+    html
+  end
+
   #/////////// 新しいプランの範囲----------------------------------------------------
 
 

@@ -49,6 +49,7 @@
 
 <div>
   class <%= @app_controller.name.pluralize.camelize %>Controller < ApplicationController<br>
+  <%== before_action_authenticate_user(@app_controller) %>
   <%== make_before_action_model_form_variable(contents_remake) %>
   <%== make_before_action_get_common_variable(contents_remake) %>
     <br>
