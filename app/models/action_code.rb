@@ -22,7 +22,7 @@ class ActionCode < ActiveHash::Base
 
     # 複数のレコードを取得
     { id: 21, keyword: '内容', sample: '@models = Model.all' },
-    { id: 22, keyword: '内容', sample: '@models = Model.where(条件式1_id: params[条件式_id])' },
+    { id: 22, keyword: '内容', sample: '@models = Model.where(条件式1_id: params[条件式1_id])' },
     { id: 23, keyword: '内容', sample: '@models = Model.where(条件式1)' },
     { id: 24, keyword: '内容', sample: '@models = Model.where(条件式1: [条件式2])' },
     { id: 25, keyword: '内容', sample: '@models = Model.where(条件式1, 条件式2)' },

@@ -30,9 +30,9 @@
 </div>
 <br>
 <%= link_to 'アクション新規作成へ',  new_application_app_controller_app_action_path %><br>
-
-
 <br>
+
+<h3><%= @app_controller.name %>コントローラーの内容</h3>
 <%# 部分テンプレートを使用し、コントローラーのコードを表示します。また編集削除のリンクは表示されます。 %>
 <%= render partial: "shared/controller", locals: {links: true} %>
 <br>
