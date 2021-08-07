@@ -6,33 +6,35 @@
 <h5>自動で作成されるメソッドについての補足説明</h5>
 <div>
   コントローラーの登録内容により、一部メソッドが初期から作成されることがあります。<br>
+  
   以下は作成されるメソッドに関する説明です。
 </div>
+<br>
 <div>
-  1, <%= @app_controller.name %>_params<br>
+  <b>＜model_params＞</b><br>
   DBへの保存の際に必要なストロングパラメーターを取得するためのメソッドです。<br>
-  コントローラー名と同名のモデルを対象に作成されます。
-</div>
+  ストロングパラメーターが必要なアクションが登録されると自動生成されます。<br>
+  実際には、'model'部分が対象のモデル名へ差し替えられます。
+</div><br>
 <div>
-  2, find_<%= @app_controller.name %><br>
-  コントローラー名と同名のモデルを取得するメソッドが作成されます。<br>
-  対象アクションはedit, update, destroy, showの４つです。<br>
-  上記アクションに共通して追加を行いたい場合、このメソッドに追加することも可能です。
-</div>
+  <b>＜get_common_variable1-3＞</b><br>
+  複数のアクションで共通する内容をbefore_actionで取得するメソッドです。<br>
+  対象モデルが異なる場合に備え、三種類まで登録することが可能です。<br>
+  初期設定では全てのアクションを対象にbefore_actionがで既往されています。<br>
+  アクション登録時に、対象アクションと当メソッド名を選ぶことで、onlyにより適応アクションを限定できます。<br>
+</div><br>
 <div>
-  3, instance_variable_for_form<br>
-  登録されたコントローラーのネスト構造から、フォームに必要なインスタンス変数を取得します。<br>
-  コントローラー名と同名のモデルを対象とします。<br>
-  ネスト構造がない場合は作成されません。<br>
-  find_<%= @app_controller.name %>と同様に、このメソッドにアクションを追加することも可能です。
+  <b>＜model_form_variable＞</b><br>
+  登録されたコントローラーのネスト構造から、フォームに必要なインスタンス変数を取得するメソッドです。<br>
+  登録内容から自動で生成されますが、このメソッドに任意のアクションを登録することもできます。<br>
 </div>
 <br>
-<%= link_to 'テスト アクション新規作成へ',  new_application_app_controller_app_action_path %><br>
-<br>
+<%= link_to 'アクション新規作成へ',  new_application_app_controller_app_action_path %><br>
+
 
 <br>
 <%# 部分テンプレートを使用し、コントローラーのコードを表示します。また編集削除のリンクは表示されます。 %>
 <%= render partial: "shared/controller", locals: {links: true} %>
 <br>
-<%= link_to 'テスト アクション新規作成へ',  new_application_app_controller_app_action_path %><br>
+<%= link_to 'アクション新規作成へ',  new_application_app_controller_app_action_path %><br>
 <%= render partial: "shared/link_index" %>
