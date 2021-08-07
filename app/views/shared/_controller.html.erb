@@ -114,7 +114,16 @@
           <br>
           <%== content[:after] %>
         <% end %>
-        <%== "#{insert_space(2)}end<br><br>"  %>
+        <%== "#{insert_space(2)}end<br>" %>
+        <% if links || !contents_remake["#{action}_targets".to_sym].nil? %>
+          <%== "#{insert_space(2)}＜#{action}を適応しているアクション＞<br>" %>
+          <% contents_remake["#{action}_targets".to_sym].each do |target| %>
+            <%== "#{insert_space(4)}#{target.action_select}" %>
+            <%= link_to '編集', edit_application_app_controller_app_action_path(id: target) %>
+            <%= link_to '削除', application_app_controller_app_action_path(id: target), method: :delete %>
+            <br>
+          <% end %>
+        <% end %><br>
       <% end %>
     <% end %>
 
