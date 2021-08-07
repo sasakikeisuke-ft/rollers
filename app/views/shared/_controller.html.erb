@@ -50,6 +50,7 @@
 <div>
   class <%= @app_controller.name.pluralize.camelize %>Controller < ApplicationController<br>
   <%== make_before_action_model_form_variable(contents_remake) %>
+  <%== make_before_action_get_common_variable(contents_remake) %>
     <br>
 
     <%# 基本の７つのアクションに関する記載を行う。 %>
@@ -96,15 +97,13 @@
     <%== make_strong_parameter_proto3(contents_remake) %>
     
     <%# get_common_variable1-3: 各アクションの共通となるインスタンス変数を取得するメソッド %>
-    <% private_actions = %w[get_common_variable1 get_common_variable2 get_common_variable3] %>
-    <% private_actions.each do |action| %>
+    <% common_actions = %w[get_common_variable1 get_common_variable2 get_common_variable3] %>
+    <% common_actions.each do |action| %>
       <% unless contents_remake[action.to_sym].nil? %>
-      
         <%== "#{insert_space(2)}def #{action}<br>"  %>
         <% contents_remake[action.to_sym].each do |app_action| %>
           <% content = {first: '', before: '', main: '', after: ''} %>
           <% make_action_code_remake(app_action, links, content) %>
-
           <%== content[:first] %>
           <%== content[:before] %>
           <%== content[:main] %>

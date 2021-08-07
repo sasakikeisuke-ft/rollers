@@ -49,12 +49,12 @@ class ActionCode < ActiveHash::Base
     { id: 51, keyword: '内容', sample: '@models = Model.includes(条件式1: :条件式2).where.not(条件式3)' },
 
     # 上記以外の取得方法
-    { id: 61, keyword: '内容', sample: '@model Model.first' },
-    { id: 62, keyword: '内容', sample: '@model Model.first(条件式1)' },
-    { id: 63, keyword: '内容', sample: '@model Model.last' },
-    { id: 64, keyword: '内容', sample: '@model Model.last(条件式1)' },
-    { id: 65, keyword: '内容', sample: '@model Model.take' },
-    { id: 66, keyword: '内容', sample: '@model Model.take(条件式1)' },
+    { id: 61, keyword: '内容', sample: '@model = Model.first' },
+    { id: 62, keyword: '内容', sample: '@model = Model.first(条件式1)' },
+    { id: 63, keyword: '内容', sample: '@model = Model.last' },
+    { id: 64, keyword: '内容', sample: '@model = Model.last(条件式1)' },
+    { id: 65, keyword: '内容', sample: '@model = Model.take' },
+    { id: 66, keyword: '内容', sample: '@model = Model.take(条件式1)' },
     { id: 67, keyword: '内容', sample: '@models = group(条件式1)' },
     { id: 68, keyword: '内容', sample: '@models = Model.order(条件式1 ASC)' },
     { id: 69, keyword: '内容', sample: '@models = Model.order(条件式1 DESC)' },
@@ -76,9 +76,10 @@ class ActionCode < ActiveHash::Base
     { id: 95, keyword: '内容', sample: 'redirect_to 条件式1_path(条件式2_id: params[条件式2_id])' },
     { id: 96, keyword: '内容', sample: 'render 条件式1' },
 
-    # オリジナルアクションの雛形設定
-    { id: 98, keyword: '内容', sample: 'collection' },
-    { id: 99, keyword: '内容', sample: 'member' }
+    # get_common_variableの使用
+    { id: 97, keyword: '内容', sample: 'get_common_variable1' },
+    { id: 98, keyword: '内容', sample: 'get_common_variable2' },
+    { id: 99, keyword: '内容', sample: 'get_common_variable3' }
   ]
   include ActiveHash::Associations
   has_many :app_actions

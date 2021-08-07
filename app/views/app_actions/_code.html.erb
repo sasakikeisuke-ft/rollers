@@ -1,4 +1,5 @@
 <div class="field">
+  <b>
   <% case code.id %>
   <% when 1 %>
     <p>インスタンスを作成する。</p>
@@ -14,10 +15,10 @@
     <p>アソシエーションを利用してレコードを取得</p>
   <% when 91 %>
     <p>ページ遷移及びページ表示</p>
-  <% when 98 %>
-    <p>オリジナルアクションを作成する場合、collection/memberを選択してください。</p>
+  <% when 97 %>
+    <p>get_common_variable1-3の使用</p>
   <% end %>
-
+  </b>
   <%= f.radio_button :action_code_id, code.id %><%== code.sample %>
   
   <% case code.id%>
@@ -57,6 +58,10 @@
     A_model -> 条件式1
     B_model -> 条件式2
     </p>
+  <% when 99 %>
+  <p>
+    上記のget_common_variableを選択すると、登録したアクションをbefore_actionの適応先として登録できます。<br>
+    この場合、選択した対象モデルは無効化されます。
+  </p>
   <% end %>
-
 </div>

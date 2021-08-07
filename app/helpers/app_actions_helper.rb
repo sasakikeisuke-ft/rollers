@@ -1,5 +1,6 @@
 module AppActionsHelper
 
+  # app_action#new/editにて使用
   # アクション新規登録画面における、アクションタイプの選択肢を作成するメソッド
   def make_selects(app_controller)
     # 基本の７つのアクション
@@ -275,13 +276,11 @@ module AppActionsHelper
 
 
 
-
-
-
   # 新しいプランの範囲----------------------------------------------------
 
 
   # 新しいプラン。contentsにハッシュ構造を持たせ、引数として使用することで複数のメソッドに渡って受け渡すことができるようにする。
+  ## contentsのハッシュ一覧とその内容について
   ## contents[:各アクション名] -> app_actionを対象とするアクションごとに分配し格納する。ここから各アクション内のコードを作成する。
   ## contents[:params_targets] -> ストロングパラメーターを取得する必要のあるモデル名(string)を格納する。ここからmodel_paramsを作成する。
   ## contents[:form_targets] -> フォームの対象となるモデル名(string)を格納する。ここからmodel_form_variableを作成する
@@ -290,44 +289,45 @@ module AppActionsHelper
 
   # コントローラーに登録されたアクションを配列に分配するメソッド
   def make_controller_array(app_actions)
-    contents = { actions: %w[
-      index new create edit update destroy show
-      get_common_before1 get_common_before2 get_common_before3
-      params_targets form_targets
-    ]}
-    contents[:actions].each do |action|
+    contents = {}
+    actions = %w[index new create edit update destroy show params_targets form_targets]
+    actions.each do |action|
       contents[action.to_sym] = []
     end
 
     app_actions.each do |app_action|
-      if contents["#{app_action.action_select}".to_sym].nil?
-        contents["#{app_action.action_select}".to_sym] = []
-      end
-
-      contents["#{app_action.action_select}".to_sym] << app_action
-
-      # ストロングパラメーターを必要とするアクションから、対象となるモデル名を格納する
-      if [2, 3, 4, 5, 6, 7, 8].include?(app_action.action_code_id) 
-        contents[:params_targets] << app_action.target unless contents[:params_targets].include?(app_action.target)
-      end
-      # formに関連するモデル名(string)と、model_form_variableを使用するアクションをそれぞれ格納する
-      if app_action.action_code_id <= 8
-        contents[:form_targets] << app_action.target unless contents[:form_targets].include?(app_action.target)
-        if contents["#{app_action.target}_form_actions".to_sym].nil?
-          contents["#{app_action.target}_form_actions".to_sym] = []
+      if app_action.action_code_id <= 96
+        if contents["#{app_action.action_select}".to_sym].nil?
+          contents["#{app_action.action_select}".to_sym] = []
         end
-        unless contents["#{app_action.target}_form_actions".to_sym].include?(app_action.action_select)
-          contents["#{app_action.target}_form_actions".to_sym] << 'edit' if app_action.action_select == 'update'
-          contents["#{app_action.target}_form_actions".to_sym] << app_action.action_select if app_action.action_code_id == 1
+
+        contents["#{app_action.action_select}".to_sym] << app_action
+
+        # ストロングパラメーターを必要とするアクションから、対象となるモデル名を格納する
+        if [2, 3, 4, 5, 6, 7, 8].include?(app_action.action_code_id) 
+          contents[:params_targets] << app_action.target unless contents[:params_targets].include?(app_action.target)
         end
+        # formに関連するモデル名(string)と、model_form_variableを使用するアクションをそれぞれ格納する
+        if app_action.action_code_id <= 8
+          contents[:form_targets] << app_action.target unless contents[:form_targets].include?(app_action.target)
+          if contents["#{app_action.target}_form_actions".to_sym].nil?
+            contents["#{app_action.target}_form_actions".to_sym] = []
+          end
+          unless contents["#{app_action.target}_form_actions".to_sym].include?(app_action.action_select)
+            contents["#{app_action.target}_form_actions".to_sym] << 'edit' if app_action.action_select == 'update'
+            contents["#{app_action.target}_form_actions".to_sym] << app_action.action_select if app_action.action_code_id == 1
+          end
+        end
+      else # app_action.action_code_id >= 97 -> get_common_variableを使用するアクション
+        sample = app_action.action_code.sample
+        contents["#{sample}_targets".to_sym] = [] if contents["#{sample}_targets".to_sym].nil?
+        contents["#{sample}_targets".to_sym] << app_action
       end
-      
 
     end
     # contentsの内容確認
     puts '---------------'
-    puts "対象モデル：#{contents[:form_targets]} -> optionなら成功"
-    puts "対象アクション: #{contents[:app_controller_form_actions]}"
+    puts "対象アクション：#{contents[:get_common_variable1_targets]} "
     puts '---------------'
     
     contents
@@ -406,6 +406,7 @@ module AppActionsHelper
     end
   end
 
+  # before_action: model_form_variableを作成するメソッド
   def make_before_action_model_form_variable(contents)
     html = ''
     contents[:form_targets].each do |target|
@@ -419,6 +420,29 @@ module AppActionsHelper
         first = false
       end
       html += ']<br>'
+    end
+    html
+  end
+
+  # before_action: get_comon_variableを作成するメソッド
+  def make_before_action_get_common_variable(contents)
+    html = ''
+    common_actions = %w[get_common_variable1 get_common_variable2 get_common_variable3]
+    common_actions.each do |action|
+      next if contents[action.to_sym].nil?
+
+      html += "#{insert_space(2)}before_action :#{action}"
+      unless contents["#{action}_targets".to_sym].nil?
+        first = true
+        html += ', only: ['
+        contents["#{action}_targets".to_sym].each do |target|
+          html += ', ' unless first
+          html += ":#{target.action_select}"
+          first = false
+        end
+        html += ']'
+      end
+      html += '<br>'
     end
     html
   end
