@@ -25,7 +25,10 @@ class ModelsController < ApplicationController
   end
 
   def update
+    before_name = @model.name
     if @model.update(model_params)
+      after_name = @model.name
+      ProcessAtModelNameChangeService.rename_all(before_name, after_name, params[:application_id])
       redirect_to new_application_model_column_path(model_id: @model)
     else
       render :edit

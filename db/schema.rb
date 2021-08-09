@@ -17,12 +17,14 @@ ActiveRecord::Schema.define(version: 2021_07_27_125700) do
     t.string "target", null: false
     t.integer "action_code_id", null: false
     t.bigint "app_controller_id"
+    t.bigint "application_id"
     t.string "input1"
     t.string "input2"
     t.string "input3"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["app_controller_id"], name: "index_app_actions_on_app_controller_id"
+    t.index ["application_id"], name: "index_app_actions_on_application_id"
   end
 
   create_table "app_controllers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -117,6 +119,7 @@ ActiveRecord::Schema.define(version: 2021_07_27_125700) do
   end
 
   add_foreign_key "app_actions", "app_controllers"
+  add_foreign_key "app_actions", "applications"
   add_foreign_key "app_controllers", "applications"
   add_foreign_key "applications", "users"
   add_foreign_key "columns", "applications"

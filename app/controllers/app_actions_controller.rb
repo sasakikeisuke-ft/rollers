@@ -42,7 +42,7 @@ class AppActionsController < ApplicationController
   private
 
   def app_action_params
-    params.require(:app_action).permit(:target, :input1, :input2, :input3, :action_select, :action_code_id).merge(app_controller_id: params[:app_controller_id])
+    params.require(:app_action).permit(:target, :input1, :input2, :input3, :action_select, :action_code_id).merge(application_id: params[:application_id] , app_controller_id: params[:app_controller_id])
   end
 
   def find_app_action

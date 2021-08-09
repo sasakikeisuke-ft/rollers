@@ -8,22 +8,24 @@ class SetDefaultActionService
       # app_controllerの登録内容により、初期設定とするアクションの情報を配列に格納する。
       default_actions = []
       find_actions = []
+      base = {target: app_controller.name, app_controller_id: app_controller.id, application_id: app_controller.application_id}
       if app_controller.new_select >= 2
-        default_actions << {action_select: 'new', target: app_controller.name, action_code_id: 1, app_controller_id: app_controller.id}
+
+        default_actions << base.merge(action_select: 'new', action_code_id: 1)
       end
       if app_controller.create_select >= 2
-        default_actions << {action_select: 'create', target: app_controller.name, action_code_id: 5, app_controller_id: app_controller.id}
+        default_actions << base.merge(action_select: 'create', action_code_id: 5)
       end
       if app_controller.edit_select >= 2
         find_actions << 'edit'
       end
       if app_controller.update_select
-        default_actions << {action_select: 'update', target: app_controller.name, action_code_id: 7, app_controller_id: app_controller.id}
+        default_actions << base.merge(action_select: 'update', action_code_id: 7)
         find_actions << 'update'
       end
       if app_controller.destroy_select
-        default_actions << {action_select: 'destroy', target: app_controller.name, action_code_id: 9, app_controller_id: app_controller.id}
-        default_actions << {action_select: 'destroy', target: app_controller.name, action_code_id: 91, app_controller_id: app_controller.id}
+        default_actions << base.merge(action_select: 'destroy', action_code_id: 9)
+        default_actions << base.merge(action_select: 'destroy', action_code_id: 91)
         find_actions << 'destroy'
       end
       if app_controller.edit_select >= 2
@@ -33,11 +35,11 @@ class SetDefaultActionService
       # get_common_variableが必要かどうかで処理を変更する。
       if find_actions.length >= 2
         find_actions.each do |action|
-          default_actions << {action_select: action, target: app_controller.name, action_code_id: 97, app_controller_id: app_controller.id}
+          default_actions << base.merge(action_select: action, action_code_id: 97)
         end
-        default_actions << {action_select: 'get_common_variable1', target: app_controller.name, action_code_id: 11, app_controller_id: app_controller.id}
+        default_actions << base.merge(action_select: 'get_common_variable1', action_code_id: 11)
       elsif find_actions.length == 1
-        default_actions << {action_select: find_actions[0], target: app_controller.name, action_code_id: 11, app_controller_id: app_controller.id}
+        default_actions << base.merge(action_select: find_actions[0], action_code_id: 11)
       end
 
       # 上記で作成したdefault_actionsをもとに、初期設定となるapp_actionを登録する。
