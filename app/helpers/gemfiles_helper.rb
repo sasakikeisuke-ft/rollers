@@ -45,7 +45,6 @@ module GemfilesHelper
   def make_rooting_html(app_controllers)
     relations = []
     make_rooting_relations(app_controllers, relations, '', 0)
-    puts relations
     contents = {
       html: ''
     }
