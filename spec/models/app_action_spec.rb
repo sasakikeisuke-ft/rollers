@@ -29,12 +29,12 @@ RSpec.describe AppAction, type: :model do
       it 'targetが空欄だと登録できない' do
         @app_action.target = ''
         @app_action.valid?
-        expect(@app_action.errors.full_messages).to include("対象モデル名を入力してください")
+        expect(@app_action.errors.full_messages).to include('対象モデル名を入力してください')
       end
       it 'app_controllerが紐づけられていないと登録できない' do
         @app_action.app_controller = nil
         @app_action.valid?
-        expect(@app_action.errors.full_messages).to include("app_controllerを入力してください")
+        expect(@app_action.errors.full_messages).to include('app_controllerを入力してください')
       end
       it 'action_type_idが空欄だと登録できない' do
         @app_action.action_type_id = ''

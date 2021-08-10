@@ -410,13 +410,12 @@ module ModelsHelper
       html += "@#{group[:model]}.valid?"
       html += '<br>'
       html += insert_space(8)
-      if japanese
-        html += "expect(@#{group[:model]}.errors.full_messages).to include(" + '"'
-        html += group[:column_ja].gsub(/_id/,'').gsub(/_/,' ').capitalize + group[:message_ja]
-      else
-        html += "expect(@#{group[:model]}.errors.full_messages).to include(" + '"'
-        html += group[:column].gsub(/_/,' ').capitalize + group[:message_en]
-      end
+      html += "expect(@#{group[:model]}.errors.full_messages).to include(" + '"'
+      html += if japanese
+                group[:column_ja].gsub(/_id/, '').gsub(/_/, ' ').capitalize + group[:message_ja]
+              else
+                group[:column].gsub(/_/, ' ').capitalize + group[:message_en]
+              end
       html += '")<br>'
       html += "#{insert_space(6)}end<br>"
     end

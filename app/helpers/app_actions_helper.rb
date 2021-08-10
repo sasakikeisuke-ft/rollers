@@ -1,5 +1,4 @@
 module AppActionsHelper
-
   # app_action#new/edit
 
   # アクション新規登録画面における、アクションタイプの選択肢を作成するメソッド
@@ -12,34 +11,28 @@ module AppActionsHelper
     targets = []
     array = {}
     seven_actions.each do |action|
-      if app_controller["#{action}_select".to_sym] >= 2
-        selects << ["#{action}", "#{action}"]
-      end
+      selects << [action.to_s, action.to_s] if app_controller["#{action}_select".to_sym] >= 2
     end
     common_actions.each do |action|
-      selects << ["#{action}", "#{action}"]
+      selects << [action.to_s, action.to_s]
     end
 
     # フォーム専用のメソッドが作成されるされる対象とメソッド名
     app_controller.app_actions.each do |app_action|
-      if app_action.action_code_id <= 8
-        targets << app_action.target unless targets.include?(app_action.target)
-        array["#{app_action.target}".to_sym] = [] if array["#{app_action.target}".to_sym].nil?
-        unless array["#{app_action.target}".to_sym].include?(app_action.action_select)
-          array["#{app_action.target}".to_sym] << app_action.action_select
-        end
+      next unless app_action.action_code_id <= 8
+
+      targets << app_action.target unless targets.include?(app_action.target)
+      array[app_action.target.to_s.to_sym] = [] if array[app_action.target.to_s.to_sym].nil?
+      unless array[app_action.target.to_s.to_sym].include?(app_action.action_select)
+        array[app_action.target.to_s.to_sym] << app_action.action_select
       end
     end
     targets.each do |target|
-      if array["#{target}".to_sym].length >= 2
-        selects << ["#{target}_form_variable", "#{target}_form_variable"]
-      end
+      selects << ["#{target}_form_variable", "#{target}_form_variable"] if array[target.to_s.to_sym].length >= 2
     end
 
-    selects 
+    selects
   end
-
-
 
   # app_action#index / _controller.html.erb
 
@@ -64,23 +57,19 @@ module AppActionsHelper
     # コントローラーに登録されているアクションを配列に分配する。
     app_actions.each do |app_action|
       if app_action.action_code_id <= 96
-        if contents["#{app_action.action_select}".to_sym].nil?
-          contents["#{app_action.action_select}".to_sym] = []
-        end
+        contents[app_action.action_select.to_s.to_sym] = [] if contents[app_action.action_select.to_s.to_sym].nil?
 
-        contents["#{app_action.action_select}".to_sym] << app_action
+        contents[app_action.action_select.to_s.to_sym] << app_action
 
         # ストロングパラメーターを必要とするアクションから、対象となるモデル名を格納する
-        if [2, 3, 4, 5, 6, 7, 8].include?(app_action.action_code_id) 
-          contents[:params_targets] << app_action.target unless contents[:params_targets].include?(app_action.target)
+        if [2, 3, 4, 5, 6, 7, 8].include?(app_action.action_code_id) && !contents[:params_targets].include?(app_action.target)
+          contents[:params_targets] << app_action.target
         end
         # formに関連するモデル名(string)と、model_form_variableを使用するアクションをそれぞれ格納する
         if app_action.action_code_id <= 8
           contents[:form_targets] << app_action.target unless contents[:form_targets].include?(app_action.target)
 
-          if contents["#{app_action.target}_form_actions".to_sym].nil?
-            contents["#{app_action.target}_form_actions".to_sym] = []
-          end
+          contents["#{app_action.target}_form_actions".to_sym] = [] if contents["#{app_action.target}_form_actions".to_sym].nil?
           if app_action.action_code_id == 1 && !contents["#{app_action.target}_form_actions".to_sym].include?(app_action.action_select)
             contents["#{app_action.target}_form_actions".to_sym] << app_action.action_select
           end
@@ -103,7 +92,7 @@ module AppActionsHelper
     when 5, 6, 7, 8 # 特殊なレイアウトを使用する場合
       create_action_template(app_action, content)
       content[:main] += "#{insert_space(6)}#{app_action.action_code.sample}" if links
-      
+
       case app_action.action_code_id
       when 5, 6 # createのレイアウトの場合
         content[:first] += "#{insert_space(4)}@#{app_action.target} = "
@@ -111,23 +100,23 @@ module AppActionsHelper
       else # 7, 8 updateのレイアウトの場合
         content[:before] = content[:before].gsub(/save/, "update(#{app_action.target}_params)")
       end
-      
+
       case app_action.action_code_id
       when 7
-        content[:after] = content[:after].gsub(/:new/, ":edit")
+        content[:after] = content[:after].gsub(/:new/, ':edit')
       when 6, 8
-        content[:before] = content[:before].gsub(/root_path/, "#{input1}") unless app_action.input1 == ''
-        content[:after] = content[:after].gsub(/:new/, "#{input2}") unless app_action.input2 == ''
+        content[:before] = content[:before].gsub(/root_path/, input1.to_s) unless app_action.input1 == ''
+        content[:after] = content[:after].gsub(/:new/, input2.to_s) unless app_action.input2 == ''
       end
     else # 特殊なレイアウトを使用しない場合
       code = insert_space(4)
       code += app_action.action_code.sample
-      code = code.gsub(/models/, "#{app_action.target.tableize}")
-      code = code.gsub(/model/, "#{app_action.target}")
-      code = code.gsub(/Model/, "#{app_action.target.classify}")
-      code = code.gsub(/条件式1/, "#{app_action.input1}") unless app_action.input1 == ''
-      code = code.gsub(/条件式2/, "#{app_action.input2}") unless app_action.input2 == ''
-      code = code.gsub(/条件式3/, "#{app_action.input3}") unless app_action.input3 == ''
+      code = code.gsub(/models/, app_action.target.tableize.to_s)
+      code = code.gsub(/model/, app_action.target.to_s)
+      code = code.gsub(/Model/, app_action.target.classify.to_s)
+      code = code.gsub(/条件式1/, app_action.input1.to_s) unless app_action.input1 == ''
+      code = code.gsub(/条件式2/, app_action.input2.to_s) unless app_action.input2 == ''
+      code = code.gsub(/条件式3/, app_action.input3.to_s) unless app_action.input3 == ''
       content[:main] = code
     end
   end
@@ -202,15 +191,15 @@ module AppActionsHelper
   # formで使用するインスタンス変数を取得するメソッドである、model_form_variableを作成するメソッド
   def make_model_form_variable(target, app_controllers, contents, links)
     app_controllers.each do |app_controller|
-      if app_controller.name == target
-        parent = app_controller.parent
-        next if parent == ''
+      next unless app_controller.name == target
 
-        contents[:model_form_variable] += "#{insert_space(4)}@#{parent} = #{parent.classify}.find(params[:#{parent}_id])"
-        contents[:model_form_variable] += ' <- 自動生成' if links
-        contents[:model_form_variable] += '<br>'
-        make_model_form_variable(parent, app_controllers, contents, links)
-      end  
+      parent = app_controller.parent
+      next if parent == ''
+
+      contents[:model_form_variable] += "#{insert_space(4)}@#{parent} = #{parent.classify}.find(params[:#{parent}_id])"
+      contents[:model_form_variable] += ' <- 自動生成' if links
+      contents[:model_form_variable] += '<br>'
+      make_model_form_variable(parent, app_controllers, contents, links)
     end
   end
 
@@ -224,7 +213,7 @@ module AppActionsHelper
       first = true
       contents["#{target}_form_actions".to_sym].each do |element|
         html += ', ' unless first
-        html += ":#{element.to_s}"
+        html += ":#{element}"
         first = false
       end
       html += ']<br>'
@@ -280,5 +269,4 @@ module AppActionsHelper
     end
     html
   end
-
 end

@@ -8,17 +8,10 @@ class SetDefaultActionService
       # app_controllerの登録内容により、初期設定とするアクションの情報を配列に格納する。
       default_actions = []
       find_actions = []
-      base = {target: app_controller.name, app_controller_id: app_controller.id, application_id: app_controller.application_id}
-      if app_controller.new_select >= 2
-
-        default_actions << base.merge(action_select: 'new', action_code_id: 1)
-      end
-      if app_controller.create_select >= 2
-        default_actions << base.merge(action_select: 'create', action_code_id: 5)
-      end
-      if app_controller.edit_select >= 2
-        find_actions << 'edit'
-      end
+      base = { target: app_controller.name, app_controller_id: app_controller.id, application_id: app_controller.application_id }
+      default_actions << base.merge(action_select: 'new', action_code_id: 1) if app_controller.new_select >= 2
+      default_actions << base.merge(action_select: 'create', action_code_id: 5) if app_controller.create_select >= 2
+      find_actions << 'edit' if app_controller.edit_select >= 2
       if app_controller.update_select
         default_actions << base.merge(action_select: 'update', action_code_id: 7)
         find_actions << 'update'
@@ -28,9 +21,7 @@ class SetDefaultActionService
         default_actions << base.merge(action_select: 'destroy', action_code_id: 91)
         find_actions << 'destroy'
       end
-      if app_controller.edit_select >= 2
-        find_actions << 'show'
-      end
+      find_actions << 'show' if app_controller.edit_select >= 2
 
       # get_common_variableが必要かどうかで処理を変更する。
       if find_actions.length >= 2
