@@ -1,0 +1,67 @@
+<div class="field">
+  <b>
+  <% case code.id %>
+  <% when 1 %>
+    <p>インスタンスを作成する。</p>
+  <%  when 11 %>
+    <p>一つのレコードを取得する。</p>
+  <% when 21 %>
+    <p>複数のレコードを取得する。</p>
+  <% when 41 %>
+    <p>複数のレコードと関連するテーブルを取得</p>
+  <% when 61 %>
+    <p>上記以外のレコード取得方法</p>
+  <% when 81 %>
+    <p>アソシエーションを利用してレコードを取得</p>
+  <% when 91 %>
+    <p>ページ遷移及びページ表示</p>
+  <% when 97 %>
+    <p>get_common_variable1-3の使用</p>
+  <% end %>
+  </b>
+  <%= f.radio_button :action_code_id, code.id %><%== code.sample %>
+  
+  <% case code.id%>
+  <% when 5 %>
+    <p>
+    <%== insert_space(4) %>@model = Model.new(model_params)<br>
+    <%== insert_space(4) %>if @model.save<br>
+    <%== insert_space(6) %>redirect_to root_path<br>
+    <%== insert_space(4) %>else<br>
+    <%== insert_space(6) %>他の登録アクションのコード<br>
+    <%== insert_space(6) %>render :new<br>
+    <%== insert_space(4) %>end
+    </p>
+  <% when 7 %>
+    <p>
+    <%== insert_space(4) %>if @model.update(model_params)<br>
+    <%== insert_space(6) %>redirect_to root_path<br>
+    <%== insert_space(4) %>else<br>
+    <%== insert_space(6) %>他の登録アクションのコード<br>
+    <%== insert_space(6) %>render :edit<br>
+    <%== insert_space(4) %>end
+    </p>
+  <% when 6, 8 %>
+    <p>
+    <%== insert_space(4) %>上記のレイアウト(固定)を編集<br>
+    <%== insert_space(4) %>redirect_to 条件式1<br>
+    <%== insert_space(4) %>render 条件式2<br>
+    </p>
+  <% when 84 %>
+    <p>
+      <%== insert_space(4) %>
+      アソシエーションを使用する場合、A_model名を条件式1に、B_model名を条件式2に入力してください
+    </p>
+  <% when 94 %>
+    <p>
+    上記を編集
+    A_model -> 条件式1
+    B_model -> 条件式2
+    </p>
+  <% when 99 %>
+  <p>
+    上記のget_common_variableを選択すると、登録したアクションをbefore_actionの適応先として登録できます。<br>
+    この場合、選択した対象モデルは無効化されます。
+  </p>
+  <% end %>
+</div>

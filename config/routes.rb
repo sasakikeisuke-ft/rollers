@@ -8,5 +8,8 @@ Rails.application.routes.draw do
         resources :options, only: [:new, :create]
       end
     end
+    resources :app_controllers do
+      resources :app_actions, only: [:index, :new, :create, :edit, :update, :destroy]
+    end
   end
 end

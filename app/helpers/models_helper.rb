@@ -58,8 +58,8 @@ module ModelsHelper
     validation_html += make_validation_html(boolean_group, common)
 
     common = 'numericality: { other_than: 0, message: "'
-    common += "can't be blank"
-    common += '"}'
+    common += " can't be blank"
+    common += '" }'
     validation_html += make_validation_html(activehash_group, common)
 
     common = ''
@@ -93,21 +93,20 @@ module ModelsHelper
 
   # マイグレーションに記載する項目のHTMLを作成するメソッド。
   def make_migration_html(column)
-    if column.data_type_id == 13
-      ''
+    html = ''
+    html += insert_space(6)
+    case column.data_type.type
+    when 'references'
+      html += "t.#{column.data_type.type} :#{column.name}, foreign_key: true"
+    when 'ActiveHash'
+      html += "t.integer :#{column.name}_id, null: false"
     else
-      html = ''
-      html += insert_space(6)
       html += "t.#{column.data_type.type} :#{column.name}"
-      if column.data_type.type == 'references'
-        html += ', foreign_key: true'
-      else
-        html += ', null: false' if column.must_exist
-        html += ', unique: true' if column.unique
-      end
-      html += '<br>'
-      html
+      html += ', null: false' if column.must_exist
+      html += ', unique: true' if column.unique
     end
+    html += '<br>'
+    html
   end
 
   # バリデーションにおけるoptionのHTMLを作成するメソッド
@@ -246,7 +245,6 @@ module ModelsHelper
       html += target.name.tableize
       html += '<br>'
       # 中間テーブルの場合、
-      # 動作確認が未実施。今後エラーの可能性があり注意が必要。
       next unless target.model_type_id == 3
 
       target_columns = target.columns.where.not(name: model.name)
@@ -350,13 +348,21 @@ module ModelsHelper
       when 'uniqueness'
         content = group_of_base(model, column, option)
         content[:info] = 'の重複があり登録できない'
-        content[:change] = option.input1
+        case option.option_type_id
+        when 41
+          content[:change] = ''
+        when 42
+          content[:change] = ", #{option.input1}: @#{model.name}.#{option.input1}"
+        when 43
+          content[:change] = ", #{option.input1}: @#{model.name}.#{option.input1}"
+          content[:change] += ", #{option.input2}: @#{model.name}.#{option.input2}"
+        end
         overlapping_groups << content
       end
     end
   end
 
-  # combination_of_optionの重複部分をまとめるメソッド
+  # make_group_optionsの重複部分をまとめるメソッド
   def group_of_base(model, column, option)
     {
       model: model.name,
@@ -404,15 +410,14 @@ module ModelsHelper
       html += "@#{group[:model]}.valid?"
       html += '<br>'
       html += insert_space(8)
+      html += "expect(@#{group[:model]}.errors.full_messages).to include(" + '"'
       html += if japanese
-                "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column_ja]}#{group[:message_ja]}')"
+                group[:column_ja].gsub(/_id/, '').gsub(/_/, ' ').capitalize + group[:message_ja]
               else
-                "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
+                group[:column].gsub(/_/, ' ').capitalize + group[:message_en]
               end
-      html += '<br>'
-      html += insert_space(6)
-      html += 'end'
-      html += '<br>'
+      html += '")<br>'
+      html += "#{insert_space(6)}end<br>"
     end
     html
   end
@@ -426,7 +431,7 @@ module ModelsHelper
       content[:column_ja] = group[:name]
       content[:info] = 'が紐づけられていないと登録できない'
       content[:change] = 'nil'
-      content[:message_ja] = ' must exist'
+      content[:message_ja] = 'を入力してください'
       content[:message_en] = ' must exist'
       abnormal_groups << content
     end
@@ -437,22 +442,22 @@ module ModelsHelper
     activehash_group.each do |group|
       content = {}
       content[:model] = model.name
-      content[:column] = group[:name]
-      content[:column_ja] = group[:name]
+      content[:column] = "#{group[:name]}_id"
+      content[:column_ja] = "#{group[:name]}_id"
       content[:info] = 'が空欄だと登録できない'
-      content[:change] = ''
-      content[:message_ja] = ' must exist'
-      content[:message_en] = ' must exist'
+      content[:change] = "''"
+      content[:message_ja] = " can't be blank"
+      content[:message_en] = " can't be blank"
       abnormal_groups << content
 
       content = {}
       content[:model] = model.name
-      content[:column] = group[:name]
-      content[:column_ja] = group[:name]
+      content[:column] = "#{group[:name]}_id"
+      content[:column_ja] = "#{group[:name]}_id"
       content[:info] = 'が未選択だと登録できない'
       content[:change] = 0
-      content[:message_ja] = ' must exist'
-      content[:message_en] = ' must exist'
+      content[:message_ja] = " can't be blank"
+      content[:message_en] = " can't be blank"
       abnormal_groups << content
     end
   end
@@ -462,22 +467,18 @@ module ModelsHelper
     html = ''
     overlapping_groups.each do |group|
       html += insert_space(6)
-      html += "it '#{group[:column]}#{group[:info]}' do"
-      html += '<br>'
+      html += "it '#{group[:column]}#{group[:info]}' do<br>"
       html += insert_space(8)
-      html += "@#{group[:model]}.save"
-      html += '<br>'
+      html += "@#{group[:model]}.save<br>"
       html += insert_space(8)
-      html += "another_#{group[:model]} = FactoryBot.build(:#{group[:model]}, #{group[:column]}: @#{group[:model]}.#{group[:column]})"
-      html += '<br>'
+      html += "another_#{group[:model]} = FactoryBot.build(:#{group[:model]}, #{group[:column]}: @#{group[:model]}.#{group[:column]}#{group[:change]})<br>"
       html += insert_space(8)
-      html += "another_#{group[:model]}.valid?"
-      html += '<br>'
+      html += "another_#{group[:model]}.valid?<br>"
       html += insert_space(8)
       html += if japanese
-                "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_ja]}')"
+                "expect(@#{group[:model]}.errors.full_messages).to include('#{group[:column_ja]}#{group[:message_ja]}')"
               else
-                "expect(#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
+                "expect(@#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
               end
       html += '<br>'
       html += insert_space(6)
@@ -491,72 +492,76 @@ module ModelsHelper
   def make_factorybot_html(column)
     return '' if column.data_type_id == 12
 
-    html = "#{insert_space(4)}#{column.name} { "
+    html = "#{insert_space(4)}#{column.name}"
     case column.data_type_id
     when 1 # 'string'
       if column.options.length != 0
+        done = false
         column.options.each do |option|
           case option.option_type.info
           when '漢字かなカナで登録可'
-            html += 'Gimei.kanji }'
+            html += ' { Gimei.kanji }'
+            done = true
           when 'ひらがなのみで登録可'
-            html += 'Gimei.hiragana }'
+            html += ' { Gimei.hiragana }'
+            done = true
           when 'カタカナのみで登録可'
-            html += 'Gimei.katakana }'
+            html += ' { Gimei.katakana }'
+            done = true
           when '郵便番号形式で登録可'
-            html += "'123-4567'}"
-          when '対象モデル内での重複禁止', '複数のモデルでの重複禁止'
-            unique_count = true
+            html += " { '123-4567'}"
+            done = true
           end
         end
+        html += ' { Faker::Lorem.characters(number: 8) }' unless done
       else
-        html += 'Faker::Lorem.characters(number: 8) }'
+        html += ' { Faker::Lorem.characters(number: 8) }'
       end
     when 2 # 'text'
-      html += 'Faker::Lorem.sentence }'
+      html += ' { Faker::Lorem.sentence }'
     when 3 # 'integer'
       if column.options.length != 0
         column.options.each do |option|
           case option.option_type.info
           when '数値のみで登録する'
-            html += 'Faker::Number(digits: 8) }'
+            html += ' { Faker::Number(digits: 8) }'
           when '上限下限を設定する'
-            html += 'Faker::Number.within(range: '
+            html += ' { Faker::Number.within(range: '
             html += option.input2 unless option.input2.nil?
             html += '..'
             html += option.input1 unless option.input1.nil?
             html += ') }'
           when '上限のみを設定する'
-            html += 'Faker::Number.within(range: '
+            html += ' { Faker::Number.within(range: '
             html += '0..'
             html += option.input1 unless option.input1.nil?
             html += ') }'
           when '下限のみを設定する'
-            html += 'Faker::Number.within(range: '
+            html += ' { Faker::Number.within(range: '
             html += option.input2 unless option.input2.nil?
             html += '..10000000'
             html += ') }'
           when '未選択状態での禁止'
-            html += 'Faker::Number.non_zero_digit }'
+            html += ' { Faker::Number.non_zero_digit }'
           else
-            html += 'Faker::Number(digits: 8) }'
+            html += ' { Faker::Number(digits: 8) }'
           end
         end
       else
-        html += 'Faker::Number(digits: 8) }'
+        html += ' { Faker::Number(digits: 8) }'
       end
     when 4, 5 # 'decimal', 'float'
-      html += 'Faker::Number.decimal(l_digits: 3, r_digits: 3) }'
+      html += ' { Faker::Number.decimal(l_digits: 3, r_digits: 3) }'
     when 6 # 'date'
-      html += 'Faker::Date.between(from: 50.years.ago, to: Date.today) }'
+      html += ' { Faker::Date.between(from: 50.years.ago, to: Date.today) }'
     when 7 # 'time'
-      html += 'Faker::Time.between(DateTime.now - 1, DateTime.now).strftime("%H:%M:%S") }'
+      html += ' { Faker::Time.between(DateTime.now - 1, DateTime.now).strftime("%H:%M:%S") }'
     when 8 # 'datetime'
-      html += 'Faker::Time.between(DateTime.now - 1, DateTime.now) }'
+      html += ' { Faker::Time.between(DateTime.now - 1, DateTime.now) }'
     when 11 # 'boolean'
-      html += 'Faker::Boolean.boolean }'
+      html += ' { Faker::Boolean.boolean }'
     when 13 # 'ActiveHash' refarences型はここでは記載不要だがassociationに記載が必要
-      html += 'Faker::Number.non_zero_digit }'
+      html += '_id { Faker::Number.non_zero_digit }'
     end
     html += '<br>'
     html
@@ -576,33 +581,32 @@ module ModelsHelper
 
   # ActiveHashのHTMLを作成するメソッド
   def make_activehash_html(model, columns)
-    html = "class = #{model.name.classify}"
-    html += '<br>'
-    html += "#{insert_space(2)}self.data = ["
-    html += '<br>'
-    before = "#{insert_space(4)}{ id: "
-    center = ''
-    model.columns.each do |column|
-      center += ', '
-      center += column.name
-      center += ": ''"
-    end
-    after = ' }'
-    content = '--'
+    html = "class #{model.name.classify} < ActiveHash::Base<br>"
+    html += "#{insert_space(2)}self.data = [<br>"
+    content = ''
     6.times do |i|
-      content = '内容' if i >= 1
-      content = '最後' if i == 5
-      html += "#{before}#{i}#{center}#{content}#{after}"
-      html += ',' if i != 5
-      html += '<br>'
+      content += "#{insert_space(4)}{ id: #{i}"
+      model.columns.each do |column|
+        content += ", #{column.name}: "
+        content += case i
+                   when 0
+                     "'----'"
+                   when 5
+                     "'最後'"
+                   else
+                     "'内容'"
+                   end
+      end
+      content += if i != 5
+                   ' },<br>'
+                 else
+                   ' }<br>'
+                 end
     end
-    html += insert_space(2)
-    html += ']'
-    html += '<br>'
-    html += insert_space(2)
-    html += 'include ActiveHash::Associations'
-    html += insert_space(2)
-    html += make_has(columns, model)
+    html += content
+    html += "#{insert_space(2)}]<br>"
+    html += "#{insert_space(2)}include ActiveHash::Associations<br>"
+    html += "#{make_has(columns, model)}end<br>"
     html
   end
 

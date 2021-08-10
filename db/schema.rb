@@ -10,7 +10,39 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_24_020324) do
+ActiveRecord::Schema.define(version: 2021_07_27_125700) do
+
+  create_table "app_actions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "action_select", null: false
+    t.string "target", null: false
+    t.integer "action_code_id", null: false
+    t.bigint "app_controller_id"
+    t.bigint "application_id"
+    t.string "input1"
+    t.string "input2"
+    t.string "input3"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["app_controller_id"], name: "index_app_actions_on_app_controller_id"
+    t.index ["application_id"], name: "index_app_actions_on_application_id"
+  end
+
+  create_table "app_controllers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "parent"
+    t.bigint "application_id"
+    t.string "target"
+    t.integer "index_select", null: false
+    t.integer "new_select", null: false
+    t.integer "create_select", null: false
+    t.integer "edit_select", null: false
+    t.integer "update_select", null: false
+    t.integer "destroy_select", null: false
+    t.integer "show_select", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["application_id"], name: "index_app_controllers_on_application_id"
+  end
 
   create_table "applications", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -86,6 +118,9 @@ ActiveRecord::Schema.define(version: 2021_06_24_020324) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "app_actions", "app_controllers"
+  add_foreign_key "app_actions", "applications"
+  add_foreign_key "app_controllers", "applications"
   add_foreign_key "applications", "users"
   add_foreign_key "columns", "applications"
   add_foreign_key "columns", "models"

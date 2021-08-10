@@ -1,0 +1,22 @@
+<h1><%= @application.name %>のコントローラー一覧</h1>
+<div>
+  <% if @app_controllers.length == 0 %>
+    コントローラーはまだ登録されていません。
+  <% else %>
+    <% @app_controllers.each do |app_controller| %>
+      <div>
+        <%= app_controller.name %>コントローラー<br>
+        <%= link_to '編集へ', edit_application_app_controller_path(id: app_controller) %>
+        <%= link_to '削除', application_app_controller_path(id: app_controller), method: :delete %>
+        <%= link_to 'コード表示', application_app_controller_path(id: app_controller) %><br>
+        <%= link_to 'アクション一覧へ', application_app_controller_app_actions_path(app_controller_id: app_controller) %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+<br>
+<div>
+<%= link_to 'コントローラー作成へ', new_application_app_controller_path %><br>
+<%= link_to 'アプリケーション詳細へ戻る', application_path(params[:application_id]) %><br>
+<%= link_to 'トップページへ戻る', root_path %>
+</div>

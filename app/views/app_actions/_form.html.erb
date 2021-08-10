@@ -1,0 +1,48 @@
+<%= form_with(model: [@application, @app_controller, @app_action], local: true) do |f| %>
+  <%= render 'shared/error_messages', model: f.object %>
+
+  <h3>＜サンプルコードの選択＞</h3>
+  <p>
+    以下のサンプルから、アクションに登録したいコードを選択してください。<br>
+    選択したサンプルにさらに設定を行います。
+  </p>
+  <%= render partial: "code", collection: ActionCode.all, locals: {f: f} %>
+
+
+  <h3>＜コードの設定＞</h3>
+
+  <p>アクションの登録先を選択してください。</p>
+  <div class="field">
+    <%= f.label :action_select, 'アクションの選択' %>
+    <%= f.select(:action_select, make_selects(@app_controller)) %>
+  </div>
+
+  <p>
+    対象となるモデルを選択してください。<br>
+    上記サンプルコードの'model'が選択したモデル名に置き換えられます。
+  </p>
+  <div class="field">
+    <%= f.label :target, '対象のモデル名を選択' %>
+    <%= f.collection_select(:target, @models, :name, :name) %>
+  </div>
+
+  <p>
+    サンプルコードの条件式の部分を置き換えたい場合、以下のフォームに内容を入力してください。<br>
+    サンプル内に書かれている条件式と対応しないフォームに入力すると、内容は反映されません。
+  </p>
+  <div class="field">
+    <%= f.label :input1, '条件式1' %>
+    <%= f.text_field :input1 %>
+  </div>
+  <div class="field">
+    <%= f.label :input2, '条件式2' %>
+    <%= f.text_field :input2 %>
+  </div>
+  <div class="field">
+    <%= f.label :input3, '条件式3' %>
+    <%= f.text_field :input3 %>
+  </div>
+  <div class="actions">
+    <%= f.submit "アクションの登録" %>
+  </div>
+<% end %>

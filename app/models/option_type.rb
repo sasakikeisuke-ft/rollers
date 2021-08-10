@@ -18,8 +18,8 @@ class OptionType < ActiveHash::Base
       message_ja: 'は英数字のみで入力してください', message_en: 'is invalid. Input harf-width numbers and characters' },
     { id: 19, type: 'format', info: '英字数字記号で登録可', code: ', format: { with: /\A[a-zA-Z0-9!-/:-@¥[-`{-~]+\z/, message: ',
       message_ja: 'は英数字および記号のみで入力してください', message_en: 'is invalid.' },
-    { id: 20, type: 'format', info: '郵便番号形式で登録可', code: ', format: { with: /\A\d{3}-\d{4}\z/, message: ',
-      message_ja: 'を入力してください。例：123-4567', message_en: ' is invalid. Enter it as follows (e.g. 123-4567)' },
+    # { id: 20, type: 'format', info: '郵便番号形式で登録可', code: ', format: { with: /\A\d{3}-\d{4}\z/, message: ',
+    #   message_ja: 'を入力してください。例：123-4567', message_en: ' is invalid. Enter it as follows (e.g. 123-4567)' },
 
     { id: 21, type: 'numericality', info: '数値のみで登録する', code: 'numericality: { only_integer: true }, message: ',
       message_ja: 'は半角数字を入力してください', message_en: ' is invalid. Input harf-width numbers' },
@@ -37,11 +37,11 @@ class OptionType < ActiveHash::Base
     # {id: 33, type: 'length', info: '下限のみを設定する', code: ', length: { minimum: ', message_ja: '',          message_en: 'is invalid.'},
     # {id: 34, type: 'length', info: '値の長さを限定する', code: ', length: { is: ',      message_ja: '',          message_en: 'is invalid.'},
 
-    { id: 41, type: 'uniqueness', info: '当テーブル内での重複禁止', code: 'uniqueness: true', message_ja: 'はすでに存在します',
+    { id: 41, type: 'uniqueness', info: '当テーブル内での重複禁止', code: ', uniqueness: { case_sensitive: false', message_ja: 'はすでに存在します',
       message_en: ' has already been taken' },
-    { id: 42, type: 'uniqueness', info: '対象モデル内での重複禁止', code: 'uniqueness: { scope: :', message_ja: 'はすでに存在します',
+    { id: 42, type: 'uniqueness', info: '対象モデル内での重複禁止', code: ', uniqueness: { case_sensitive: false, scope: :', message_ja: 'はすでに存在します',
       message_en: ' has already been taken' },
-    { id: 43, type: 'uniqueness', info: '複数のモデルでの重複禁止', code: 'uniqueness: { scope: [:', message_ja: 'はすでに存在します',
+    { id: 43, type: 'uniqueness', info: '複数のモデルでの重複禁止', code: ', uniqueness: { case_sensitive: false, scope: [:', message_ja: 'はすでに存在します',
       message_en: ' has already been taken' }
     # {id: 42, type: 'uniqueness', info: '対象モデル内での重複禁止', code: ', uniqueness: { scope: :model名_id }', message_ja: 'はすでに存在します', message_en: ' has already been taken'},
     # {id: 43, type: 'uniqueness', info: '複数のモデルでの重複禁止', code: ', uniqueness: { scope: [:model名_id, :model名_id] }', message_ja: 'はすでに存在します', message_en: ' has already been taken'}

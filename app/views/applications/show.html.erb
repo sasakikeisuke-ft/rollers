@@ -22,11 +22,13 @@
 
   <div>
   <h3>コード一覧</h3>
-  <%= link_to 'README', application_gemfile_path(@application)%>
-  <%= link_to '事前準備', application_gemfiles_path(@application) %>
+  <%= link_to '事前準備1 雛形の作成など', application_gemfiles_path(@application) %><br>
+  <%= link_to '事前準備2 README ルーティングなど', application_gemfile_path(@application)%>
   </div>
 </div>
 <%= link_to 'モデル一覧へ', application_models_path(@application) %>
+<br>
+<%= link_to 'コントローラー一覧へ', application_app_controllers_path(@application) %>
 <br>
 <%= link_to 'アプリケーション一覧へ戻る', root_path %>
 

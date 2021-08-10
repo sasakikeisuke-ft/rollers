@@ -5,7 +5,7 @@
       <%= f.label :name, 'カラム名' %>
       <%= f.collection_select(:name, @models, :name, :name, include_blank: true) %>
       <%= f.hidden_field :name_ja, value: '' %>
-      <%= f.hidden_field :must_exist, value: false %>
+      <%= f.hidden_field :must_exist, value: true %>
       <%= f.hidden_field :unique, value: false %>
     </div>
 
