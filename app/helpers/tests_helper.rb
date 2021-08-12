@@ -1,4 +1,23 @@
 module TestsHelper
+
+  # マイグレーションファイルに追記する項目に関するHTMLを作成するメソッド
+  def make_migration_appending(model)
+    html = ''
+    model.columns.each do |column|
+      html += insert_space(6)
+      case column.data_type.type
+      when 'references'
+        html += "t.#{column.data_type.type} :#{column.name}, foreign_key: true"
+      when 'ActiveHash'
+        html += "t.integer :#{column.name}_id, null: false"
+      else
+        html += "t.#{column.data_type.type} :#{column.name}"
+        html += ', null: false' if column.must_exist
+        html += ', unique: true' if column.unique
+      end
+      html += '<br>'  
+    end
+    html
   end
 
 

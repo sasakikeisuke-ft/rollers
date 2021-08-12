@@ -1,1 +1,42 @@
-<%  %>
+<% contents = make_model_array(@model, @gemfile) %>
+<%= @gemfile %>
+<%= @model %>
+<%= @columns %>
+<br><br>-------------------------------------------------------------<br>
+
+<%# マイグレーションファイルに関する記載 %>
+<%# マイグレーションファイルが必要な場合にのみ記載 %>
+<% if @model.model_type.name == '通常モデル' || @model.model_type.name == '中間テーブル' %>
+  <h2><%= @model.name.tableize %>テーブルのマイグレーションファイルの編集</h2>
+
+    <div class="migration_file">
+      <div class="target">
+        ファイル：20XXXX...._devise_create_<%= @model.name %>
+      </div>
+      <br>
+      <div class="code-field">
+        class Create<%= @model.name.pluralize.camelize %> < ActiveRecord::Migration[6.0]<br>
+        <%= insert_space(2) %>def change<br>
+        <%= insert_space(4) %>create_table :<%= @model.name.tableize %> do |t|<br>
+        <%# ヘルパーメソッドより作成 %>
+        <%== make_migration_appending(@model) %>
+        <%= insert_space(6) %>t.timestamps<br>
+        <%= insert_space(4) %>end<br>
+        <%= insert_space(2) %>end<br>
+        end<br>
+      </div>
+    </div>
+    <div class="terminal-field">
+      <p>ターミナル：マイグレーションの実行</p>
+      <p>rails db:migrate </p>
+    </div>
+<% elsif @model.model_type.name == 'devise' %>
+  <h2><%= @model.name.tableize %>テーブルのマイグレーションファイルの編集</h2>
+    <%# ヘルパーメソッドより作成 %>
+    <%== make_migration_appending(@model) %>
+    上記を必要な箇所に挿入<br>
+    <div class="terminal-field">
+      <p>ターミナル：マイグレーションの実行</p>
+      <p>rails db:migrate </p>
+    </div>
+<% end %>
