@@ -68,9 +68,6 @@ module TestsHelper
   end
 
   # モデルファイルのバリデーションに関する記載を作成するメソッド
-  # 計画メモ：バリデーションの記載はここ以外では使用しないため、ここで完結させても良い。
-  # まずはmake_arrayで作成した内容をさらに振り分けてみよう。
-  # まとめるのは＝二段目のwith_optionが必要なのはformatのみ
   def make_varidation(contents, japanese)
     html = ''
     space = 2
@@ -79,7 +76,6 @@ module TestsHelper
     # 空欄禁止を設定されたものから処理を行う。
     option = 'presence: true'
     html += use_with_option?(contents[:presence_true], space, japanese, option)
-    
 
     # 空欄を禁止せずoptionのみ設定されたgroupの処理を行う。
     html += make_with_options(contents[:presence_false], space, japanese)
@@ -192,6 +188,53 @@ module TestsHelper
       result += '<br>'
     end
     result
+  end
+
+  # アソシエーションに関する記述を作成するメソッド
+  def make_association(contents, columns, model, attached_image)
+    html = ''
+    space = 2
+    
+    # belongs_toに関する記述を作成する。
+    contents[:references_group].each do |column|
+      html += "#{insert_space(2)}belongs_to :#{column.name}<br>"
+    end
+
+    # has_many/has_oneに関する記述を作成する。ここでのcolumnsはアプリに関連する全てのカラムが対象となっている。
+    columns.each do |column|
+      # このモデル名と同じカラム名である -> references型で対象がこのモデル -> 対象モデルではbelongs_toが記載されている。
+      next unless column.name == model.name
+
+      if model.not_only
+        has ='has_many :'
+      else
+        has = 'has_one :'
+      end
+      target_model = column.model
+      html += "#{insert_space(space)}#{has}#{target_model.name.tableize}<br>"
+
+      # target_modelが中間テーブルの場合、追加処理を行う。
+      next unless target_model.model_type_id == 3
+
+      target_columns = target_model.columns.where.not(name: model.name)
+      target_columns.each do |target_column|
+        html += "#{insert_space(space)}has_many :#{target_column.name}"
+        html += ", through: :#{target_model.name}<br>"
+      end
+    end
+
+    # ImageMagickを使用する場合のアソシエーションを記載
+    html += "#{insert_space(2)}has_one_attached :image<br>" if attached_image
+
+    # ActiveHashに関する記述を作成する。
+    if contents[:activehash_group].length != 0
+      html += "<br>#{insert_space(2)}# ActiveHash<br>"
+      html += "#{insert_space(2)}extend ActiveHash::Associations::ActiveRecordExtensions<br>"
+      contents[:activehash_group].each do |column|
+        html += "#{insert_space(2)}belongs_to :#{column.name}<br>"
+      end
+    end
+    html
   end
 
 end  #/ module

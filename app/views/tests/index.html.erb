@@ -1,9 +1,4 @@
 <% contents = make_model_array(@model, @gemfile) %>
-<%= @gemfile %>
-<%= @model %>
-<%= @columns %>
-<br><br>-------------------------------------------------------------<br>
-
 <%# マイグレーションファイルに関する記載 %>
 <%# マイグレーションファイルが必要な場合にのみ記載 %>
 <% if @model.model_type.name == '通常モデル' || @model.model_type.name == '中間テーブル' %>
@@ -48,9 +43,10 @@
   ターミナル：対象ファイルへジャンプ<br>
   code app/models/<%= @model.name %>.rb
 </div>
-
+<br>
 <div class="code-field">
   class <%= @model.name.classify %> < ApplicationRecord<br>
+  
   <%# Deviseのみ対象の専用記述 %>
   <% if @model.model_type_id == 5 %>
     <%= insert_space(2) %># Include default devise modules. Others available are:<br>
@@ -67,24 +63,11 @@
   <% end %>
   <%#/ Deviseのみ対象の専用記述 %>
 
-  <%# バリデーションに関する記述 %>
-  <div class="validation">
-    <%# ヘルパーメソッドによりバリデーションに関するHTMLを作成 %>
-    <%== make_varidation(contents, @gemfile.rails_i18n) %>
-  </div>
-  <div class="association">
-    <%# ヘルパーメソッドによりbelongs_toに関連するHTMLを作成 %>
-    <%==contents[:belongs_to_html] %>
+  <%# ヘルパーメソッドによりバリデーションに関するHTMLを作成 %>
+  <%== make_varidation(contents, @gemfile.rails_i18n) %>
 
-    <%# ヘルパーメソッドによりhasのアソシエーションに関するHTMLを作成 %>
-    <%== make_has(@columns, @model) %>
-
-    <%# ImageMagickを使用する場合のアソシエーションを記載 %>
-    <%== "#{insert_space(2)}has_one_attached :image<br>" if @model.attached_image %>
-    
-    <%# ActiveHashに関するアソシエーションをヘルパーメソッドにより作成 %>
-    <%== contents[:activehash_html] %>
+  <%# ヘルパーメソッドによりアソシエーションに関するHTMLを作成 %>
+  <%== make_association(contents, @columns, @model, @model.attached_image) %>
 
   end<br>
-  </div> <%#/association %>
 </div><%#/ code-field モデルファイルの記載の終了 %>
