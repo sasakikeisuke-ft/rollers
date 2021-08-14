@@ -40,3 +40,51 @@
       <p>rails db:migrate </p>
     </div>
 <% end %>
+<br>
+
+<%# モデルファイルの編集 %>
+<h2><%= @model.name.classify %>モデルのモデルファイルの編集</h2>
+<div class="terminal-field">
+  ターミナル：対象ファイルへジャンプ<br>
+  code app/models/<%= @model.name %>.rb
+</div>
+
+<div class="code-field">
+  class <%= @model.name.classify %> < ApplicationRecord<br>
+  <%# Deviseのみ対象の専用記述 %>
+  <% if @model.model_type_id == 5 %>
+    <%= insert_space(2) %># Include default devise modules. Others available are:<br>
+    <%= insert_space(2) %># :confirmable, :lockable, :timeoutable, :trackable and :omniauthable<br>
+    <%= insert_space(2) %>devise :database_authenticatable, :registerable,<br>
+    <%= insert_space(9) %>:recoverable, :rememberable, :validatable<br>
+    <br>
+    # パスワードを英数字混合に制限します。不要であれば削除してください。<br>
+    <%= insert_space(2) %>PASSWORD_REGEX = /\A(?=.*?[a-z])(?=.*?\d)[a-z\d]+\z/i.freeze<br>
+    <%= insert_space(2) %>validates_format_of :password, with: PASSWORD_REGEX, message: 
+    <%= "'は英字と数字の両方を含む必要があります'" if @gemfile.rails_i18n %>
+    <%= "'should contain both letters and numbers.'" unless @gemfile.rails_i18n %>
+    <br><br>
+  <% end %>
+  <%#/ Deviseのみ対象の専用記述 %>
+
+  <%# バリデーションに関する記述 %>
+  <div class="validation">
+    <%# ヘルパーメソッドによりバリデーションに関するHTMLを作成 %>
+    <%== make_varidation(contents, @gemfile.rails_i18n) %>
+  </div>
+  <div class="association">
+    <%# ヘルパーメソッドによりbelongs_toに関連するHTMLを作成 %>
+    <%==contents[:belongs_to_html] %>
+
+    <%# ヘルパーメソッドによりhasのアソシエーションに関するHTMLを作成 %>
+    <%== make_has(@columns, @model) %>
+
+    <%# ImageMagickを使用する場合のアソシエーションを記載 %>
+    <%== "#{insert_space(2)}has_one_attached :image<br>" if @model.attached_image %>
+    
+    <%# ActiveHashに関するアソシエーションをヘルパーメソッドにより作成 %>
+    <%== contents[:activehash_html] %>
+
+  end<br>
+  </div> <%#/association %>
+</div><%#/ code-field モデルファイルの記載の終了 %>
