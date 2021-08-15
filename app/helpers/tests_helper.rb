@@ -33,7 +33,16 @@ module TestsHelper
   def make_model_array(model, gemfile)
     contents = make_model_array_template
     contents[:japanese] = gemfile.rails_i18n
-    model.columns.each do |column|
+    
+    if model.model_type.name != 'Formオブジェクト'
+      target_columns = model.columns
+    else  # Formオブジェクトの場合、特別な処理により、対象としているモデルのカラムが全てを取得する
+      target_columns = []
+      make_form_object(target_columns, model, contents)
+    end
+
+    # 取得したカラムを配列へと振り分けていく。
+    target_columns.each do |column|
       if column.data_type_id <= 10
         contents[:presence_true] << column if column.must_exist
         contents[:presence_false] << column if !column.must_exist && column.options.length != 0
@@ -49,6 +58,7 @@ module TestsHelper
         end
       end
     end
+    contents[:presence_true] += contents[:references_group] if model.model_type.name == 'ActiveHash'
     contents[:presence_true] += contents[:activehash_group]
     contents
   end
@@ -226,7 +236,7 @@ module TestsHelper
     # ImageMagickを使用する場合のアソシエーションを記載
     html += "#{insert_space(2)}has_one_attached :image<br>" if attached_image
 
-    # ActiveHashに関する記述を作成する。
+    # ActiveHashに関する記述を作成するメソッド。
     if contents[:activehash_group].length != 0
       html += "<br>#{insert_space(2)}# ActiveHash<br>"
       html += "#{insert_space(2)}extend ActiveHash::Associations::ActiveRecordExtensions<br>"
@@ -235,6 +245,48 @@ module TestsHelper
       end
     end
     html
+  end
+
+  # Formオブジェクトパターンにおける処理をまとめたメソッド
+  def make_form_object(target_columns, model, contents)
+    contents[:attr_accessor] = "#{insert_space(2)}attr_accessor "
+    save_method = "#{insert_space(2)}def save<br>"
+    first = true
+    parent_name = ''
+    model.columns.each do |column|
+      # Formオブジェクトに登録された対象モデルをDBから取得する。登録回数分DBにアクセスすることになってしまうため、改善が必要
+      target_model = Model.where(application_id: params[:application_id]).includes(columns: :options).find_by(name: column.name)
+
+      # Formオブジェクトにおけるsaveメソッドの冒頭部分。対象モデルごとに必要。
+      save_method += "#{insert_space(4)}#{target_model.name.classify}.create("
+
+      # 対象モデルの前カラムにおける処理を行う。
+      target_model.columns.each do |column|
+        # バリデーションのため、全てのカラムをtarget_columnsに格納する
+        target_columns << column
+
+        # attr_accessorに適応するカラムを追記する。
+        contents[:attr_accessor] += ', ' unless first
+        contents[:attr_accessor] += column.name
+
+        # saveメソッドの対象カラムを記載する。
+        save_method += ', ' unless first
+        if column.name == parent_name
+          save_method += "#{column.name}_id: #{column.name}.id"
+        elsif ['references', 'ActiveHash'].include?(column.data_type.type)
+          save_method += "#{column.name}_id: #{column.name}_id"
+        else
+          save_method += "#{column.name}: #{column.name}"
+        end
+
+        first = false
+      end
+      parent_name = target_model.name
+    end
+    contents[:attr_accessor] += '<br><br>'
+    contents[:save_method] = save_method
+
+
   end
 
 end  #/ module

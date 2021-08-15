@@ -1,12 +1,17 @@
-<% contents = make_model_array(@model, @gemfile) %>
+<% contents = make_model_array(@model, @gemfile) if [1, 3, 4, 5].include?(@model.model_type_id) %>
 <%# マイグレーションファイルに関する記載 %>
 <%# マイグレーションファイルが必要な場合にのみ記載 %>
 <% if @model.model_type.name == '通常モデル' || @model.model_type.name == '中間テーブル' %>
   <h2><%= @model.name.tableize %>テーブルのマイグレーションファイルの編集</h2>
 
     <div class="migration_file">
-      <div class="target">
-        ファイル：20XXXX...._devise_create_<%= @model.name %>
+      <div class="terminal-field">
+        <p>ターミナル：関連ファイルの作成</p>
+        <p>rails g model <%= @model.name %></p>
+      </div>
+      <div class="terminal-field">
+        <p>ターミナル：対象ファイルへジャンプ</p>
+        <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
       </div>
       <br>
       <div class="code-field">
@@ -37,37 +42,78 @@
 <% end %>
 <br>
 
-<%# モデルファイルの編集 %>
-<h2><%= @model.name.classify %>モデルのモデルファイルの編集</h2>
-<div class="terminal-field">
-  ターミナル：対象ファイルへジャンプ<br>
-  code app/models/<%= @model.name %>.rb
-</div>
-<br>
-<div class="code-field">
-  class <%= @model.name.classify %> < ApplicationRecord<br>
-  
-  <%# Deviseのみ対象の専用記述 %>
-  <% if @model.model_type_id == 5 %>
-    <%= insert_space(2) %># Include default devise modules. Others available are:<br>
-    <%= insert_space(2) %># :confirmable, :lockable, :timeoutable, :trackable and :omniauthable<br>
-    <%= insert_space(2) %>devise :database_authenticatable, :registerable,<br>
-    <%= insert_space(9) %>:recoverable, :rememberable, :validatable<br>
-    <br>
-    # パスワードを英数字混合に制限します。不要であれば削除してください。<br>
-    <%= insert_space(2) %>PASSWORD_REGEX = /\A(?=.*?[a-z])(?=.*?\d)[a-z\d]+\z/i.freeze<br>
-    <%= insert_space(2) %>validates_format_of :password, with: PASSWORD_REGEX, message: 
-    <%= "'は英字と数字の両方を含む必要があります'" if @gemfile.rails_i18n %>
-    <%= "'should contain both letters and numbers.'" unless @gemfile.rails_i18n %>
-    <br><br>
-  <% end %>
-  <%#/ Deviseのみ対象の専用記述 %>
+<% if ['通常モデル', '中間テーブル', 'devise'].include?(@model.model_type.name) %>
+  <%# モデルファイルの編集 %>
+  <h2><%= @model.name.classify %>モデルのモデルファイルの編集</h2>
+  <div class="terminal-field">
+    ターミナル：対象ファイルへジャンプ<br>
+    code app/models/<%= @model.name %>.rb
+  </div>
+  <br>
+  <div class="code-field">
+    class <%= @model.name.classify %> < ApplicationRecord<br>
+    
+    <%# Deviseのみ対象の専用記述 %>
+    <% if @model.model_type_id == 5 %>
+      <%= insert_space(2) %># Include default devise modules. Others available are:<br>
+      <%= insert_space(2) %># :confirmable, :lockable, :timeoutable, :trackable and :omniauthable<br>
+      <%= insert_space(2) %>devise :database_authenticatable, :registerable,<br>
+      <%= insert_space(9) %>:recoverable, :rememberable, :validatable<br>
+      <br>
+      # パスワードを英数字混合に制限します。不要であれば削除してください。<br>
+      <%= insert_space(2) %>PASSWORD_REGEX = /\A(?=.*?[a-z])(?=.*?\d)[a-z\d]+\z/i.freeze<br>
+      <%= insert_space(2) %>validates_format_of :password, with: PASSWORD_REGEX, message: 
+      <%= "'は英字と数字の両方を含む必要があります'" if @gemfile.rails_i18n %>
+      <%= "'should contain both letters and numbers.'" unless @gemfile.rails_i18n %>
+      <br><br>
+    <% end %>
+    <%#/ Deviseのみ対象の専用記述 %>
 
-  <%# ヘルパーメソッドによりバリデーションに関するHTMLを作成 %>
-  <%== make_varidation(contents, @gemfile.rails_i18n) %>
+    <%# ヘルパーメソッドによりバリデーションに関するHTMLを作成 %>
+    <%== make_varidation(contents, @gemfile.rails_i18n) %>
 
-  <%# ヘルパーメソッドによりアソシエーションに関するHTMLを作成 %>
-  <%== make_association(contents, @columns, @model, @model.attached_image) %>
+    <%# ヘルパーメソッドによりアソシエーションに関するHTMLを作成 %>
+    <%== make_association(contents, @columns, @model, @model.attached_image) %>
 
+    end<br>
+  </div><%#/ code-field モデルファイルの記載の終了 %>
+
+<% elsif @model.model_type.name == 'Formオブジェクト' %>
+  <div class="terminal-field">
+    <p>ターミナル：関連ファイルの作成</p>
+    <p>touch app/models/<%= @model.name %></p>
+  </div>
+  <div class="terminal-field">
+    <p>ターミナル：対象ファイルへジャンプ</p>
+    <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
+  </div>
+  <br>
+  <div class="code-field">
+    class <%= @model.name.classify %><br>
+    <%== insert_space(2) %>include ActiveModel::Model<br>
+    <%== contents[:attr_accessor] %>
+    <%== make_varidation(contents, @gemfile.rails_i18n) %>
+    <%#== make_form_object_save(model) %>
+    end<br>
+
+  </div>
+  include ActiveModel::Model<br>
+  attr_accessor :親modelの全てのカラム, 子modelの全てのカラム<br>
+
+  with_options presence: true do<br>
+    validates :カラム名, オプション<br>
+    validates :user_id<br>
   end<br>
-</div><%#/ code-field モデルファイルの記載の終了 %>
+<br>
+  def save<br>
+    親model名変数 = 親Model名.create(カラム名: カラム名, user_id: user_id)<br>
+    Address.create(カラム名: カラム名, 親model名_id: 親model名変数.id)<br>
+  end<br>
+end<br>
+
+
+
+
+
+
+<% end %>
