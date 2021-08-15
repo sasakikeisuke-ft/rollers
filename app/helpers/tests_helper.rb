@@ -118,12 +118,12 @@ module TestsHelper
   # optionに関する記載を行うメソッド。そのカラムのオプションのみ追加していく。
   def make_options(option, japanese)
     code = option.option_type.code
-    code = code.gsub(/数値1/, option.input1) unless option.input1 == ''
-    code = code.gsub(/数値2/, option.input2) unless option.input2 == ''
+    code = code.gsub(/入力1/, option.input1) unless option.input1 == ''
+    code = code.gsub(/入力2/, option.input2) unless option.input2 == ''
     if japanese
-      code = code.gsub(/メッセージ/, option.option_type.message_ja)
+      code = code.gsub(/エラーメッセージ/, option.option_type.message_ja)
     else
-      code = code.gsub(/メッセージ/, option.option_type.message_en)
+      code = code.gsub(/エラーメッセージ/, option.option_type.message_en)
     end
     code = ", #{code}"
     code
@@ -163,9 +163,9 @@ module TestsHelper
       if content["option_type_#{id}".to_sym].length >= 2
         option_type = OptionType.find(id)
         if japanese
-          code = option_type.code.gsub(/メッセージ/, option_type.message_ja)
+          code = option_type.code.gsub(/エラーメッセージ/, option_type.message_ja)
         else
-          code = option_type.code.gsub(/メッセージ/, option_type.message_en)
+          code = option_type.code.gsub(/エラーメッセージ/, option_type.message_en)
         end
         before = "#{insert_space(space)}with_options #{code} do<br>"
         after = "#{insert_space(space)}end<br>"
