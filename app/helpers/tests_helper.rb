@@ -37,8 +37,7 @@ module TestsHelper
     if model.model_type.name != 'Formオブジェクト'
       target_columns = model.columns
     else  # Formオブジェクトの場合、特別な処理により、対象としているモデルのカラムが全てを取得する
-      target_columns = []
-      make_form_object(target_columns, model, contents)
+      target_columns = make_form_object(model, contents)
     end
 
     # 取得したカラムを配列へと振り分けていく。
@@ -247,46 +246,51 @@ module TestsHelper
     html
   end
 
-  # Formオブジェクトパターンにおける処理をまとめたメソッド
-  def make_form_object(target_columns, model, contents)
-    contents[:attr_accessor] = "#{insert_space(2)}attr_accessor "
-    save_method = "#{insert_space(2)}def save<br>"
-    first = true
-    parent_name = ''
+  # Formオブジェクトパターンに必要な処理を行うメソッド。追加するハッシュは以下
+  ## contents[:attr_accessor] -> attr_accessorに必要な記述をまとめて格納する。
+  ## contents[:save] -> Formオブジェクトに必要なsaveメソッドに関する記述を格納する。
+  def make_form_object(model, contents)
+    # Formオブジェクトに必要なカラムを全て取得する。
+    target_model_names = []
     model.columns.each do |column|
-      # Formオブジェクトに登録された対象モデルをDBから取得する。登録回数分DBにアクセスすることになってしまうため、改善が必要
-      target_model = Model.where(application_id: params[:application_id]).includes(columns: :options).find_by(name: column.name)
+      target_model_names << column.name
+    end
+    target_models = Model.where(name: target_model_names)
+    target_columns = Column.where(model_id: target_models).includes(:options)
 
-      # Formオブジェクトにおけるsaveメソッドの冒頭部分。対象モデルごとに必要。
-      save_method += "#{insert_space(4)}#{target_model.name.classify}.create("
+    # 各記述を行う事前準備。二つの記述にコードを追加していく。
+    contents[:attr_accessor] = "#{insert_space(2)}attr_accessor "
+    contents[:save] = "<br>#{insert_space(2)}def save<br>"
+    accessor_first = true
 
-      # 対象モデルの前カラムにおける処理を行う。
-      target_model.columns.each do |column|
-        # バリデーションのため、全てのカラムをtarget_columnsに格納する
-        target_columns << column
-
-        # attr_accessorに適応するカラムを追記する。
-        contents[:attr_accessor] += ', ' unless first
+    # モデルごとに処理を行う。
+    target_models.each do |target_model|
+      contents[:save] += "#{insert_space(4)}#{target_model.name} = #{target_model.name.classify}.create("
+      save_first = true
+      target_columns.each do |column|
+        next unless column.model_id == target_model.id
+        
+        # contents[:attr_accessor]
+        contents[:attr_accessor] += ', ' unless accessor_first
         contents[:attr_accessor] += column.name
+        accessor_first = false
 
-        # saveメソッドの対象カラムを記載する。
-        save_method += ', ' unless first
-        if column.name == parent_name
-          save_method += "#{column.name}_id: #{column.name}.id"
+        # contents[:save]
+        contents[:save] += ', ' unless save_first
+        if target_model_names.include?(column.name)
+          contents[:save] += "#{column.name}_id: #{column.name}.id"
         elsif ['references', 'ActiveHash'].include?(column.data_type.type)
-          save_method += "#{column.name}_id: #{column.name}_id"
+          contents[:save] += "#{column.name}_id: #{column.name}_id"
         else
-          save_method += "#{column.name}: #{column.name}"
+          contents[:save] += "#{column.name}: #{column.name}"
         end
-
-        first = false
+        save_first = false
       end
-      parent_name = target_model.name
+      contents[:save] += ')<br>'
     end
     contents[:attr_accessor] += '<br><br>'
-    contents[:save_method] = save_method
-
-
+    contents[:save] += "#{insert_space(2)}end<br>"
+    target_columns
   end
 
 end  #/ module

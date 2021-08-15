@@ -93,27 +93,7 @@
     <%== insert_space(2) %>include ActiveModel::Model<br>
     <%== contents[:attr_accessor] %>
     <%== make_varidation(contents, @gemfile.rails_i18n) %>
-    <%#== make_form_object_save(model) %>
+    <%== contents[:save] %>
     end<br>
-
   </div>
-  include ActiveModel::Model<br>
-  attr_accessor :親modelの全てのカラム, 子modelの全てのカラム<br>
-
-  with_options presence: true do<br>
-    validates :カラム名, オプション<br>
-    validates :user_id<br>
-  end<br>
-<br>
-  def save<br>
-    親model名変数 = 親Model名.create(カラム名: カラム名, user_id: user_id)<br>
-    Address.create(カラム名: カラム名, 親model名_id: 親model名変数.id)<br>
-  end<br>
-end<br>
-
-
-
-
-
-
 <% end %>

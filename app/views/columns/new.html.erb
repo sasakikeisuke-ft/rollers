@@ -53,7 +53,8 @@
   <h2>Formオブジェクト：<%= @model.name %>の対象モデル設定</h2>
   <p>
     対象モデルを同時に登録するためのFormオブジェクトパターンを作成します。<br>
-    対象にしたいモデルを選択してください。
+    対象にしたいモデルを選択してください。<br>
+    アソシエーションが組まれている場合、親モデルを先に登録してください。
   </p>
   <%= render partial: "formobject_form", locals: {application: @application, model: @model, column: @column} %>
 
@@ -61,5 +62,4 @@
 
 <br>
 <%= link_to 'モデル新規作成へ', new_application_model_path %><br>
-<%= link_to 'モデル一覧へ', application_models_path %><br>
-<%= link_to 'アプリケーション一覧へ戻る', root_path %>
+<%= render partial: "shared/link_index" %>
