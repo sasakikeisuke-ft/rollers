@@ -54,7 +54,8 @@
   <p>
     対象モデルを同時に登録するためのFormオブジェクトパターンを作成します。<br>
     対象にしたいモデルを選択してください。<br>
-    アソシエーションが組まれている場合、親モデルを先に登録してください。
+    アソシエーションが組まれている場合、親モデルを先に登録してください。<br>
+    また、登録するモデルのカラム名が重複しないようご注意ください。
   </p>
   <%= render partial: "formobject_form", locals: {application: @application, model: @model, column: @column} %>
 

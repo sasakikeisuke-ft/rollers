@@ -20,6 +20,7 @@ module TestsHelper
     result
   end
 
+  #   model#showのコード表示機能に関するメソッド
   ##  計画: contentsにハッシュ構造を持たせ、引数として使用することで複数のメソッドに渡って受け渡すことができるようにする。
   ### contentsのハッシュ一覧とその内容について
   ### contents[:presence_true] -> 空欄禁止として登録したカラムを格納する。バリデーションの作成に必要。
@@ -43,15 +44,20 @@ module TestsHelper
     # 取得したカラムを配列へと振り分けていく。
     target_columns.each do |column|
       if column.data_type_id <= 10
-        contents[:presence_true] << column if column.must_exist
-        contents[:presence_false] << column if !column.must_exist && column.options.length != 0
+        if column.must_exist
+          contents[:presence_true] << column 
+        elsif column.options.length != 0
+          contents[:presence_false] << column
+          contents[:normal_example_group] << column
+        else # 空欄可能であり、かつオプションの設定がされていない場合
+          contents[:normal_example_group] << column
+        end
       else
         case column.data_type.type
         when 'boolean'
           contents[:boolean_group] << column
         when 'references'
           contents[:references_group] << column
-          # valid_references_group << content if content[:options] != ''
         when 'ActiveHash'
           contents[:activehash_group] << column
         end
@@ -67,7 +73,7 @@ module TestsHelper
     categorcies = %W[
       presence_true presence_false
       boolean_group references_group activehash_group
-      normal_group abnormal_group
+      normal_example_group
     ]
     contents = {}
     categorcies.each do |category|
@@ -114,7 +120,6 @@ module TestsHelper
     html
   end 
 
-
   # optionに関する記載を行うメソッド。そのカラムのオプションのみ追加していく。
   def make_options(option, japanese)
     code = option.option_type.code
@@ -131,11 +136,8 @@ module TestsHelper
 
   def make_with_options(group, space, japanese)
     result = ''
-    content = {
-      else: [],
-      single: []
-    }
-    grouping_ids = [11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 25]
+    content = {else: [], single: []}
+    grouping_ids = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25]
     # 引数となるcontents[:presence_true]とcontents[:presence_false]をグループ化できるoptionごとに再分配。
     # ただし、通常と異なる登録方法を行うActiveHashについては、option_type_id: 25として扱う。
     group.each do |column|
@@ -150,7 +152,7 @@ module TestsHelper
           added = true
         end
         content[:else] << column unless added  
-      else  # column.data_type.type != 'ActiveHash'
+      else  # column.data_type.type == 'ActiveHash'
         content[:option_type_25] = [] if content[:option_type_25].nil?
         content[:option_type_25] << column
       end
@@ -258,24 +260,23 @@ module TestsHelper
     target_models = Model.where(name: target_model_names)
     target_columns = Column.where(model_id: target_models).includes(:options)
 
-    # 各記述を行う事前準備。二つの記述にコードを追加していく。
-    contents[:attr_accessor] = "#{insert_space(2)}attr_accessor "
+    # モデルごとにカラムの処理を行う。この時点でattr_accessorのための配列を作成する
+    accessor_names = []
     contents[:save] = "<br>#{insert_space(2)}def save<br>"
-    accessor_first = true
-
-    # モデルごとに処理を行う。
     target_models.each do |target_model|
       contents[:save] += "#{insert_space(4)}#{target_model.name} = #{target_model.name.classify}.create("
       save_first = true
       target_columns.each do |column|
         next unless column.model_id == target_model.id
         
-        # contents[:attr_accessor]
-        contents[:attr_accessor] += ', ' unless accessor_first
-        contents[:attr_accessor] += column.name
-        accessor_first = false
+        # contents[:attr_accessor]に重複して表示しない処理のために、カラム名を専用の配列へ格納する。
+        if ['references', 'ActiveHash'].include?(column.data_type.type)
+          accessor_names << "#{column.name}_id"
+        else
+          accessor_names << column.name
+        end
 
-        # contents[:save]
+        # contents[:save]にsaveメソッドに関する記述を作成し格納する。
         contents[:save] += ', ' unless save_first
         if target_model_names.include?(column.name)
           contents[:save] += "#{column.name}_id: #{column.name}.id"
@@ -288,9 +289,223 @@ module TestsHelper
       end
       contents[:save] += ')<br>'
     end
-    contents[:attr_accessor] += '<br><br>'
     contents[:save] += "#{insert_space(2)}end<br>"
+
+    # attr_accessorの記述を作成する。
+    contents[:attr_accessor] = "#{insert_space(2)}attr_accessor "
+    accessor_first = true
+    accessor_names.uniq.each do |name|
+      contents[:attr_accessor] += ', ' unless accessor_first
+      contents[:attr_accessor] += ":#{name}"
+      accessor_first = false
+    end
+    contents[:attr_accessor] += '<br><br>'
+
     target_columns
   end
+
+  # RSpec正常系のテストコードを作成するメソッド
+  def make_normal_example(contents, model)
+    result = ''
+    contents[:normal_example_group].each do |column|
+      result += "#{insert_space(6)}it '#{column.name}が空欄でも登録できる' do<br>"
+      result += "#{insert_space(8)}@#{model.name}.#{column.name} = ''<br>"
+      result += "#{insert_space(8)}expect(@#{model.name}).to be_valid<br>"
+      result += "#{insert_space(6)}end<br>"
+    end
+    result
+  end
+
+  # RSpec異常系のテストコードを作成するメソッド
+  def make_abnormal_example(contents, model, japanese)
+    result = ''
+
+    # 空欄禁止とそのオプションに関するテストコード
+    contents[:presence_true].each do |column|
+      base = make_abnormal_example_template(column, model.name, japanese)
+      sample = base.gsub(/条件/, 'が空欄だと登録できない')
+      sample = sample.gsub(/変更点/, "''")
+      if japanese
+        sample = sample.gsub(/メッセージ/, 'を入力してください')
+      else
+        sample = sample.gsub(/メッセージ/, " is can't be blank")
+      end
+      result += sample
+      result += make_option_example(column, model.name, japanese, base)
+    end
+
+    # オプションのみ設定されているカラムのテストコード
+    contents[:presence_false].each do |column|
+      base = make_abnormal_example_template(column, model.name, japanese)
+      result += make_option_example(column, model.name, japanese, base)
+    end
+
+    # references型カラムのテストコード
+    contents[:references_group].each do |column|
+      base = make_abnormal_example_template(column, model.name, japanese)
+      sample = base.gsub(/条件/, 'が紐づけられていないと登録できない')
+      sample = sample.gsub(/変更点/, 'nil')
+      sample = sample.gsub(/メッセージ/, ' must exist')
+      result += sample
+      result += make_option_example(column, model.name, japanese, base)
+    end
+
+    # ActiveHashを選択したカラムのテストコード
+    contents[:activehash_group].each do |column|
+      base = make_abnormal_example_template(column, model.name, japanese)
+      sample = base.gsub(/条件/, 'が未選択だと登録できない')
+      sample = sample.gsub(/変更点/, '0')
+      sample = sample.gsub(/メッセージ/, " can't be blank")
+      result += sample
+    end
+    result
+  end
+
+  # 異常系テストコードの原型を作成するメソッド
+  def make_abnormal_example_template(column, model_name, japanese)
+    if ['references', 'ActiveHash'].include?(column.data_type.type)
+      column_name = "#{column.name}_id"
+    else
+      column_name = column.name
+    end
+    if japanese && column.name_ja != ''
+      display_name = column.name_ja
+    else
+      display_name = column.name.titleize
+    end
+    base = "#{insert_space(6)}it '#{column_name}条件' do<br>"
+    base += "#{insert_space(8)}@#{model_name}.#{column_name} = 変更点<br>"
+    base += "#{insert_space(8)}@#{model_name}.valid?<br>"
+    base += "#{insert_space(8)}expect(@#{model_name}.errors.full_message).to include("
+    base += '"表示名メッセージ")<br>'.sub(/表示名/, display_name)
+    base += "#{insert_space(6)}end<br>"
+    base
+  end
+
+  # カラムの登録内容から必要なテストコードを作成するメソッド
+  ## 対象により必要な内容が微妙に異なるため不採用
+  # def make_column_example(infomation, model_name, japanese)
+  #   result = ''
+  #   infomation[:group].each do |column|
+  #     base = make_abnormal_example_template(column, model_name, japanese)
+  #     sample = base.gsub(/条件/, infomation[:condition])
+  #     sample = sample.gsub(/変更点/, infomation[:change])
+  #     if japanese
+  #       sample = sample.gsub(/メッセージ/, infomation[:message_ja])
+  #     else
+  #       sample = sample.gsub(/メッセージ/, infomation[:message_en])
+  #     end
+  #     result += sample
+  #     result += make_option_example(column, japanese, base)
+  #   end
+  #   result
+  # end
+
+  # そのカラムに登録されているオプションに対応したテストコードを作成する。
+  def make_option_example(column, model_name, japanese, base)
+    result = ''
+    column.options.each do |option|
+      case option.option_type.type
+      when 'format'
+        # 数字が含まれる場合に対するexample
+        if [11, 12, 13, 15, 16, 17].include?(option.option_type_id)
+          sample = base.gsub(/条件/, 'に数字が含まれていると保存できない')
+          sample = sample.gsub(/変更点/, "'12345678'")
+          result += sample
+        end
+        # 英字が含まれる場合に対するexample
+        if [11, 12, 13, 14, 20].include?(option.option_type_id)
+          sample = base.gsub(/条件/, 'に英字が含まれていると保存できない')
+          sample = sample.gsub(/変更点/, "'abcdEFGH'")
+          result += sample
+        end
+        # 英字小文字が含まれる場合に対するexample
+        if [17].include?(option.option_type_id)
+          sample = base.gsub(/条件/, 'に英字小文字が含まれていると保存できない')
+          sample = sample.gsub(/変更点/, "'abcdefgh'")
+          result += sample
+        end
+        # 英字大文字が含まれる場合に対するexample
+        if [16].include?(option.option_type_id)
+          sample = base.gsub(/条件/, 'に英字大文字が含まれていると保存できない')
+          sample = sample.gsub(/変更点/, "'ABCDEFGH'")
+          result += sample
+        end
+        # 漢字が含まれる場合に対するexample
+        if [12, 13, 14, 15, 16, 17, 18, 19, 20].include?(option.option_type_id)
+          sample = base.gsub(/条件/, 'に漢字が含まれていると保存できない')
+          sample = sample.gsub(/変更点/, "'漢字漢字漢字漢字'")
+          result += sample
+        end
+        # ひらがなが含まれる場合に対するexample
+        if [13, 14, 15, 16, 17, 18, 19, 20].include?(option.option_type_id)
+          sample = base.gsub(/条件/, 'にひらがなが含まれていると保存できない')
+          sample = sample.gsub(/変更点/, "'ひらがなひらがな'")
+          result += sample
+        end
+        # カタカナが含まれる場合に対するexample
+        if [12, 14, 15, 16, 17, 18, 19, 20].include?(option.option_type_id)
+          sample = base.gsub(/条件/, 'にカタカナが含まれていると保存できない')
+          sample = sample.gsub(/変更点/, 'カタカナカタカナ')
+          result += sample
+        end
+      when 'numericality'
+        if [22, 24].include?(option.option_type_id)
+          sample = base.gsub(/条件/, 'が設定した数値より大きいと保存できない')
+          sample = sample.gsub(/変更点/, option.input1 + 1)
+          result += sample
+        end
+        if [22, 23].include?(option.option_type_id)
+          sample = base.gsub(/条件/, 'が設定した数値より小さいと保存できない')
+          sample = sample.gsub(/変更点/, option.input1 - 1)
+          result += sample
+        end
+      when 'uniqueness'
+        # 重複確認のテストコードではbaseの形が異なるため、専用のbaseを作成する
+        if ['references', 'ActiveHash'].include?(column.data_type.type)
+          column_name = "#{column.name}_id"
+        else
+          column_name = column.name
+        end
+        if japanese && column.name_ja != ''
+          display_name = column.name_ja
+        else
+          display_name = column.name.titleize
+        end
+        sample = "#{insert_space(6)}it '#{column_name}の重複があり登録できない' do<br>"
+        sample += "#{insert_space(8)}@#{model_name}.save<br>"
+        sample += "#{insert_space(8)}another_#{model_name} = FactoryBot.build(:#{model_name}, "
+        sample += "#{column_name}: @#{model_name}.#{column_name}変更点)<br>"
+        sample += "#{insert_space(8)}another_#{model_name}.valid?<br>"
+        sample += "#{insert_space(8)}expect(@#{model_name}.errors.full_message).to include("
+        sample += '"表示名メッセージ")<br>'.sub(/表示名/, display_name)
+        sample += "#{insert_space(6)}end<br>"
+        case option.option_type_id
+        when 41
+          sample = sample.sub(/変更点/, '')
+        when 42
+          sample = sample.sub(/変更点/, ", #{option.input1}: @#{model_name}.#{option.input1}")
+        when 43
+          change = ", #{option.input1}_id: @#{model_name}.#{option.input1}_id"
+          change += ", #{option.input2}_id: @#{model_name}.#{option.input2}_id"
+          sample = sample.sub(/変更点/, change)
+        end
+        result += sample
+      end
+
+      # エラーメッセージの変更 -> オプションごとにエラーメッセージは固定
+      if japanese
+        result = result.gsub(/メッセージ/, option.option_type.message_ja)
+      else
+        result = result.gsub(/メッセージ/, option.option_type.message_en)
+      end
+    end
+    result
+  end
+
+
+
+
+
 
 end  #/ module

@@ -37,12 +37,12 @@ class OptionType < ActiveHash::Base
     # {id: 33, type: 'length', info: '下限のみを設定する', code: ', length: { minimum: ', message_ja: '',          message_en: 'is invalid.'},
     # {id: 34, type: 'length', info: '値の長さを限定する', code: ', length: { is: ',      message_ja: '',          message_en: 'is invalid.'},
 
-    { id: 41, type: 'uniqueness', info: '当テーブル内での重複禁止', code: 'uniqueness: { case_sensitive: false }', message_ja: 'はすでに存在します',
-      message_en: ' has already been taken' },
-    { id: 42, type: 'uniqueness', info: '対象モデル内での重複禁止', code: 'uniqueness: { case_sensitive: false, scope: :入力1_id }', message_ja: 'はすでに存在します',
-      message_en: ' has already been taken' },
-    { id: 43, type: 'uniqueness', info: '複数のモデルでの重複禁止', code: 'uniqueness: { case_sensitive: false, scope: [:入力1_id, 入力2_id] }', message_ja: 'はすでに存在します',
-      message_en: ' has already been taken' }
+    { id: 41, type: 'uniqueness', info: '当テーブル内での重複禁止', code: 'uniqueness: { case_sensitive: false }',
+      message_ja: 'はすでに存在します', message_en: ' has already been taken' },
+    { id: 42, type: 'uniqueness', info: '対象モデル内での重複禁止', code: 'uniqueness: { case_sensitive: false, scope: :入力1_id }', 
+      message_ja: 'はすでに存在します', message_en: ' has already been taken' },
+    { id: 43, type: 'uniqueness', info: '複数のモデルでの重複禁止', code: 'uniqueness: { case_sensitive: false, scope: [:入力1_id, 入力2_id] }', 
+      message_ja: 'はすでに存在します', message_en: ' has already been taken' }
   ]
   include ActiveHash::Associations
   has_many :options
