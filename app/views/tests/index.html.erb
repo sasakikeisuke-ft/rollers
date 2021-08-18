@@ -34,7 +34,7 @@
   <h2><%= @model.name.tableize %>テーブルのマイグレーションファイルの編集</h2>
     <%# ヘルパーメソッドより作成 %>
     <%== make_migration_appending(@model) %>
-    上記を必要な箇所に挿入<br>
+    <%== insert_space(6) %>上記を必要な箇所に挿入<br>
     <div class="terminal-field">
       <p>ターミナル：マイグレーションの実行</p>
       <p>rails db:migrate </p>
@@ -99,38 +99,30 @@
 <% end %>
 
 <%# RSpecに関する記載 %>
-
-<h2><%= @model.name.classify %>モデルのRSpecの編集</h2>
-<p>
-  RSpecを途中から導入した場合、下記の作成から作業が必要となります。<br>
-  事前準備で導入していた場合は対象ファイルへジャンプし、編集から始めてください。
-</p>
-<div class="terminal-field">
-  <p>ターミナル：関連ファイルの作成</p>
-  <p>rails g rspec:model <%= @model.name %></p>
-</div>
-<div class="terminal-field">
-  <p>ターミナル：対象ファイルへジャンプ</p>
-  <p>code spec/models/<%= @model.name %>_spec.rb</p>
-</div>
-
-<% if @model.model_type.name != 'ActiveHash' %>
+<% if @model.model_type.name != 'ActiveHash' && @gemfile.rspec %>
+  <h2><%= @model.name.classify %>モデルのRSpecの編集</h2>
+  <% if @model.model_type.name != 'Formオブジェクト' %>
+    <p>
+    RSpecを途中から導入した場合、下記の作成から作業が必要となります。<br>
+    事前準備で導入していた場合は対象ファイルへジャンプし、編集から始めてください。
+    </p>
+  <% end %>
+  <div class="terminal-field">
+    <p>ターミナル：関連ファイルの作成</p>
+    <p>rails g rspec:model <%= @model.name %></p>
+  </div>
+  <div class="terminal-field">
+    <p>ターミナル：対象ファイルへジャンプ</p>
+    <p>code spec/models/<%= @model.name %>_spec.rb</p>
+  </div>
   <div class="code-field">
     require 'rails_helper'<br>
     <br>
     RSpec.describe <%= @model.name.classify %>, type: :model do<br>
-    <%# FactoryBotを使用 %>
     <%== insert_space(2) %>before do<br>
-    <%# Formオブジェクト専用の処理。表示内容が重複しないように表示する。 %>
-    <% if @model.model_type.name == 'Formオブジェクト' %>
-      <% names = [] %>
-      <% contents[:references_group].each do |column| %>
-        <% names << column.name %>
-      <% end %>
-      <% names.uniq.each do |name| %>
-        <%== "#{insert_space(4)}#{name} = FactoryBot.create(:#{name})<br>" %>
-      <% end %>
-    <% end %>
+    <%# Formオブジェクト専用の処理。関連モデルのFactoryBot.createを重複せずに表示する。 %>
+    <%== add_bot(contents) if @model.model_type.name == 'Formオブジェクト' %>
+
     <%== insert_space(4) %>@<%= @model.name %> = FactoryBot.build(:<%= @model.name %>)<br>
     <%== insert_space(4) %>sleep 0.1 # エラーを防ぐために休止時間を入れています。不要なら削除してください。<br>
     <%== insert_space(2) %>end<br>
@@ -243,5 +235,56 @@
     <%== insert_space(2) %>end<br>
     end<br>
   </div>
-    
+  <br>
   <%# FactoryBotに関するコード %>
+  <h2><%= @model.name.classify %>モデルのFactoryBotの編集</h2>
+  <div class="terminal-field">
+    <p>ターミナル：対象ファイルへジャンプ</p>
+    <p>code spec/factories/<%= @model.name.tableize %>.rb</p>
+  </div>
+  <div class="code-field">
+    FactoryBot.define do<br>
+    <%== insert_space(2) %>factory :<%= @model.name %> do<br>
+    
+    <%# ヘルパーメソッドを使用し、FactoryBotのカラムに関するHTMLを作成する %>
+    <%== make_factorybot_html(contents) %>
+    
+    <% if @model.model_type_id == 5 %>
+      <%== insert_space(4) %>email { Faker::Internet.free_email }<br>
+      <%== insert_space(4) %>password { Faker::Internet.password(min_length: 6) }<br>
+      <%== insert_space(4) %>password_confirmation { password }<br>
+    <% end %>
+
+    <%# ヘルパーメソッドを使用し、FactoryBotのアソシエーションに関するHTMLを作成する %>
+    <%== make_association_html(contents) %>
+
+    <% if @model.attached_image %><%# 画像を紐づける設定の場合 %>
+      <br>
+      <%== insert_space(4) %>after(:build) do |target|<br>
+      <%== insert_space(6) %>target.image.attach(io: File.open('public/images/test_image.png'), filename: 'test_image.png')
+      <%== insert_space(4) %>end<br>
+      # public/imagesのディレクトリを作成し、test_image.pngと名付けた画像ファイルを用意してください。
+    <% end %>
+    <%== insert_space(2) %>end<br>
+    end<br>
+  </div><%# code-field %>
+  <br>
+  <div>
+    <%= render partial: "models/factorybot_sample" %>
+  </div>
+  <div class="terminal-field">
+    <p>ターミナル：テストコードの実行</p>
+    <p>bundle exec rspec spec/models/<%= @model.name %>_spec.rb </p>
+  </div>
+  <br>
+<% end %>
+
+<% if @gemfile.rubocop %>
+  <div class="terminal-field">
+    <p>ターミナル：Rubocopの実行</p>
+    <p>bundle exec rubocop -a </p>
+  </div>
+  <br>
+<% end %>
+
+<%= render partial: "shared/link_index" %>

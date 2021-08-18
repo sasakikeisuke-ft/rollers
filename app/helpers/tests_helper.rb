@@ -28,7 +28,8 @@ module TestsHelper
   ### contents[:boolean_group] -> 上記とは別にboolean型のカラムを格納する。バリデーションの処理が異なるため別の配列に格納する。
   ### contents[:references_group] -> references型のカラムを格納する。この配列を参考にアソシエーションに関する記載を行う。
   ### contents[:activehash_group] -> activehash型のカラムを格納する。データ型をintegerに固定し、また専用のアソシエーションを記載する。
-  ### contents[japanese] -> gemfileにて、日本語化ファイルを適応するかどうかの情報を格納する。
+  ### contents[:japanese] -> gemfileにて、日本語化ファイルを適応するかどうかの情報を格納する。
+  ### contents[:all_columns] -> 全てのカラムを格納する。FactoryBotに関するコード作成に必要。
 
   # 配列を作成するメソッド
   def make_model_array(model, gemfile)
@@ -62,6 +63,7 @@ module TestsHelper
           contents[:activehash_group] << column
         end
       end
+      contents[:all_columns] << column
     end
     contents[:presence_true] += contents[:references_group] if model.model_type.name == 'ActiveHash'
     contents[:presence_true] += contents[:activehash_group]
@@ -73,7 +75,7 @@ module TestsHelper
     categorcies = %W[
       presence_true presence_false
       boolean_group references_group activehash_group
-      normal_example_group
+      normal_example_group all_columns
     ]
     contents = {}
     categorcies.each do |category|
@@ -304,6 +306,19 @@ module TestsHelper
     target_columns
   end
 
+  # Formオブジェクトに関連するFactryBotに関する記述を作成するメソッド
+  def add_bot(contents)
+    result = ''
+    names = []
+    contents[:references_group].each do |column|
+      names << column.name
+    end
+    names.uniq.each do |name|
+      result += "#{insert_space(4)}#{name} = FactoryBot.create(:#{name})<br>"
+    end
+    result
+  end
+
   # RSpec正常系のテストコードを作成するメソッド
   def make_normal_example(contents, model)
     result = ''
@@ -503,9 +518,106 @@ module TestsHelper
     result
   end
 
+  # FactoryBotで使用するFaker及びGimeiのHTMLを作成するメソッド
+  def make_factorybot_html(contents)
+    result = ''
+    contents[:all_columns].each do |column|
+      next if column.data_type_id == 12
 
+      result += "#{insert_space(4)}#{column.name}"
+      case column.data_type_id
+      when 1 # 'string'
+        if column.options.length != 0
+          done = false
+          column.options.each do |option|
+            case option.option_type.info
+            when '漢字かなカナで登録可'
+              result += ' { Gimei.kanji }'
+              done = true
+            when 'ひらがなのみで登録可'
+              result += ' { Gimei.hiragana }'
+              done = true
+            when 'カタカナのみで登録可'
+              result += ' { Gimei.katakana }'
+              done = true
+            when '数字のみ限定で登録可'
+              result += " { 12345678 }"
+              done = true
+            when '英字小文字のみ登録可'
+              result += " { 'abcdefgh' }"
+              done = true
+            when '英字大文字のみ登録可'
+              result += " { 'ABCDEFGH }"
+              done = true
+            when '英字数字のみで登録可'
+              result += " { '1234ABcd'}"
+              done = true
+            when '郵便番号形式で登録可'
+              result += " { '123-4567'}"
+              done = true
+            end
+          end
+          result += ' { Faker::Lorem.characters(number: 8) }' unless done
+        else
+          result += ' { Faker::Lorem.characters(number: 8) }'
+        end
+      when 2 # 'text'
+        result += ' { Faker::Lorem.sentence }'
+      when 3 # 'integer'
+        if column.options.length != 0
+          column.options.each do |option|
+            case option.option_type.info
+            when '上限下限を設定する'
+              sample = ' { Faker::Number.within(range: 入力2..入力1) }'
+              sample = sample.gsub(/入力2/, option.input2) unless option.input2.nil?
+              sample = sample.gsub(/入力1/, option.input1) unless option.input1.nil?
+              result += sample
+            when '上限のみを設定する'
+              sample = ' { Faker::Number.within(range: 0..入力1) }'
+              sample = sample.gsub(/入力1/, option.input1) unless option.input1.nil?
+              result += sample
+            when '下限のみを設定する'
+              sample = ' { Faker::Number.within(range: 入力2..10000000) }'
+              sample = sample.gsub(/入力2/, option.input2) unless option.input2.nil?
+              result += sample
+            when '未選択状態での禁止'
+              result += ' { Faker::Number.non_zero_digit }'
+            else
+              result += ' { Faker::Number(digits: 8) }'
+            end
+          end
+        else
+          result += ' { Faker::Number(digits: 8) }'
+        end
+      when 4, 5 # 'decimal', 'float'
+        result += ' { Faker::Number.decimal(l_digits: 3, r_digits: 3) }'
+      when 6 # 'date'
+        result += ' { Faker::Date.between(from: 50.years.ago, to: Date.today) }'
+      when 7 # 'time'
+        result += ' { Faker::Time.between(DateTime.now - 1, DateTime.now).strftime("%H:%M:%S") }'
+      when 8 # 'datetime'
+        result += ' { Faker::Time.between(DateTime.now - 1, DateTime.now) }'
+      when 11 # 'boolean'
+        result += ' { Faker::Boolean.boolean }'
+      when 13 # 'ActiveHash' refarences型はここでは記載不要だがassociationに記載が必要
+        result += '_id { Faker::Number.non_zero_digit }'
+      end
+      result += '<br>'
+    end
+    result
+  end
 
-
-
+  # FactoryBotのアソシエーションを作成するメソッド
+  def make_association_html(contents)
+    result = ''
+    names = []
+    contents[:references_group].each do |column|
+      names << column.name 
+    end
+    names.uniq.each do |name|
+      result += "#{insert_space(4)}association :#{name}<br>"
+    end
+    result
+  end
 
 end  #/ module
