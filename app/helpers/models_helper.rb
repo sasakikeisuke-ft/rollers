@@ -1,746 +1,657 @@
 module ModelsHelper
-  # メインとなるHTML作成メソッド。
-  def make_contents_html(model, gemfile)
-    migration_html = ''
-    validation_html = ''
-    factorybot_html = ''
-    presence_true = []
-    presence_false = []
-    boolean_group = []
-    references_group = []
-    valid_regerences_group = []
-    activehash_group = []
-    normal_groups = []
-    abnormal_groups = []
-    overlapping_groups = []
 
-    # 取得したカラムごとに文章を作成していきます。eachメソッドは一回で済むようにします。
+  # マイグレーションファイルに追記する項目に関する記述を作成するメソッド
+  def make_migration_appending(model)
+    result = ''
     model.columns.each do |column|
-      # マイグレーションファイルのモデルごとの記載を作成します。
-      migration_html += make_migration_html(column)
-
-      # データ型とmust_existによって、追加先の配列を選択します。
-      content = { name: column.name }
-      # optionの表記が必要なグループを、さらにpresence: trueが必要かで追加先の配列を決めます
-      content[:options] = make_options_html(column, gemfile.rails_i18n)
-      if column.data_type_id <= 10
-        presence_true << content if column.must_exist
-        presence_false << content if !column.must_exist && content[:options] != ''
+      result += insert_space(6)
+      case column.data_type.type
+      when 'references'
+        result += "t.#{column.data_type.type} :#{column.name}, foreign_key: true"
+      when 'ActiveHash'
+        result += "t.integer :#{column.name}_id, null: false"
       else
-        case column.data_type_id
-        when 11
-          boolean_group << content
-        when 12
-          references_group << content
-          valid_regerences_group << content if content[:options] != ''
-        when 13
-          activehash_group << content
-        end
+        result += "t.#{column.data_type.type} :#{column.name}"
+        result += ', null: false' if column.must_exist
+        result += ', unique: true' if column.unique
       end
-
-      # RSpecのための配列を作成します
-      make_group_exist(model, column, abnormal_groups, normal_groups)
-      make_group_options(model, column, abnormal_groups, overlapping_groups)
-
-      # FactoryBotのためのHTMLを作成します。
-      factorybot_html += make_factorybot_html(column)
+      result += '<br>'  
     end
-    # ここまでで作られた配列を基に、RSpecのグループへさらに追加する。
-    make_group_references(references_group, model, abnormal_groups)
-    make_activehash_example_html(activehash_group, model, abnormal_groups)
-    # / ここまでで配列が完成しました。
-
-    # ここから実際のHTMLをmake_validation_htmlメソッドを使用し作成します
-    common = 'presence: true'
-    validation_html += make_validation_html(presence_true, common)
-
-    common = 'inclusion: { in: [true, false] }'
-    validation_html += make_validation_html(boolean_group, common)
-
-    common = 'numericality: { other_than: 0, message: "'
-    common += " can't be blank"
-    common += '" }'
-    validation_html += make_validation_html(activehash_group, common)
-
-    common = ''
-    validation_html += make_validation_html(presence_false, common)
-    validation_html += make_validation_html(valid_regerences_group, common)
-
-    # アソシエーションのbelongs_toに関する記載を行います。
-    belongs_to_html = make_belong(references_group, insert_space(2), false)
-    activehash_html = make_belong(activehash_group, insert_space(2), true)
-
-    # RSpecのexampleに関するHTMLを作成します
-    normal_example_html = make_normal_examples_html(normal_groups)
-    abnormal_example_html = make_abnormal_example_html(abnormal_groups, gemfile.rails_i18n)
-    abnormal_example_html += make_overlapping_example_html(overlapping_groups, gemfile.rails_i18n)
-
-    # FactoryBotのアソシエーションに関するHTMLを作成します。
-    association_html = make_association_html(references_group)
-
-    # 作成したHTMLをハッシュにしてビューファイルへ返します
-    contents_html = {
-      migration_html: migration_html,
-      validation_html: validation_html,
-      belongs_to_html: belongs_to_html,
-      activehash_html: activehash_html,
-      normal_example_html: normal_example_html,
-      abnormal_example_html: abnormal_example_html,
-      factorybot_html: factorybot_html,
-      association_html: association_html
-    }
+    result
   end
 
-  # マイグレーションに記載する項目のHTMLを作成するメソッド。
-  def make_migration_html(column)
+  #   model#showのコード表示機能に関するメソッド
+  ##  計画: contentsにハッシュ構造を持たせ、引数として使用することで複数のメソッドに渡って受け渡すことができるようにする。
+  ### contentsのハッシュ一覧とその内容について
+  ### contents[:presence_true] -> 空欄禁止として登録したカラムを格納する。バリデーションの作成に必要。
+  ### contents[:presence_false] -> 空欄禁止として登録せず、optionの登録がされているカラムを格納する。上記と別の処理を行う。
+  ### contents[:boolean_group] -> 上記とは別にboolean型のカラムを格納する。バリデーションの処理が異なるため別の配列に格納する。
+  ### contents[:references_group] -> references型のカラムを格納する。この配列を参考にアソシエーションに関する記載を行う。
+  ### contents[:activehash_group] -> activehash型のカラムを格納する。データ型をintegerに固定し、また専用のアソシエーションを記載する。
+  ### contents[:japanese] -> gemfileにて、日本語化ファイルを適応するかどうかの情報を格納する。
+  ### contents[:all_columns] -> 全てのカラムを格納する。FactoryBotに関するコード作成に必要。
+
+  # 配列を作成するメソッド
+  def make_model_array(model, gemfile)
+    contents = make_model_array_template
+    contents[:japanese] = gemfile.rails_i18n
+    
+    if model.model_type.name != 'Formオブジェクト'
+      target_columns = model.columns
+    else  # Formオブジェクトの場合、特別な処理により、対象としているモデルのカラムが全てを取得する
+      target_columns = make_form_object(model, contents)
+    end
+
+    # 取得したカラムを配列へと振り分けていく。
+    target_columns.each do |column|
+      if column.data_type_id <= 10
+        if column.must_exist
+          contents[:presence_true] << column 
+        elsif column.options.length != 0
+          contents[:presence_false] << column
+          contents[:normal_example_group] << column
+        else # 空欄可能であり、かつオプションの設定がされていない場合
+          contents[:normal_example_group] << column
+        end
+      else
+        case column.data_type.type
+        when 'boolean'
+          contents[:boolean_group] << column
+        when 'references'
+          contents[:references_group] << column
+        when 'ActiveHash'
+          contents[:activehash_group] << column
+        end
+      end
+      contents[:all_columns] << column
+    end
+    contents[:presence_true] += contents[:references_group] if model.model_type.name == 'ActiveHash'
+    contents[:presence_true] += contents[:activehash_group]
+    contents
+  end
+
+  # contentsのハッシュに紐づけられた空の配列を作成するメソッド。make_model_arrayの事前準備として使用する。
+  def make_model_array_template
+    categorcies = %W[
+      presence_true presence_false
+      boolean_group references_group activehash_group
+      normal_example_group all_columns
+    ]
+    contents = {}
+    categorcies.each do |category|
+      contents[category.to_sym] = []
+    end
+    contents
+  end
+
+  # モデルファイルのバリデーションに関する記載を作成するメソッド
+  def make_varidation(contents, japanese)
     html = ''
-    html += insert_space(6)
-    case column.data_type.type
-    when 'references'
-      html += "t.#{column.data_type.type} :#{column.name}, foreign_key: true"
-    when 'ActiveHash'
-      html += "t.integer :#{column.name}_id, null: false"
+    space = 2
+    after = "#{insert_space(space)}end<br>"
+
+    # 空欄禁止を設定されたものから処理を行う。
+    option = 'presence: true'
+    html += use_with_option?(contents[:presence_true], space, japanese, option)
+
+    # 空欄を禁止せずoptionのみ設定されたgroupの処理を行う。
+    html += make_with_options(contents[:presence_false], space, japanese)
+
+    # boolean型のグループに関するvaridationを記載する。
+    option = 'inclusion:{in: [true, false]}'
+    html += use_with_option?(contents[:boolean_group], space, japanese, option)
+    
+    # 最終的なHTMLを返却する
+    html
+  end
+
+  # with_optionを使用するかどうかを判断し、必要に応じてメソッドを使用するメソッド
+  def use_with_option?(group, space, japanese, option)
+    html = ''
+    if group.length >= 2
+      html += "#{insert_space(space)}with_options #{option} do<br>"
+      html += make_with_options(group, space + 2, japanese)
+      html += "#{insert_space(space)}end<br>"
+    elsif group.length == 1
+      html += "#{insert_space(space)}varidates :#{group[0].name}, #{option}"
+      group[0].options.each do |option|
+        html += make_options(option, japanese)
+      end
+      html += '<br>'
+    end
+    html
+  end 
+
+  # optionに関する記載を行うメソッド。そのカラムのオプションのみ追加していく。
+  def make_options(option, japanese)
+    code = option.option_type.code
+    code = code.gsub(/入力1/, option.input1) unless option.input1 == ''
+    code = code.gsub(/入力2/, option.input2) unless option.input2 == ''
+    if japanese
+      code = code.gsub(/エラーメッセージ/, option.option_type.message_ja)
     else
-      html += "t.#{column.data_type.type} :#{column.name}"
-      html += ', null: false' if column.must_exist
-      html += ', unique: true' if column.unique
+      code = code.gsub(/エラーメッセージ/, option.option_type.message_en)
     end
-    html += '<br>'
-    html
+    code = ", #{code}"
+    code
   end
 
-  # バリデーションにおけるoptionのHTMLを作成するメソッド
-  def make_options_html(column, japanese)
-    html = ''
-    column.options.each do |option|
-      # ActiveHash app/models/option_type.rbのデータを使用しています。
-      if option.option_type.type == 'format'
-        html += option.option_type.code
-
-      # オプションがnumericalityの場合は特別処理を行います。
-      elsif option.option_type.type == 'numericality'
-        html += ',<br>'
-        html += insert_space(14)
-        html += 'format: { with: /\A[0-9]+\z/, message: '
-        html += if japanese
-                  "'は半角数字を入力してください' },<br>"
-                else
-                  "'is invalid. Input harf-width numbers' },<br>"
-                end
-        html += insert_space(14)
-        case option.option_type.info
-        when '数値のみで登録する', '未選択状態での禁止'
-          html += option.option_type.code
-        when '上限下限を設定する'
-          html += 'numericality: {greater_than_or_equal_to: '
-          html += option.input1 unless option.input1.nil?
-          html += '数値' if option.input1.nil?
-          html += ', less_than_or_equal_to: '
-          html += option.input2 unless option.input2.nil?
-          html += '数値' if option.input2.nil?
-          html += ', message: '
-        when '上限のみを設定する'
-          html += 'numericality: {less_than_or_equal_to: '
-          html += option.input1 unless option.input1.nil?
-          html += '数値' if option.input1.nil?
-          html += ', message: '
-        when '上限下限を設定する'
-          html += 'numericality: {greater_than_or_equal_to: '
-          html += option.input2 unless option.input2.nil?
-          html += '数値' if option.input2.nil?
-          html += ', message: '
+  def make_with_options(group, space, japanese)
+    result = ''
+    content = {else: [], single: []}
+    grouping_ids = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25]
+    # 引数となるcontents[:presence_true]とcontents[:presence_false]をグループ化できるoptionごとに再分配。
+    # ただし、通常と異なる登録方法を行うActiveHashについては、option_type_id: 25として扱う。
+    group.each do |column|
+      if column.data_type.type != 'ActiveHash'
+        added = false
+        column.options.each do |option|
+          next unless grouping_ids.include?(option.option_type_id)
+  
+          id = option.option_type_id
+          content["option_type_#{id}".to_sym] = [] if content["option_type_#{id}".to_sym].nil?
+          content["option_type_#{id}".to_sym] << column
+          added = true
         end
-      elsif option.option_type.type == 'uniqueness'
-        html += "#{option.option_type.code}#{option.input1}"
-        html += ", :#{option.input2}" if option.option_type.info == '複数のモデルでの重複禁止'
-        html += ', message: '
+        content[:else] << column unless added  
+      else  # column.data_type.type == 'ActiveHash'
+        content[:option_type_25] = [] if content[:option_type_25].nil?
+        content[:option_type_25] << column
       end
-
-      # エラーメッセージを追加します
-      html += '"'
-      html += make_message_html(option, japanese)
-      html += '" }'
     end
-    html
-  end
 
-  # エラー文日本語化を設定しているかどうかで、エラー文を選択するメソッド。
-  def make_message_html(option, japanese)
-    html = if japanese
-             option.option_type.message_ja
-           else
-             option.option_type.message_en
-           end
-  end
+    # 分配した配列をもとにバリデーションを作成する。
+    grouping_ids.each do |id|
+      next if content["option_type_#{id}".to_sym].nil?
+      
+      if content["option_type_#{id}".to_sym].length >= 2
+        option_type = OptionType.find(id)
+        if japanese
+          code = option_type.code.gsub(/エラーメッセージ/, option_type.message_ja)
+        else
+          code = option_type.code.gsub(/エラーメッセージ/, option_type.message_en)
+        end
+        before = "#{insert_space(space)}with_options #{code} do<br>"
+        after = "#{insert_space(space)}end<br>"
+        during = ''
+        content["option_type_#{id}".to_sym].each do |column|
+          name = column.name
+          name = "#{column.name}_id" if column.data_type.type = 'ActiveHash'
+          during += "#{insert_space(space + 2)}varidates :#{name}"
+          column.options.each do |option|
+            next if grouping_ids.include?(option.option_type_id)
 
-  # with_optionsが使用できるかどうかで記載形態を変更するメソッド
-  def make_validation_html(array, common)
-    html = ''
-    if array.length == 0
-      return ''
-    elsif array.length == 1 || common == ''
-      array.each do |element|
-        html += insert_space(2)
-        html += 'validates :'
-        html += element[:name]
-        html += ', '
-        html += common
-        html += element[:options]
-        html += '<br>'
+            during += make_options(option, japanese)
+          end
+          during += '<br>'
+        end
+        result += before + during + after
+      else  # if content["option_type_#{id}".to_sym].length == 1
+        content[:single] += content["option_type_#{id}".to_sym]
       end
-    elsif array.length >= 2
-      html += insert_space(2)
-      html += 'with_options '
-      html += common
-      html += ' do<br>'
-      array.each do |element|
-        html += insert_space(4)
-        html += 'validates :'
-        html += element[:name]
-        html += element[:options]
-        html += '<br>'
+    end
+
+    # formatを使用していないカラムのバリデーションを記載する。
+    content[:single] += content[:else]
+    content[:single].each do |column|
+      result += "#{insert_space(space)}varidates :#{column.name}"
+      column.options.each do |option|
+        result += make_options(option, japanese)
       end
-      html += insert_space(2)
-      html += 'end<br><br>'
+      result += '<br>'
     end
-
-    html
+    result
   end
 
-  # references型カラム名からbelongs_toの対象を定め、HTMLを作成するメソッド。
-  def make_belong(array, before, activehash)
-    return if array.length == 0
-
+  # アソシエーションに関する記述を作成するメソッド
+  def make_association(contents, columns, model, attached_image)
     html = ''
-    if activehash
-      html += '<br>'
-      html += before
-      html += 'extend ActiveHash::Associations::ActiveRecordExtensions'
-      html += '<br>'
+    space = 2
+    
+    # belongs_toに関する記述を作成する。
+    contents[:references_group].each do |column|
+      html += "#{insert_space(2)}belongs_to :#{column.name}<br>"
     end
-    array.each do |element|
-      html += before
-      html += 'belongs_to :'
-      html += element[:name]
-      html += '<br>'
-    end
-    html
-  end
 
-  # アソシエーションのhas_many/has_oneを作成するメソッド
-  # 中間メソッドの場合に必要な追記も組み込んでいます
-  def make_has(columns, model)
-    html = ''
+    # has_many/has_oneに関する記述を作成する。ここでのcolumnsはアプリに関連する全てのカラムが対象となっている。
     columns.each do |column|
-      # 以下の条件が合った場合にのみ処理を行う。
+      # このモデル名と同じカラム名である -> references型で対象がこのモデル -> 対象モデルではbelongs_toが記載されている。
       next unless column.name == model.name
 
-      html += insert_space(2)
-      html += if model.not_only
-                'has_many :'
-              else
-                'has_one :'
-              end
-      target = column.model
-      html += target.name.tableize
-      html += '<br>'
-      # 中間テーブルの場合、
-      next unless target.model_type_id == 3
+      if model.not_only
+        has ='has_many :'
+      else
+        has = 'has_one :'
+      end
+      target_model = column.model
+      html += "#{insert_space(space)}#{has}#{target_model.name.tableize}, dependent: :destroy<br>"
 
-      target_columns = target.columns.where.not(name: model.name)
-      target_columns.each do |tie|
-        html += insert_space(2)
-        html += 'has_many :'
-        html += tie.name
-        html += ', through: :'
-        html += target.name
-        html += '<br>'
+      # target_modelが中間テーブルの場合、追加処理を行う。
+      next unless target_model.model_type_id == 3
+
+      target_columns = target_model.columns.where.not(name: model.name)
+      target_columns.each do |target_column|
+        html += "#{insert_space(space)}has_many :#{target_column.name}"
+        html += ", through: :#{target_model.name}<br>"
+      end
+    end
+
+    # ImageMagickを使用する場合のアソシエーションを記載
+    html += "#{insert_space(2)}has_one_attached :image<br>" if attached_image
+
+    # ActiveHashに関する記述を作成するメソッド。
+    if contents[:activehash_group].length != 0
+      html += "<br>#{insert_space(2)}# ActiveHash<br>"
+      html += "#{insert_space(2)}extend ActiveHash::Associations::ActiveRecordExtensions<br>"
+      contents[:activehash_group].each do |column|
+        html += "#{insert_space(2)}belongs_to :#{column.name}<br>"
       end
     end
     html
   end
 
-  # 以下はRSpecに関するメソッド
-
-  # カラムを受け取ってexampleのための配列を作成するメソッド
-  def make_group_exist(model, column, abnormal_groups, normal_groups)
-    content = { model: model.name, column: column.name, column_ja: column.name_ja }
-    if [12, 13].include?(column.data_type_id)
-      nil
-    elsif column.must_exist
-      content[:info] = 'が空欄だと登録できない'
-      content[:change] = "''"
-      content[:message_ja] = 'を入力してください'
-      content[:message_en] = "is can't be blank"
-      abnormal_groups << content
-    else
-      normal_groups << content
+  # Formオブジェクトパターンに必要な処理を行うメソッド。追加するハッシュは以下
+  ## contents[:attr_accessor] -> attr_accessorに必要な記述をまとめて格納する。
+  ## contents[:save] -> Formオブジェクトに必要なsaveメソッドに関する記述を格納する。
+  def make_form_object(model, contents)
+    # Formオブジェクトに必要なカラムを全て取得する。
+    target_model_names = []
+    model.columns.each do |column|
+      target_model_names << column.name
     end
+    target_models = Model.where(name: target_model_names)
+    target_columns = Column.where(model_id: target_models).includes(:options)
+
+    # モデルごとにカラムの処理を行う。この時点でattr_accessorのための配列を作成する
+    accessor_names = []
+    contents[:save] = "<br>#{insert_space(2)}def save<br>"
+    target_models.each do |target_model|
+      contents[:save] += "#{insert_space(4)}#{target_model.name} = #{target_model.name.classify}.create("
+      save_first = true
+      target_columns.each do |column|
+        next unless column.model_id == target_model.id
+        
+        # contents[:attr_accessor]に重複して表示しない処理のために、カラム名を専用の配列へ格納する。
+        if ['references', 'ActiveHash'].include?(column.data_type.type)
+          accessor_names << "#{column.name}_id"
+        else
+          accessor_names << column.name
+        end
+
+        # contents[:save]にsaveメソッドに関する記述を作成し格納する。
+        contents[:save] += ', ' unless save_first
+        if target_model_names.include?(column.name)
+          contents[:save] += "#{column.name}_id: #{column.name}.id"
+        elsif ['references', 'ActiveHash'].include?(column.data_type.type)
+          contents[:save] += "#{column.name}_id: #{column.name}_id"
+        else
+          contents[:save] += "#{column.name}: #{column.name}"
+        end
+        save_first = false
+      end
+      contents[:save] += ')<br>'
+    end
+    contents[:save] += "#{insert_space(2)}end<br>"
+
+    # attr_accessorの記述を作成する。
+    contents[:attr_accessor] = "#{insert_space(2)}attr_accessor "
+    accessor_first = true
+    accessor_names.uniq.each do |name|
+      contents[:attr_accessor] += ', ' unless accessor_first
+      contents[:attr_accessor] += ":#{name}"
+      accessor_first = false
+    end
+    contents[:attr_accessor] += '<br><br>'
+
+    target_columns
   end
 
-  # columnのoptionごとにexampleのための配列を作成するメソッド
-  def make_group_options(model, column, abnormal_groups, overlapping_groups)
+  # Formオブジェクトに関連するFactryBotに関する記述を作成するメソッド
+  def add_bot(contents)
+    result = ''
+    names = []
+    contents[:references_group].each do |column|
+      names << column.name
+    end
+    names.uniq.each do |name|
+      result += "#{insert_space(4)}#{name} = FactoryBot.create(:#{name})<br>"
+    end
+    result
+  end
+
+  # RSpec正常系のテストコードを作成するメソッド
+  def make_normal_example(contents, model)
+    result = ''
+    contents[:normal_example_group].each do |column|
+      result += "#{insert_space(6)}it '#{column.name}が空欄でも登録できる' do<br>"
+      result += "#{insert_space(8)}@#{model.name}.#{column.name} = ''<br>"
+      result += "#{insert_space(8)}expect(@#{model.name}).to be_valid<br>"
+      result += "#{insert_space(6)}end<br>"
+    end
+    result
+  end
+
+  # RSpec異常系のテストコードを作成するメソッド
+  def make_abnormal_example(contents, model, japanese)
+    result = ''
+
+    # 空欄禁止とそのオプションに関するテストコード
+    contents[:presence_true].each do |column|
+      base = make_abnormal_example_template(column, model.name, japanese)
+      sample = base.gsub(/条件/, 'が空欄だと登録できない')
+      sample = sample.gsub(/変更点/, "''")
+      if japanese
+        sample = sample.gsub(/メッセージ/, 'を入力してください')
+      else
+        sample = sample.gsub(/メッセージ/, " is can't be blank")
+      end
+      result += sample
+      result += make_option_example(column, model.name, japanese, base)
+    end
+
+    # オプションのみ設定されているカラムのテストコード
+    contents[:presence_false].each do |column|
+      base = make_abnormal_example_template(column, model.name, japanese)
+      result += make_option_example(column, model.name, japanese, base)
+    end
+
+    # references型カラムのテストコード
+    contents[:references_group].each do |column|
+      base = make_abnormal_example_template(column, model.name, japanese)
+      sample = base.gsub(/条件/, 'が紐づけられていないと登録できない')
+      sample = sample.gsub(/変更点/, 'nil')
+      sample = sample.gsub(/メッセージ/, ' must exist')
+      result += sample
+      result += make_option_example(column, model.name, japanese, base)
+    end
+
+    # ActiveHashを選択したカラムのテストコード
+    contents[:activehash_group].each do |column|
+      base = make_abnormal_example_template(column, model.name, japanese)
+      sample = base.gsub(/条件/, 'が未選択だと登録できない')
+      sample = sample.gsub(/変更点/, '0')
+      sample = sample.gsub(/メッセージ/, " can't be blank")
+      result += sample
+    end
+    result
+  end
+
+  # 異常系テストコードの原型を作成するメソッド
+  def make_abnormal_example_template(column, model_name, japanese)
+    if ['references', 'ActiveHash'].include?(column.data_type.type)
+      column_name = "#{column.name}_id"
+    else
+      column_name = column.name
+    end
+    if japanese && column.name_ja != ''
+      display_name = column.name_ja
+    else
+      display_name = column.name.titleize
+    end
+    base = "#{insert_space(6)}it '#{column_name}条件' do<br>"
+    base += "#{insert_space(8)}@#{model_name}.#{column_name} = 変更点<br>"
+    base += "#{insert_space(8)}@#{model_name}.valid?<br>"
+    base += "#{insert_space(8)}expect(@#{model_name}.errors.full_message).to include("
+    base += '"表示名メッセージ")<br>'.sub(/表示名/, display_name)
+    base += "#{insert_space(6)}end<br>"
+    base
+  end
+
+  # カラムの登録内容から必要なテストコードを作成するメソッド
+  ## 対象により必要な内容が微妙に異なるため不採用
+  # def make_column_example(infomation, model_name, japanese)
+  #   result = ''
+  #   infomation[:group].each do |column|
+  #     base = make_abnormal_example_template(column, model_name, japanese)
+  #     sample = base.gsub(/条件/, infomation[:condition])
+  #     sample = sample.gsub(/変更点/, infomation[:change])
+  #     if japanese
+  #       sample = sample.gsub(/メッセージ/, infomation[:message_ja])
+  #     else
+  #       sample = sample.gsub(/メッセージ/, infomation[:message_en])
+  #     end
+  #     result += sample
+  #     result += make_option_example(column, japanese, base)
+  #   end
+  #   result
+  # end
+
+  # そのカラムに登録されているオプションに対応したテストコードを作成する。
+  def make_option_example(column, model_name, japanese, base)
+    result = ''
     column.options.each do |option|
       case option.option_type.type
       when 'format'
         # 数字が含まれる場合に対するexample
         if [11, 12, 13, 15, 16, 17].include?(option.option_type_id)
-          content = group_of_base(model, column, option)
-          content[:info] = 'に数字が含まれていると保存できない'
-          content[:change] = "'12345678'"
-          abnormal_groups << content
+          sample = base.gsub(/条件/, 'に数字が含まれていると保存できない')
+          sample = sample.gsub(/変更点/, "'12345678'")
+          result += sample
         end
         # 英字が含まれる場合に対するexample
         if [11, 12, 13, 14, 20].include?(option.option_type_id)
-          content = group_of_base(model, column, option)
-          content[:info] = 'に英字が含まれていると保存できない'
-          content[:change] = "'abcdEFGH'"
-          abnormal_groups << content
+          sample = base.gsub(/条件/, 'に英字が含まれていると保存できない')
+          sample = sample.gsub(/変更点/, "'abcdEFGH'")
+          result += sample
         end
         # 英字小文字が含まれる場合に対するexample
         if [17].include?(option.option_type_id)
-          content = group_of_base(model, column, option)
-          content[:info] = 'に英字小文字が含まれていると保存できない'
-          content[:change] = "'abcdefgh'"
-          abnormal_groups << content
+          sample = base.gsub(/条件/, 'に英字小文字が含まれていると保存できない')
+          sample = sample.gsub(/変更点/, "'abcdefgh'")
+          result += sample
         end
         # 英字大文字が含まれる場合に対するexample
         if [16].include?(option.option_type_id)
-          content = group_of_base(model, column, option)
-          content[:info] = 'に英字大文字が含まれていると保存できない'
-          content[:change] = "'ABCDEFGH'"
-          abnormal_groups << content
+          sample = base.gsub(/条件/, 'に英字大文字が含まれていると保存できない')
+          sample = sample.gsub(/変更点/, "'ABCDEFGH'")
+          result += sample
         end
         # 漢字が含まれる場合に対するexample
         if [12, 13, 14, 15, 16, 17, 18, 19, 20].include?(option.option_type_id)
-          content = group_of_base(model, column, option)
-          content[:info] = 'に漢字が含まれていると保存できない'
-          content[:change] = "'漢字漢字漢字漢字'"
-          abnormal_groups << content
+          sample = base.gsub(/条件/, 'に漢字が含まれていると保存できない')
+          sample = sample.gsub(/変更点/, "'漢字漢字漢字漢字'")
+          result += sample
         end
         # ひらがなが含まれる場合に対するexample
         if [13, 14, 15, 16, 17, 18, 19, 20].include?(option.option_type_id)
-          content = group_of_base(model, column, option)
-          content[:info] = 'にひらがなが含まれていると保存できない'
-          content[:change] = "'ひらがなひらがな'"
-          abnormal_groups << content
+          sample = base.gsub(/条件/, 'にひらがなが含まれていると保存できない')
+          sample = sample.gsub(/変更点/, "'ひらがなひらがな'")
+          result += sample
         end
         # カタカナが含まれる場合に対するexample
         if [12, 14, 15, 16, 17, 18, 19, 20].include?(option.option_type_id)
-          content = group_of_base(model, column, option)
-          content[:info] = 'にカタカナが含まれていると保存できない'
-          content[:change] = "'カタカナカタカナ'"
-          abnormal_groups << content
+          sample = base.gsub(/条件/, 'にカタカナが含まれていると保存できない')
+          sample = sample.gsub(/変更点/, 'カタカナカタカナ')
+          result += sample
         end
       when 'numericality'
         if [22, 24].include?(option.option_type_id)
-          content = group_of_base(model, column, option)
-          content[:info] = 'が設定した数値より大きいと保存できない'
-          content[:change] = (option.input1 + 1).to_s
-          abnormal_groups << content
+          sample = base.gsub(/条件/, 'が設定した数値より大きいと保存できない')
+          sample = sample.gsub(/変更点/, option.input1 + 1)
+          result += sample
         end
         if [22, 23].include?(option.option_type_id)
-          content = group_of_base(model, column, option)
-          content[:info] = 'が設定した数値より小さいと保存できない'
-          content[:change] = (option.input2 - 1).to_s
-          abnormal_groups << content
+          sample = base.gsub(/条件/, 'が設定した数値より小さいと保存できない')
+          sample = sample.gsub(/変更点/, option.input1 - 1)
+          result += sample
         end
       when 'uniqueness'
-        content = group_of_base(model, column, option)
-        content[:info] = 'の重複があり登録できない'
+        # 重複確認のテストコードではbaseの形が異なるため、専用のbaseを作成する
+        if ['references', 'ActiveHash'].include?(column.data_type.type)
+          column_name = "#{column.name}_id"
+        else
+          column_name = column.name
+        end
+        if japanese && column.name_ja != ''
+          display_name = column.name_ja
+        else
+          display_name = column.name.titleize
+        end
+        sample = "#{insert_space(6)}it '#{column_name}の重複があり登録できない' do<br>"
+        sample += "#{insert_space(8)}@#{model_name}.save<br>"
+        sample += "#{insert_space(8)}another_#{model_name} = FactoryBot.build(:#{model_name}, "
+        sample += "#{column_name}: @#{model_name}.#{column_name}変更点)<br>"
+        sample += "#{insert_space(8)}another_#{model_name}.valid?<br>"
+        sample += "#{insert_space(8)}expect(@#{model_name}.errors.full_message).to include("
+        sample += '"表示名メッセージ")<br>'.sub(/表示名/, display_name)
+        sample += "#{insert_space(6)}end<br>"
         case option.option_type_id
         when 41
-          content[:change] = ''
+          sample = sample.sub(/変更点/, '')
         when 42
-          content[:change] = ", #{option.input1}: @#{model.name}.#{option.input1}"
+          sample = sample.sub(/変更点/, ", #{option.input1}: @#{model_name}.#{option.input1}")
         when 43
-          content[:change] = ", #{option.input1}: @#{model.name}.#{option.input1}"
-          content[:change] += ", #{option.input2}: @#{model.name}.#{option.input2}"
+          change = ", #{option.input1}_id: @#{model_name}.#{option.input1}_id"
+          change += ", #{option.input2}_id: @#{model_name}.#{option.input2}_id"
+          sample = sample.sub(/変更点/, change)
         end
-        overlapping_groups << content
+        result += sample
+      end
+
+      # エラーメッセージの変更 -> オプションごとにエラーメッセージは固定
+      if japanese
+        result = result.gsub(/メッセージ/, option.option_type.message_ja)
+      else
+        result = result.gsub(/メッセージ/, option.option_type.message_en)
       end
     end
-  end
-
-  # make_group_optionsの重複部分をまとめるメソッド
-  def group_of_base(model, column, option)
-    {
-      model: model.name,
-      column: column.name,
-      column_ja: column.name_ja,
-      message_ja: option.option_type.message_ja,
-      message_en: option.option_type.message_en
-    }
-  end
-
-  # RSpecの正常系テストコードを作成するメソッド
-  # ≒空欄でも保存できるか確認するexampleを作成する
-  # 引数を変更している。未編集
-  def make_normal_examples_html(normal_groups)
-    html = ''
-    normal_groups.each do |group|
-      # itの文章を作成する。it~<br>まで
-      html += insert_space(6)
-      html += "it '#{group[:column]}が空欄でも登録できる' do"
-      html += '<br>'
-      html += insert_space(8)
-      html += "@#{group[:model]}.#{group[:column]} = ''"
-      html += '<br>'
-      html += insert_space(8)
-      html += "expect(@#{group[:model]}).to be_valid"
-      html += '<br>'
-      html += insert_space(6)
-      html += 'end'
-      html += '<br>'
-    end
-    html
-  end
-
-  # RSpecの異常系テストコードを作成するメソッド
-  def make_abnormal_example_html(abnormal_groups, japanese)
-    html = ''
-    abnormal_groups.each do |group|
-      html += insert_space(6)
-      html += "it '#{group[:column]}#{group[:info]}' do"
-      html += '<br>'
-      html += insert_space(8)
-      html += "@#{group[:model]}.#{group[:column]} = #{group[:change]}"
-      html += '<br>'
-      html += insert_space(8)
-      html += "@#{group[:model]}.valid?"
-      html += '<br>'
-      html += insert_space(8)
-      html += "expect(@#{group[:model]}.errors.full_messages).to include(" + '"'
-      html += if japanese
-                group[:column_ja].gsub(/_id/, '').gsub(/_/, ' ').capitalize + group[:message_ja]
-              else
-                group[:column].gsub(/_/, ' ').capitalize + group[:message_en]
-              end
-      html += '")<br>'
-      html += "#{insert_space(6)}end<br>"
-    end
-    html
-  end
-
-  # references_groupを基に、紐付けに関するexampleの組み合わせを作成するメソッド
-  def make_group_references(references_group, model, abnormal_groups)
-    references_group.each do |group|
-      content = {}
-      content[:model] = model.name
-      content[:column] = group[:name]
-      content[:column_ja] = group[:name]
-      content[:info] = 'が紐づけられていないと登録できない'
-      content[:change] = 'nil'
-      content[:message_ja] = 'を入力してください'
-      content[:message_en] = ' must exist'
-      abnormal_groups << content
-    end
-  end
-
-  # activehash_groupを基に、必要なexampleを作成する組み合わせを作成するメソッド
-  def make_activehash_example_html(activehash_group, model, abnormal_groups)
-    activehash_group.each do |group|
-      content = {}
-      content[:model] = model.name
-      content[:column] = "#{group[:name]}_id"
-      content[:column_ja] = "#{group[:name]}_id"
-      content[:info] = 'が空欄だと登録できない'
-      content[:change] = "''"
-      content[:message_ja] = " can't be blank"
-      content[:message_en] = " can't be blank"
-      abnormal_groups << content
-
-      content = {}
-      content[:model] = model.name
-      content[:column] = "#{group[:name]}_id"
-      content[:column_ja] = "#{group[:name]}_id"
-      content[:info] = 'が未選択だと登録できない'
-      content[:change] = 0
-      content[:message_ja] = " can't be blank"
-      content[:message_en] = " can't be blank"
-      abnormal_groups << content
-    end
-  end
-
-  # 重複保存禁止に関するexampleのhtmlを作成するメソッド
-  def make_overlapping_example_html(overlapping_groups, japanese)
-    html = ''
-    overlapping_groups.each do |group|
-      html += insert_space(6)
-      html += "it '#{group[:column]}#{group[:info]}' do<br>"
-      html += insert_space(8)
-      html += "@#{group[:model]}.save<br>"
-      html += insert_space(8)
-      html += "another_#{group[:model]} = FactoryBot.build(:#{group[:model]}, #{group[:column]}: @#{group[:model]}.#{group[:column]}#{group[:change]})<br>"
-      html += insert_space(8)
-      html += "another_#{group[:model]}.valid?<br>"
-      html += insert_space(8)
-      html += if japanese
-                "expect(@#{group[:model]}.errors.full_messages).to include('#{group[:column_ja]}#{group[:message_ja]}')"
-              else
-                "expect(@#{group[:model]}.errors.full_messages).to include('#{group[:column]}#{group[:message_en]}')"
-              end
-      html += '<br>'
-      html += insert_space(6)
-      html += 'end'
-      html += '<br>'
-    end
-    html
+    result
   end
 
   # FactoryBotで使用するFaker及びGimeiのHTMLを作成するメソッド
-  def make_factorybot_html(column)
-    return '' if column.data_type_id == 12
+  def make_factorybot_html(contents)
+    result = ''
+    contents[:all_columns].each do |column|
+      next if column.data_type_id == 12
 
-    html = "#{insert_space(4)}#{column.name}"
-    case column.data_type_id
-    when 1 # 'string'
-      if column.options.length != 0
-        done = false
-        column.options.each do |option|
-          case option.option_type.info
-          when '漢字かなカナで登録可'
-            html += ' { Gimei.kanji }'
-            done = true
-          when 'ひらがなのみで登録可'
-            html += ' { Gimei.hiragana }'
-            done = true
-          when 'カタカナのみで登録可'
-            html += ' { Gimei.katakana }'
-            done = true
-          when '郵便番号形式で登録可'
-            html += " { '123-4567'}"
-            done = true
+      result += "#{insert_space(4)}#{column.name}"
+      case column.data_type_id
+      when 1 # 'string'
+        if column.options.length != 0
+          done = false
+          column.options.each do |option|
+            case option.option_type.info
+            when '漢字かなカナで登録可'
+              result += ' { Gimei.kanji }'
+              done = true
+            when 'ひらがなのみで登録可'
+              result += ' { Gimei.hiragana }'
+              done = true
+            when 'カタカナのみで登録可'
+              result += ' { Gimei.katakana }'
+              done = true
+            when '数字のみ限定で登録可'
+              result += " { 12345678 }"
+              done = true
+            when '英字小文字のみ登録可'
+              result += " { 'abcdefgh' }"
+              done = true
+            when '英字大文字のみ登録可'
+              result += " { 'ABCDEFGH }"
+              done = true
+            when '英字数字のみで登録可'
+              result += " { '1234ABcd'}"
+              done = true
+            when '郵便番号形式で登録可'
+              result += " { '123-4567'}"
+              done = true
+            end
           end
+          result += ' { Faker::Lorem.characters(number: 8) }' unless done
+        else
+          result += ' { Faker::Lorem.characters(number: 8) }'
         end
-        html += ' { Faker::Lorem.characters(number: 8) }' unless done
-      else
-        html += ' { Faker::Lorem.characters(number: 8) }'
-      end
-    when 2 # 'text'
-      html += ' { Faker::Lorem.sentence }'
-    when 3 # 'integer'
-      if column.options.length != 0
-        column.options.each do |option|
-          case option.option_type.info
-          when '数値のみで登録する'
-            html += ' { Faker::Number(digits: 8) }'
-          when '上限下限を設定する'
-            html += ' { Faker::Number.within(range: '
-            html += option.input2 unless option.input2.nil?
-            html += '..'
-            html += option.input1 unless option.input1.nil?
-            html += ') }'
-          when '上限のみを設定する'
-            html += ' { Faker::Number.within(range: '
-            html += '0..'
-            html += option.input1 unless option.input1.nil?
-            html += ') }'
-          when '下限のみを設定する'
-            html += ' { Faker::Number.within(range: '
-            html += option.input2 unless option.input2.nil?
-            html += '..10000000'
-            html += ') }'
-          when '未選択状態での禁止'
-            html += ' { Faker::Number.non_zero_digit }'
-          else
-            html += ' { Faker::Number(digits: 8) }'
+      when 2 # 'text'
+        result += ' { Faker::Lorem.sentence }'
+      when 3 # 'integer'
+        if column.options.length != 0
+          column.options.each do |option|
+            case option.option_type.info
+            when '上限下限を設定する'
+              sample = ' { Faker::Number.within(range: 入力2..入力1) }'
+              sample = sample.gsub(/入力2/, option.input2) unless option.input2.nil?
+              sample = sample.gsub(/入力1/, option.input1) unless option.input1.nil?
+              result += sample
+            when '上限のみを設定する'
+              sample = ' { Faker::Number.within(range: 0..入力1) }'
+              sample = sample.gsub(/入力1/, option.input1) unless option.input1.nil?
+              result += sample
+            when '下限のみを設定する'
+              sample = ' { Faker::Number.within(range: 入力2..10000000) }'
+              sample = sample.gsub(/入力2/, option.input2) unless option.input2.nil?
+              result += sample
+            when '未選択状態での禁止'
+              result += ' { Faker::Number.non_zero_digit }'
+            else
+              result += ' { Faker::Number(digits: 8) }'
+            end
           end
+        else
+          result += ' { Faker::Number(digits: 8) }'
         end
-      else
-        html += ' { Faker::Number(digits: 8) }'
+      when 4, 5 # 'decimal', 'float'
+        result += ' { Faker::Number.decimal(l_digits: 3, r_digits: 3) }'
+      when 6 # 'date'
+        result += ' { Faker::Date.between(from: 50.years.ago, to: Date.today) }'
+      when 7 # 'time'
+        result += ' { Faker::Time.between(DateTime.now - 1, DateTime.now).strftime("%H:%M:%S") }'
+      when 8 # 'datetime'
+        result += ' { Faker::Time.between(DateTime.now - 1, DateTime.now) }'
+      when 11 # 'boolean'
+        result += ' { Faker::Boolean.boolean }'
+      when 13 # 'ActiveHash' refarences型はここでは記載不要だがassociationに記載が必要
+        result += '_id { Faker::Number.non_zero_digit }'
       end
-    when 4, 5 # 'decimal', 'float'
-      html += ' { Faker::Number.decimal(l_digits: 3, r_digits: 3) }'
-    when 6 # 'date'
-      html += ' { Faker::Date.between(from: 50.years.ago, to: Date.today) }'
-    when 7 # 'time'
-      html += ' { Faker::Time.between(DateTime.now - 1, DateTime.now).strftime("%H:%M:%S") }'
-    when 8 # 'datetime'
-      html += ' { Faker::Time.between(DateTime.now - 1, DateTime.now) }'
-    when 11 # 'boolean'
-      html += ' { Faker::Boolean.boolean }'
-    when 13 # 'ActiveHash' refarences型はここでは記載不要だがassociationに記載が必要
-      html += '_id { Faker::Number.non_zero_digit }'
+      result += '<br>'
     end
-    html += '<br>'
-    html
+    result
   end
 
   # FactoryBotのアソシエーションを作成するメソッド
-  def make_association_html(groups)
-    html = ''
-    groups.each do |group|
-      html += insert_space(4)
-      html += 'association :'
-      html += group[:name]
-      html += '<br>'
+  def make_association_html(contents)
+    result = ''
+    names = []
+    contents[:references_group].each do |column|
+      names << column.name 
     end
-    html
+    names.uniq.each do |name|
+      result += "#{insert_space(4)}association :#{name}<br>"
+    end
+    result
   end
 
-  # ActiveHashのHTMLを作成するメソッド
-  def make_activehash_html(model, columns)
-    html = "class #{model.name.classify} < ActiveHash::Base<br>"
-    html += "#{insert_space(2)}self.data = [<br>"
-    content = ''
-    6.times do |i|
-      content += "#{insert_space(4)}{ id: #{i}"
-      model.columns.each do |column|
-        content += ", #{column.name}: "
-        content += case i
-                   when 0
-                     "'----'"
-                   when 5
-                     "'最後'"
-                   else
-                     "'内容'"
-                   end
-      end
-      content += if i != 5
-                   ' },<br>'
-                 else
-                   ' }<br>'
-                 end
-    end
-    html += content
-    html += "#{insert_space(2)}]<br>"
-    html += "#{insert_space(2)}include ActiveHash::Associations<br>"
-    html += "#{make_has(columns, model)}end<br>"
-    html
-  end
-
-  # Formオブジェクトパターンに関するHTMLを記載するメソッド
-  def make_formobject_html(model, gemfile)
-    target_models = []
-    all_columns = []
-
+  # ActiveHashにおける要素を作成する専用メソッド
+  def make_activehash_code(model)
+    base = "#{insert_space(4)}{ id: 数値"
     model.columns.each do |column|
-      target_model = Model.includes(columns: :options).find_by(name: column.name)
-      target_models << target_model
+      base += ", #{column.name}: '内容'"
     end
-    target_models.each do |target_model|
-      target_model.columns.each do |column|
-        all_columns << column
-      end
+    base += ' }'
+    result = ''
+    first = true
+    6.times do |i|
+      result +=', <br>' unless first
+      sample = base.gsub(/数値/, i.to_s)
+      sample = sample.gsub(/内容/, "'----'") if i == 0
+      sample = sample.gsub(/内容/, "'最後'") if i == 5
+      result += sample
+      first = false
     end
-
-    validation_html = ''
-    factorybot_html = ''
-    presence_true = []
-    presence_false = []
-    boolean_group = []
-    references_group = []
-    valid_regerences_group = []
-    activehash_group = []
-    normal_groups = []
-    abnormal_groups = []
-    overlapping_groups = []
-
-    # 取得したカラムごとに文章を作成していきます。eachメソッドは一回で済むようにします。
-    all_columns.each do |column|
-      # データ型とmust_existによって、追加先の配列を選択します。
-      content = { name: column.name }
-      # optionの表記が必要なグループを、さらにpresence: trueが必要かで追加先の配列を決めます
-      content[:options] = make_options_html(column, gemfile.rails_i18n)
-      if column.data_type_id <= 10
-        presence_true << content if column.must_exist
-        presence_false << content if !column.must_exist && content[:options] != ''
-      else
-        case column.data_type_id
-        when 11
-          boolean_group << content
-        when 12
-          references_group << content
-          valid_regerences_group << content if content[:options] != ''
-        when 13
-          activehash_group << content
-        end
-      end
-
-      # RSpecのための配列を作成します
-      make_group_exist(model, column, abnormal_groups, normal_groups)
-      make_group_options(model, column, abnormal_groups, overlapping_groups)
-
-      # FactoryBotのためのHTMLを作成します。
-      factorybot_html += make_factorybot_html(column)
-    end
-    # ここまでで作られた配列を基に、RSpecのグループへさらに追加する。
-    make_group_references(references_group, model, abnormal_groups)
-    make_activehash_example_html(activehash_group, model, abnormal_groups)
-    # / ここまでで配列が完成しました。
-
-    # ここから実際のHTMLをmake_validation_htmlメソッドを使用し作成します
-    common = 'presence: true'
-    validation_html += make_validation_html(presence_true, common)
-
-    common = 'inclusion: { in: [true, false] }'
-    validation_html += make_validation_html(boolean_group, common)
-
-    common = 'numericality: { other_than: 0, message: "'
-    common += "can't be blank"
-    common += '"}'
-    validation_html += make_validation_html(activehash_group, common)
-
-    common = ''
-    validation_html += make_validation_html(presence_false, common)
-    validation_html += make_validation_html(valid_regerences_group, common)
-
-    # RSpecのexampleに関するHTMLを作成します
-    normal_example_html = make_normal_examples_html(normal_groups)
-    abnormal_example_html = make_abnormal_example_html(abnormal_groups, gemfile.rails_i18n)
-    abnormal_example_html += make_overlapping_example_html(overlapping_groups, gemfile.rails_i18n)
-
-    # 作成したHTMLをハッシュにしてビューファイルへ返します
-    {
-      validation_html: validation_html,
-      normal_example_html: normal_example_html,
-      abnormal_example_html: abnormal_example_html,
-      factorybot_html: factorybot_html,
-      attr_accessor_html: make_attr_accessor_html(all_columns),
-      save_html: make_save_html(target_models)
-    }
+    result += '<br>'
+    result
   end
 
-  def make_attr_accessor_html(all_columns)
-    html = 'attr_accessor :'
-    count = 0
-    all_columns.each do |column|
-      html += ',' if count != 0
-      html += " :#{column.name}"
-      count += 1
+  # ActiveHashにおけるアソシエーションを作成する専用メソッド
+  def make_activehash_has(columns, model_name)
+    result = ''
+    columns.each do |column|
+      # このモデル名と同じカラム名である -> references型で対象がこのモデル -> 対象モデルではbelongs_toが記載されている。
+      next unless column.name == model_name
+
+      target_model = column.model
+      result += "#{insert_space(2)}has_many :#{target_model.name.tableize}<br>"
     end
-    html
+    result
   end
 
-  def make_save_html(target_models)
-    html = ''
-    target_models.each do |model|
-      count = 0
-      html += insert_space(4)
-      html += "#{model.name.classify}.create("
-      model.columns.each do |column|
-        html += ', ' if count != 0
-        html += if column.data_type_id != 12
-                  "#{column.name}: #{column.name}"
-                else
-                  "#{column.name}_id: #{column.name}_id"
-                end
-        count += 1
-      end
-      html += ')'
-      html += '<br>'
-    end
-    html
-  end
-
-  def make_group_exist_exception(abnormal_groups, references_group)
-    references_group.each do |content|
-      content[:info] = 'が空欄だと登録できない'
-      content[:change] = "''"
-      content[:message_ja] = 'を入力してください'
-      content[:message_en] = "is can't be blank"
-      abnormal_groups << content
-    end
-  end
-end
+end  #/ module

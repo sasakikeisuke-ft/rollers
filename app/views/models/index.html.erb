@@ -7,7 +7,6 @@
     <br>
     <%= link_to '削除', application_model_path(id: model), method: :delete %><br>
     <%= link_to 'コード表示', application_model_path(id: model) %><br>
-    <%= link_to 'リファクタリングのテスト用リンク', application_model_tests_path(model_id: model) %><br>
     
     <%# モデルに対するカラム名を表示。編集画面へのリンクも付属 %>
     <% model.columns.each do |column| %>
