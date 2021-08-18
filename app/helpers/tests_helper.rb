@@ -224,7 +224,7 @@ module TestsHelper
         has = 'has_one :'
       end
       target_model = column.model
-      html += "#{insert_space(space)}#{has}#{target_model.name.tableize}<br>"
+      html += "#{insert_space(space)}#{has}#{target_model.name.tableize}, dependent: :destroy<br>"
 
       # target_modelが中間テーブルの場合、追加処理を行う。
       next unless target_model.model_type_id == 3
@@ -616,6 +616,40 @@ module TestsHelper
     end
     names.uniq.each do |name|
       result += "#{insert_space(4)}association :#{name}<br>"
+    end
+    result
+  end
+
+  # ActiveHashにおける要素を作成する専用メソッド
+  def make_activehash_code(model)
+    base = "#{insert_space(4)}{ id: 数値"
+    model.columns.each do |column|
+      base += ", #{column.name}: '内容'"
+    end
+    base += ' }'
+    result = ''
+    first = true
+    6.times do |i|
+      result +=', <br>' unless first
+      sample = base.gsub(/数値/, i.to_s)
+      sample = sample.gsub(/内容/, "'----'") if i == 0
+      sample = sample.gsub(/内容/, "'最後'") if i == 5
+      result += sample
+      first = false
+    end
+    result += '<br>'
+    result
+  end
+
+  # ActiveHashにおけるアソシエーションを作成する専用メソッド
+  def make_activehash_has(columns, model_name)
+    result = ''
+    columns.each do |column|
+      # このモデル名と同じカラム名である -> references型で対象がこのモデル -> 対象モデルではbelongs_toが記載されている。
+      next unless column.name == model_name
+
+      target_model = column.model
+      result += "#{insert_space(2)}has_many :#{target_model.name.tableize}<br>"
     end
     result
   end

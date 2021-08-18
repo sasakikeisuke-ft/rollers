@@ -278,7 +278,32 @@
   </div>
   <br>
 <% end %>
-
+<%# ActiveHashに関するコード表示 %>
+<% if @model.model_type.name == 'ActiveHash' %>
+  <h1>ActiveHash:<%= @model.name %>の作成</h1>
+  <br>
+  <div>
+    <p>ActiveHash: <%= @model.name %>を作成します。</p>
+    <div class="terminal-field">
+      <p>ターミナル：対象ファイルの作成</p>
+      <p>touch app/models/<%= @model.name %>.rb</p>
+    </div>
+    <div class="terminal-field">
+      <p>ターミナル：対象ファイルへジャンプ</p>
+      <p>code app/models/<%= @model.name %>.rb</p>
+    </div>
+  </div>
+  <br>
+  <div class="code-field">
+    <%== "class #{@model.name.classify} < ActiveHash::Base<br>" %>
+    <%== "#{insert_space(2)}self.data = [<br>" %>
+    <%== make_activehash_code(@model) %>
+    <%== "#{insert_space(2)}include ActiveHash::Associations<br>" %>
+    <%== make_activehash_has(@columns, @model.name) %>
+    end<br>
+  </div>
+  <p>上記の'内容'及び'最後'の部分を編集してください。</p>
+<% end %>
 <% if @gemfile.rubocop %>
   <div class="terminal-field">
     <p>ターミナル：Rubocopの実行</p>
