@@ -37,23 +37,18 @@
 <%# 中間テーブルの場合 %>
 <% elsif @model.model_type_id == 3 %>
   <h2>中間テーブル：<%= @model.name %>の対象モデル設定</h2>
-  <p>
-    中間テーブルの対象となるモデルを再選択します。<br>
-    <%= @column.name %>を別のモデルへ変更します。
-  </p>
+  <h3><%= @column.name %>を別のモデルへ変更します。</h3>
+  <p>中間テーブルの対象となるモデルを再選択してください。</p>
   <%= render partial: "relation_form", locals: {application: @application, model: @model, column: @column} %>
   
 <% else %><%# Formオブジェクトを作成する場合 %>
   <h2>Formオブジェクト：<%= @model.name %>の対象モデル設定</h2>
-  <p>
-    Formオブジェクトパターンの対象モデルを再選択します。<br>
-    <%= @column.name %>を別のモデルへ変更します。
-  </p>
+  <h3><%= @column.name %>を別のモデルへ変更します。</h3>
+  <p>Formオブジェクトの対象となるモデルを再選択してください。</p>
   <%= render partial: "formobject_form", locals: {application: @application, model: @model, column: @column} %>
 
 <% end %>
 
 <br>
 <%= link_to 'モデル新規作成へ', new_application_model_path %><br>
-<%= link_to 'モデル一覧へ', application_models_path %><br>
-<%= link_to 'アプリケーション一覧へ戻る', root_path %>
+<%= render partial: "shared/link_index" %>
