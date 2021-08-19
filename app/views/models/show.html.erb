@@ -15,6 +15,19 @@
       </div>
       <br>
       <div class="code-field">
+  <div class="code-field">
+    <div class="code-tab">
+      <%= image_tag "ruby_icon.png", class: "code-icon", size: "16x16", alt: "Ruby" %>
+      <%= "20XXXX...._create_#{@model.name.tableize}.rb" %>
+      <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "Ruby" %>
+    </div>
+    <div class="code-route">
+      db > migrate > 
+      <%= image_tag "ruby_icon.png", class: "code-icon", size: "12x12", alt: "Ruby" %>
+      <%= "20XXXX...._create_#{@model.name.tableize}.rb" %>
+    </div>
+    <div class="code-contents">
+      <div class="code-right">
         class Create<%= @model.name.pluralize.camelize %> < ActiveRecord::Migration[6.0]<br>
         <%= insert_space(2) %>def change<br>
         <%= insert_space(4) %>create_table :<%= @model.name.tableize %> do |t|<br>
@@ -26,10 +39,18 @@
         end<br>
       </div>
     </div>
-    <div class="terminal-field">
-      <p>ターミナル：マイグレーションの実行</p>
-      <p>rails db:migrate </p>
+  </div>
+
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      <span class="terminal-title">ターミナル：マイグレーションの実行</span>
     </div>
+    <div class="terminal-contents">
+      rails db:migrate
+    </div>
+  </div>
+
 <% elsif @model.model_type.name == 'devise' %>
   <h2><%= @model.name.tableize %>テーブルのマイグレーションファイルの編集</h2>
     <%# ヘルパーメソッドより作成 %>

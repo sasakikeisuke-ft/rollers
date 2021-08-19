@@ -9,3 +9,29 @@
 .left {
   margin: 0 30px 0 0;
 }
+
+// ターミナル操作に関するCSS
+.code-field {
+  color: white;
+  margin-bottom: 40px;
+}
+
+.code-tab {
+  background-color: #2A2A2A;
+  padding: 10px 10px 5px 10px;
+  display: inline-block;
+}
+
+.code-route {
+  background-color: #2A2A2A;
+  width: 700px;
+  padding: 5px 20px 5px 5px;
+  border-bottom: black solid 2px;
+}
+
+.code-contents {
+  background-color: #2A2A2A;
+  width: 700px;
+  padding: 5px 5px 5px 20px;
+  display: flex;
+}
