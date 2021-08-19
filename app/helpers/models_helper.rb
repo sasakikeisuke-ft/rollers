@@ -1,5 +1,4 @@
 module ModelsHelper
-
   # マイグレーションファイルに追記する項目に関する記述を作成するメソッド
   def make_migration_appending(model)
     result = ''
@@ -15,7 +14,7 @@ module ModelsHelper
         result += ', null: false' if column.must_exist
         result += ', unique: true' if column.unique
       end
-      result += '<br>'  
+      result += '<br>'
     end
     result
   end
@@ -35,18 +34,18 @@ module ModelsHelper
   def make_model_array(model, gemfile)
     contents = make_model_array_template
     contents[:japanese] = gemfile.rails_i18n
-    
-    if model.model_type.name != 'Formオブジェクト'
-      target_columns = model.columns
-    else  # Formオブジェクトの場合、特別な処理により、対象としているモデルのカラムが全てを取得する
-      target_columns = make_form_object(model, contents)
-    end
+
+    target_columns = if model.model_type.name != 'Formオブジェクト'
+                       model.columns
+                     else # Formオブジェクトの場合、特別な処理により、対象としているモデルのカラムが全てを取得する
+                       make_form_object(model, contents)
+                     end
 
     # 取得したカラムを配列へと振り分けていく。
     target_columns.each do |column|
       if column.data_type_id <= 10
         if column.must_exist
-          contents[:presence_true] << column 
+          contents[:presence_true] << column
         elsif column.options.length != 0
           contents[:presence_false] << column
           contents[:normal_example_group] << column
@@ -72,7 +71,7 @@ module ModelsHelper
 
   # contentsのハッシュに紐づけられた空の配列を作成するメソッド。make_model_arrayの事前準備として使用する。
   def make_model_array_template
-    categorcies = %W[
+    categorcies = %w[
       presence_true presence_false
       boolean_group references_group activehash_group
       normal_example_group all_columns
@@ -86,23 +85,23 @@ module ModelsHelper
 
   # モデルファイルのバリデーションに関する記載を作成するメソッド
   def make_varidation(contents, japanese)
-    html = ''
+    result = ''
     space = 2
     after = "#{insert_space(space)}end<br>"
 
     # 空欄禁止を設定されたものから処理を行う。
     option = 'presence: true'
-    html += use_with_option?(contents[:presence_true], space, japanese, option)
+    result += use_with_option?(contents[:presence_true], space, japanese, option)
 
     # 空欄を禁止せずoptionのみ設定されたgroupの処理を行う。
-    html += make_with_options(contents[:presence_false], space, japanese)
+    result += make_with_options(contents[:presence_false], space, japanese)
 
     # boolean型のグループに関するvaridationを記載する。
     option = 'inclusion:{in: [true, false]}'
-    html += use_with_option?(contents[:boolean_group], space, japanese, option)
-    
+    result += use_with_option?(contents[:boolean_group], space, japanese, option)
+
     # 最終的なHTMLを返却する
-    html
+    result
   end
 
   # with_optionを使用するかどうかを判断し、必要に応じてメソッドを使用するメソッド
@@ -120,25 +119,24 @@ module ModelsHelper
       html += '<br>'
     end
     html
-  end 
+  end
 
   # optionに関する記載を行うメソッド。そのカラムのオプションのみ追加していく。
   def make_options(option, japanese)
     code = option.option_type.code
     code = code.gsub(/入力1/, option.input1) unless option.input1 == ''
     code = code.gsub(/入力2/, option.input2) unless option.input2 == ''
-    if japanese
-      code = code.gsub(/エラーメッセージ/, option.option_type.message_ja)
-    else
-      code = code.gsub(/エラーメッセージ/, option.option_type.message_en)
-    end
-    code = ", #{code}"
-    code
+    code = if japanese
+             code.gsub(/エラーメッセージ/, option.option_type.message_ja)
+           else
+             code.gsub(/エラーメッセージ/, option.option_type.message_en)
+           end
+    ", #{code}"
   end
 
   def make_with_options(group, space, japanese)
     result = ''
-    content = {else: [], single: []}
+    content = { else: [], single: [] }
     grouping_ids = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25]
     # 引数となるcontents[:presence_true]とcontents[:presence_false]をグループ化できるoptionごとに再分配。
     # ただし、通常と異なる登録方法を行うActiveHashについては、option_type_id: 25として扱う。
@@ -147,14 +145,14 @@ module ModelsHelper
         added = false
         column.options.each do |option|
           next unless grouping_ids.include?(option.option_type_id)
-  
+
           id = option.option_type_id
           content["option_type_#{id}".to_sym] = [] if content["option_type_#{id}".to_sym].nil?
           content["option_type_#{id}".to_sym] << column
           added = true
         end
-        content[:else] << column unless added  
-      else  # column.data_type.type == 'ActiveHash'
+        content[:else] << column unless added
+      else # column.data_type.type == 'ActiveHash'
         content[:option_type_25] = [] if content[:option_type_25].nil?
         content[:option_type_25] << column
       end
@@ -163,14 +161,14 @@ module ModelsHelper
     # 分配した配列をもとにバリデーションを作成する。
     grouping_ids.each do |id|
       next if content["option_type_#{id}".to_sym].nil?
-      
+
       if content["option_type_#{id}".to_sym].length >= 2
         option_type = OptionType.find(id)
-        if japanese
-          code = option_type.code.gsub(/エラーメッセージ/, option_type.message_ja)
-        else
-          code = option_type.code.gsub(/エラーメッセージ/, option_type.message_en)
-        end
+        code = if japanese
+                 option_type.code.gsub(/エラーメッセージ/, option_type.message_ja)
+               else
+                 option_type.code.gsub(/エラーメッセージ/, option_type.message_en)
+               end
         before = "#{insert_space(space)}with_options #{code} do<br>"
         after = "#{insert_space(space)}end<br>"
         during = ''
@@ -186,7 +184,7 @@ module ModelsHelper
           during += '<br>'
         end
         result += before + during + after
-      else  # if content["option_type_#{id}".to_sym].length == 1
+      else # if content["option_type_#{id}".to_sym].length == 1
         content[:single] += content["option_type_#{id}".to_sym]
       end
     end
@@ -207,7 +205,7 @@ module ModelsHelper
   def make_association(contents, columns, model, attached_image)
     html = ''
     space = 2
-    
+
     # belongs_toに関する記述を作成する。
     contents[:references_group].each do |column|
       html += "#{insert_space(2)}belongs_to :#{column.name}<br>"
@@ -218,11 +216,11 @@ module ModelsHelper
       # このモデル名と同じカラム名である -> references型で対象がこのモデル -> 対象モデルではbelongs_toが記載されている。
       next unless column.name == model.name
 
-      if model.not_only
-        has ='has_many :'
-      else
-        has = 'has_one :'
-      end
+      has = if model.not_only
+              'has_many :'
+            else
+              'has_one :'
+            end
       target_model = column.model
       html += "#{insert_space(space)}#{has}#{target_model.name.tableize}, dependent: :destroy<br>"
 
@@ -270,23 +268,23 @@ module ModelsHelper
       save_first = true
       target_columns.each do |column|
         next unless column.model_id == target_model.id
-        
+
         # contents[:attr_accessor]に重複して表示しない処理のために、カラム名を専用の配列へ格納する。
-        if ['references', 'ActiveHash'].include?(column.data_type.type)
-          accessor_names << "#{column.name}_id"
-        else
-          accessor_names << column.name
-        end
+        accessor_names << if %w[references ActiveHash].include?(column.data_type.type)
+                            "#{column.name}_id"
+                          else
+                            column.name
+                          end
 
         # contents[:save]にsaveメソッドに関する記述を作成し格納する。
         contents[:save] += ', ' unless save_first
-        if target_model_names.include?(column.name)
-          contents[:save] += "#{column.name}_id: #{column.name}.id"
-        elsif ['references', 'ActiveHash'].include?(column.data_type.type)
-          contents[:save] += "#{column.name}_id: #{column.name}_id"
-        else
-          contents[:save] += "#{column.name}: #{column.name}"
-        end
+        contents[:save] += if target_model_names.include?(column.name)
+                             "#{column.name}_id: #{column.name}.id"
+                           elsif %w[references ActiveHash].include?(column.data_type.type)
+                             "#{column.name}_id: #{column.name}_id"
+                           else
+                             "#{column.name}: #{column.name}"
+                           end
         save_first = false
       end
       contents[:save] += ')<br>'
@@ -340,11 +338,11 @@ module ModelsHelper
       base = make_abnormal_example_template(column, model.name, japanese)
       sample = base.gsub(/条件/, 'が空欄だと登録できない')
       sample = sample.gsub(/変更点/, "''")
-      if japanese
-        sample = sample.gsub(/メッセージ/, 'を入力してください')
-      else
-        sample = sample.gsub(/メッセージ/, " is can't be blank")
-      end
+      sample = if japanese
+                 sample.gsub(/メッセージ/, 'を入力してください')
+               else
+                 sample.gsub(/メッセージ/, " is can't be blank")
+               end
       result += sample
       result += make_option_example(column, model.name, japanese, base)
     end
@@ -378,16 +376,16 @@ module ModelsHelper
 
   # 異常系テストコードの原型を作成するメソッド
   def make_abnormal_example_template(column, model_name, japanese)
-    if ['references', 'ActiveHash'].include?(column.data_type.type)
-      column_name = "#{column.name}_id"
-    else
-      column_name = column.name
-    end
-    if japanese && column.name_ja != ''
-      display_name = column.name_ja
-    else
-      display_name = column.name.titleize
-    end
+    column_name = if %w[references ActiveHash].include?(column.data_type.type)
+                    "#{column.name}_id"
+                  else
+                    column.name
+                  end
+    display_name = if japanese && column.name_ja != ''
+                     column.name_ja
+                   else
+                     column.name.titleize
+                   end
     base = "#{insert_space(6)}it '#{column_name}条件' do<br>"
     base += "#{insert_space(8)}@#{model_name}.#{column_name} = 変更点<br>"
     base += "#{insert_space(8)}@#{model_name}.valid?<br>"
@@ -477,16 +475,16 @@ module ModelsHelper
         end
       when 'uniqueness'
         # 重複確認のテストコードではbaseの形が異なるため、専用のbaseを作成する
-        if ['references', 'ActiveHash'].include?(column.data_type.type)
-          column_name = "#{column.name}_id"
-        else
-          column_name = column.name
-        end
-        if japanese && column.name_ja != ''
-          display_name = column.name_ja
-        else
-          display_name = column.name.titleize
-        end
+        column_name = if %w[references ActiveHash].include?(column.data_type.type)
+                        "#{column.name}_id"
+                      else
+                        column.name
+                      end
+        display_name = if japanese && column.name_ja != ''
+                         column.name_ja
+                       else
+                         column.name.titleize
+                       end
         sample = "#{insert_space(6)}it '#{column_name}の重複があり登録できない' do<br>"
         sample += "#{insert_space(8)}@#{model_name}.save<br>"
         sample += "#{insert_space(8)}another_#{model_name} = FactoryBot.build(:#{model_name}, "
@@ -509,11 +507,11 @@ module ModelsHelper
       end
 
       # エラーメッセージの変更 -> オプションごとにエラーメッセージは固定
-      if japanese
-        result = result.gsub(/メッセージ/, option.option_type.message_ja)
-      else
-        result = result.gsub(/メッセージ/, option.option_type.message_en)
-      end
+      result = if japanese
+                 result.gsub(/メッセージ/, option.option_type.message_ja)
+               else
+                 result.gsub(/メッセージ/, option.option_type.message_en)
+               end
     end
     result
   end
@@ -541,7 +539,7 @@ module ModelsHelper
               result += ' { Gimei.katakana }'
               done = true
             when '数字のみ限定で登録可'
-              result += " { 12345678 }"
+              result += ' { 12345678 }'
               done = true
             when '英字小文字のみ登録可'
               result += " { 'abcdefgh' }"
@@ -612,7 +610,7 @@ module ModelsHelper
     result = ''
     names = []
     contents[:references_group].each do |column|
-      names << column.name 
+      names << column.name
     end
     names.uniq.each do |name|
       result += "#{insert_space(4)}association :#{name}<br>"
@@ -630,7 +628,7 @@ module ModelsHelper
     result = ''
     first = true
     6.times do |i|
-      result +=', <br>' unless first
+      result += ', <br>' unless first
       sample = base.gsub(/数値/, i.to_s)
       sample = sample.gsub(/内容/, "'----'") if i == 0
       sample = sample.gsub(/内容/, "'最後'") if i == 5
@@ -653,5 +651,4 @@ module ModelsHelper
     end
     result
   end
-
-end  #/ module
+end

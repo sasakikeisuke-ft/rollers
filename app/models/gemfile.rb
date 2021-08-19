@@ -1,5 +1,5 @@
 class Gemfile < ApplicationRecord
-  with_options inclusion:{in: [true, false]} do
+  with_options inclusion: { in: [true, false] } do
     validates :devise
     validates :pry_rails
     validates :image_magick

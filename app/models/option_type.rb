@@ -29,7 +29,7 @@ class OptionType < ActiveHash::Base
       message_ja: 'は入力が範囲外です。', message_en: ' is out of setting range' },
     { id: 24, type: 'numericality', info: '下限のみを設定する', code: 'numericality: { greater_than_or_equal_to: 入力1, message: エラーメッセージ }',
       message_ja: 'は入力が範囲外です。', message_en: ' is out of setting range' },
-    { id: 25, type: 'numericality', info: '未選択状態での禁止', code: 'numericality: { other_than: 0, message: エラーメッセージ }', 
+    { id: 25, type: 'numericality', info: '未選択状態での禁止', code: 'numericality: { other_than: 0, message: エラーメッセージ }',
       message_ja: 'を選択してください', message_en: "can't be blank" },
 
     # {id: 31, type: 'length', info: '上限下限を設定する', code: ', length: { in: ',      message_ja: '',          message_en: 'is invalid.'},
@@ -39,9 +39,9 @@ class OptionType < ActiveHash::Base
 
     { id: 41, type: 'uniqueness', info: '当テーブル内での重複禁止', code: 'uniqueness: { case_sensitive: false }',
       message_ja: 'はすでに存在します', message_en: ' has already been taken' },
-    { id: 42, type: 'uniqueness', info: '対象モデル内での重複禁止', code: 'uniqueness: { case_sensitive: false, scope: :入力1_id }', 
+    { id: 42, type: 'uniqueness', info: '対象モデル内での重複禁止', code: 'uniqueness: { case_sensitive: false, scope: :入力1_id }',
       message_ja: 'はすでに存在します', message_en: ' has already been taken' },
-    { id: 43, type: 'uniqueness', info: '複数のモデルでの重複禁止', code: 'uniqueness: { case_sensitive: false, scope: [:入力1_id, 入力2_id] }', 
+    { id: 43, type: 'uniqueness', info: '複数のモデルでの重複禁止', code: 'uniqueness: { case_sensitive: false, scope: [:入力1_id, 入力2_id] }',
       message_ja: 'はすでに存在します', message_en: ' has already been taken' }
   ]
   include ActiveHash::Associations
