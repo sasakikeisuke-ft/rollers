@@ -4,17 +4,27 @@
 <% if @model.model_type.name == '通常モデル' || @model.model_type.name == '中間テーブル' %>
   <h2><%= @model.name.tableize %>テーブルのマイグレーションファイルの編集</h2>
 
-    <div class="migration_file">
-      <div class="terminal-field">
-        <p>ターミナル：関連ファイルの作成</p>
-        <p>rails g model <%= @model.name %></p>
-      </div>
-      <div class="terminal-field">
-        <p>ターミナル：対象ファイルへジャンプ</p>
-        <p>20XXXX...._devise_create_<%= @model.name %> -> command + クリック</p>
-      </div>
-      <br>
-      <div class="code-field">
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      <span class="terminal-title">ターミナル：関連ファイルの作成</span>
+    </div>
+    <div class="terminal-contents">
+      rails g model <%= @model.name %>
+    </div>
+  </div>
+
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      <span class="terminal-title">ターミナル：対象ファイルへジャンプ</span>
+    </div>
+    <div class="terminal-contents">
+      create db/migrate/20XXXX...._create_<%= @model.name %>.rb<br>
+      上記ファイル -> command + クリック
+    </div>
+  </div>
+
   <div class="code-field">
     <div class="code-tab">
       <%= image_tag "ruby_icon.png", class: "code-icon", size: "16x16", alt: "Ruby" %>

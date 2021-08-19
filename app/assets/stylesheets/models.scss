@@ -11,6 +11,43 @@
 }
 
 // ターミナル操作に関するCSS
+.terminal-field {
+  width: 500px;
+  margin-bottom: 40px;
+}
+
+.terminal-header {
+  background-color: #EAE8F2;
+  border: #A9A9A9 solid 1px;
+  border-radius: 10px 10px 0 0;
+}
+
+.terminal-field span {
+  font-size: 15px;
+  margin-left: 5px;
+}
+
+.close {
+  color:  #ff3333;
+}
+
+.minimum {
+  color: #F7AD2E;
+}
+
+.fullscreen {
+  color: #33cc00;
+}
+
+.terminal-contents {
+  background-color: white;
+  border: #A9A9A9 solid 1px;
+  border-radius: 0 0 10px 10px;
+  padding: 5px 5px 30px 5px;
+}
+
+
+// コード表示機能に関するCSS
 .code-field {
   color: white;
   margin-bottom: 40px;
