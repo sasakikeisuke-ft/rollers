@@ -12,7 +12,7 @@
 
 // ターミナル操作に関するCSS
 .terminal-field {
-  width: 500px;
+  width: 700px;
   margin-bottom: 40px;
 }
 
@@ -20,6 +20,7 @@
   background-color: #EAE8F2;
   border: #A9A9A9 solid 1px;
   border-radius: 10px 10px 0 0;
+  display: flex;
 }
 
 .terminal-field span {
@@ -37,6 +38,10 @@
 
 .fullscreen {
   color: #33cc00;
+}
+
+.terminal-title {
+  margin-left: 100px;
 }
 
 .terminal-contents {
@@ -70,5 +75,9 @@
   background-color: #2A2A2A;
   width: 700px;
   padding: 5px 5px 5px 20px;
-  display: flex;
+}
+
+.links {
+  color: aqua;
+  text-decoration: none;
 }

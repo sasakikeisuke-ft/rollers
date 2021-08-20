@@ -1,9 +1,20 @@
 <% contents = make_controller_array(@app_actions) %>
 <div class="code-field">
-  class <%= @app_controller.name.pluralize.camelize %>Controller < ApplicationController<br>
-  <%== before_action_authenticate_user(@app_controller) %>
-  <%== make_before_action_model_form_variable(contents) %>
-  <%== make_before_action_get_common_variable(contents) %>
+  <div class="code-tab">
+    <%= image_tag "ruby_icon.png", class: "code-icon", size: "16x16", alt: "Ruby" %>
+    <%= "20XXXX...._create_#{@app_controller.name.tableize}.rb" %>
+    <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "Ruby" %>
+  </div>
+  <div class="code-route">
+    db > migrate > 
+    <%= image_tag "ruby_icon.png", class: "code-icon", size: "12x12", alt: "Ruby" %>
+    <%= "20XXXX...._create_#{@app_controller.name.tableize}.rb" %>
+  </div>
+  <div class="code-contents">
+    class <%= @app_controller.name.pluralize.camelize %>Controller < ApplicationController<br>
+    <%== before_action_authenticate_user(@app_controller) %>
+    <%== make_before_action_model_form_variable(contents) %>
+    <%== make_before_action_get_common_variable(contents) %>
     <br>
 
     <%# 基本の７つのアクションに関する記載を行う。 %>
@@ -20,8 +31,8 @@
           <%== content[:before] %>
           <%== content[:main] %>
           <% if links %>
-            <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action) %>
-            <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete %>
+            <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action), class: "links" %>
+            <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete, class: "links" %>
           <% end %>
           <br>
           <%# レイアウトを使用する場合、create/updateのためmodel_form_variableの内容に合わせて挿入が必要。 %>
@@ -61,8 +72,8 @@
           <%== content[:before] %>
           <%== content[:main] %>
           <% if links %>
-            <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action) %>
-            <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete %>
+            <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action), class: "links" %>
+            <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete, class: "links" %>
           <% end %>
           <br>
           <%== content[:after] %>
@@ -72,8 +83,8 @@
           <%== "#{insert_space(2)}＜#{action}を適応しているアクション＞<br>" %>
           <% contents["#{action}_targets".to_sym].each do |target| %>
             <%== "#{insert_space(4)}#{target.action_select}" %>
-            <%= link_to '編集', edit_application_app_controller_app_action_path(id: target) %>
-            <%= link_to '削除', application_app_controller_app_action_path(id: target), method: :delete %>
+            <%= link_to '編集', edit_application_app_controller_app_action_path(id: target), class: "links" %>
+            <%= link_to '削除', application_app_controller_app_action_path(id: target), method: :delete, class: "links" %>
             <br>
           <% end %>
         <% end %><br>
@@ -99,15 +110,14 @@
           <%== content[:before] %>
           <%== content[:main] %>
           <% if links %>
-            <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action) %>
-            <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete %>
+            <%= link_to '編集', edit_application_app_controller_app_action_path(id: app_action), class: "links" %>
+            <%= link_to '削除', application_app_controller_app_action_path(id: app_action), method: :delete, class: "links" %>
             <br>
           <% end %>
         <% end %>
       <% end %>
       <%== "#{insert_space(2)}end<br><br>" %>
     <% end %>
-    
+  end
   </div>
-  end<br>
 </div>
