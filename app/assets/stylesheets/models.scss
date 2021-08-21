@@ -9,3 +9,83 @@
 .left {
   margin: 0 30px 0 0;
 }
+
+// ターミナル操作に関するCSS
+.terminal-field {
+  width: 700px;
+  margin-bottom: 40px;
+}
+
+.terminal-header {
+  background-color: #EAE8F2;
+  border: #A9A9A9 solid 1px;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+}
+
+.terminal-field span {
+  font-size: 15px;
+  margin-left: 5px;
+}
+
+.close {
+  color:  #ff3333;
+}
+
+.minimum {
+  color: #F7AD2E;
+}
+
+.fullscreen {
+  color: #33cc00;
+}
+
+.terminal-title {
+  margin-left: 100px;
+}
+
+.terminal-contents {
+  background-color: white;
+  border: #A9A9A9 solid 1px;
+  border-radius: 0 0 10px 10px;
+  padding: 5px 5px 30px 5px;
+}
+
+
+// コード表示機能に関するCSS
+.code-field {
+  color: white;
+  margin-bottom: 40px;
+}
+
+.code-tab {
+  background-color: #2A2A2A;
+  padding: 10px 10px 5px 10px;
+  display: inline-block;
+}
+
+.code-route {
+  background-color: #2A2A2A;
+  width: 700px;
+  padding: 5px 20px 5px 5px;
+  border-bottom: black solid 2px;
+}
+
+.code-contents {
+  background-color: #2A2A2A;
+  width: 700px;
+  padding: 5px 5px 5px 20px;
+}
+
+.links {
+  color: aqua;
+  text-decoration: none;
+}
+
+.comment-out {
+  color: #387948;
+}
+
+.changes {
+  color: red;
+}

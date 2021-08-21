@@ -1,16 +1,30 @@
 <h2><%= @app_controller.name.tableize %>コントローラーの作成と編集</h2>
 
-<p><%= @app_controller.name.tableize %>コントローラーを作成します。</p>
-
-<h2><%= @app_controller.name.tableize %>コントローラー関連ファイルの作成</h2>
-
 <div class="terminal-field">
-  <p>ターミナル：関連ファイルの作成</p>
-  <p>rails g controller <%= @app_controller.name.tableize %></p>
+  <div class="terminal-header">
+    <div class="terminal-icons">
+      <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+    </div>
+    <div class="terminal-title">
+      ターミナル：関連ファイルの作成
+    </div>
+  </div>
+  <div class="terminal-contents">
+    rails g controller <%= @app_controller.name.tableize %>
+  </div>
 </div>
 <div class="terminal-field">
-  <p>ターミナル：対象ファイルへジャンプ</p>
-  <p>app/controllers/<%= @app_controller.name.tableize %>_controller.rb -> command + クリック</p>
+  <div class="terminal-header">
+    <div class="terminal-icons">
+      <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+    </div>
+    <div class="terminal-title">
+      ターミナル：対象ファイルへジャンプ
+    </div>
+  </div>
+  <div class="terminal-contents">
+    code app/controllers/<%= @app_controller.name.tableize %>_controller.rb<br>
+  </div>
 </div>
 
 <h2><%= @app_controller.name.tableize %>コントローラーの編集</h2>
@@ -21,12 +35,18 @@
 <br>
 <% if @gemfile.rubocop %>
   <div class="terminal-field">
-    <p>ターミナル：Rubocopの実行</p>
-    <p>bundle exec rubocop -a </p>
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：Rubocopの実行
+      </div>
+    </div>
+    <div class="terminal-contents">
+      bundle exec rubocop -a
+    </div>
   </div>
 <% end %>
-<div>
-<%= link_to 'コントローラー一覧へ', application_app_controllers_path %><br>
-<%= link_to 'アプリケーション詳細へ戻る', application_path(params[:application_id]) %><br>
-<%= link_to 'トップページへ戻る', root_path %>
-</div>
+
+<%= render partial: "shared/link_index" %>

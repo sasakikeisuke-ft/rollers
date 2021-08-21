@@ -2,6 +2,7 @@ class GemfilesController < ApplicationController
   before_action :find_gemfile, only: [:index, :edit, :update]
 
   def index
+    @application = Application.find(params[:application_id])
   end
 
   def new

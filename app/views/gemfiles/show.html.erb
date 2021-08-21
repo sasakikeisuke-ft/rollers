@@ -1,141 +1,224 @@
 
 <%# READMEのDB設計に関するコード %>
-
 <div class="read_me">
-
   <h1>README</h1>
   <h2><%= @application.name  %></h2>
   <p>READMEに関するの記載内容です。</p>
-  <p>念の為、ご自身でも記載内容を確認するようお願いします。</p>
-  また、現在の仕様では枠がずれているように見えますが、
-  ペーストすれとちょうど良い位置になるように調整されています
-  <br><br>
-  <%= link_to 'アプリケーション詳細ページへ戻る', application_path(@application) %><br>
+  <div>
+    念の為、ご自身でも記載内容を確認するようお願いします。<br>
+    また、現在の仕様では枠がずれているように見えますが、<br>
+    ペーストすれとちょうど良い位置になるように調整されています。
+  </div>
+  <br>
+  <%= link_to 'アプリケーション詳細ページへ戻る', application_path(@application) %><br><br>
 
+  <h2><%= @application.name %> READMEの編集</h2>
+
+  <%# ターミナル操作 %>
   <div class="terminal-field">
-    <p>ターミナル<p>
-    <p>code README.md</p>
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：対象ファイルへのジャンプ
+      </div>
+    </div>
+    <div class="terminal-contents">
+      code README.md
+    </div>
   </div>
 
-  <p>コード内容</p>
+  <%# コード表示%>
   <div class="code-field">
-    # README<br>
-    <br>
-    # テーブル設計<br>
-    <br>
+    <div class="code-tab">
+      <%= image_tag "info_icon.png", class: "code-icon", size: "16x16", alt: "info_icon" %>
+      README.md
+      <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+    </div>
+    <div class="code-route">
+      <%= image_tag "info_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+      README.md
+    </div>
+    <div class="code-contents">
+      # README<br>
+      <br>
+      # テーブル設計<br>
+      <br>
 
-    <%# モデルごとのテーブル表記。対象は通常モデルのみ %>
-    <% @models.each do |model| %>
-      
-      <% if [1, 3, 5].include?(model.model_type_id) %>
-        <%# 最も長いカラム名の文字数＝longestを決定する%>
-        <% longest = the_longest(model) %>
+      <%# モデルごとのテーブル表記。対象は通常モデルのみ %>
+      <% @models.each do |model| %>
         
-        # <%= model.name.pluralize %>テーブル<br>
-        <br>
-        <%# マークダウン方式の表のタイトルと間仕切りを作成 %>
-        | column<%= insert_space(longest - 6) %> | Type<%= insert_space(6) %>  | Options<%= insert_space(18) %> |<br>
-        | <%= insert_bar(longest) %> | ---------- | ------------------------- |<br>
-
-        <%# 各カラムの名前とデータ型とオプションの項目 %>
-        <% model.columns.each do |column| %>
-
-          <%# カラムがActiveHash関連ならば_idを付属するよう場合分け %>
-          <% if column.data_type_id != 13 %>
-            | <%= column.name %><%= insert_space(longest - column.name.length) %> 
-            | <%= column.data_type.type %><%= insert_space(column.data_type.space) %>
-          <% else %>
-            | <%= column.name %>_id<%= insert_space(longest - column.name.length - 3) %> 
-            | integer<%= insert_space(3) %>
-          <% end %> |
+        <% if [1, 3, 5].include?(model.model_type_id) %>
+          <%# 最も長いカラム名の文字数＝longestを決定する%>
+          <% longest = the_longest(model) %>
           
-          <%# カラムのデータ型により、オプションを場合分け %>
-          <% if column.data_type_id == 12 %>
-            foreign_key: true <%= insert_space(7) %>
-          <% elsif column.must_exist && column.unique %>
-            null: false, unique: true
-          <% elsif column.must_exist %>
-            null: false <%= insert_space(13) %>
-          <% elsif column.unique %>
-            unique: true <%= insert_space(12) %>
-          <% else %>
-            <%= insert_space(25) %>
-          <% end %> |<br>
-        <% end %>
+          # <%= model.name.pluralize %>テーブル<br>
+          <br>
+          <%# マークダウン方式の表のタイトルと間仕切りを作成 %>
+          | column<%= insert_space(longest - 6) %> | Type<%= insert_space(6) %>  | Options<%= insert_space(18) %> |<br>
+          | <%= insert_bar(longest) %> | ---------- | ------------------------- |<br>
 
-        <%# Deviseのモデルにはemailとpasswwordを最後に記載 %>
-        <% if model.model_type_id == 5 %>
-          | email <%= insert_space(12) %> | string <%= insert_space(3) %> | null: false, unique: true |<br>
-          | encrypted_password | string <%= insert_space(3) %> | null: false <%= insert_space(13) %> |<br>
-        <% end %><br>
+          <%# 各カラムの名前とデータ型とオプションの項目 %>
+          <% model.columns.each do |column| %>
 
-        <%#/テーブル表記 %>
-
-        
-        # Association<br>
-        <br>
-
-        <%# referencesの対象=belongs_toの対象のため、抽出し記載 %>
-        <% model.columns.each do |column| %>
-          <% if column.data_type_id == 12 %>
-            - belongs_to :<%= column.name %><br>
+            <%# カラムがActiveHash関連ならば_idを付属するよう場合分け %>
+            <% if column.data_type_id != 13 %>
+              | <%= column.name %><%= insert_space(longest - column.name.length) %> 
+              | <%= column.data_type.type %><%= insert_space(column.data_type.space) %>
+            <% else %>
+              | <%= column.name %>_id<%= insert_space(longest - column.name.length - 3) %> 
+              | integer<%= insert_space(3) %>
+            <% end %> |
+            
+            <%# カラムのデータ型により、オプションを場合分け %>
+            <% if column.data_type_id == 12 %>
+              foreign_key: true <%= insert_space(7) %>
+            <% elsif column.must_exist && column.unique %>
+              null: false, unique: true
+            <% elsif column.must_exist %>
+              null: false <%= insert_space(13) %>
+            <% elsif column.unique %>
+              unique: true <%= insert_space(12) %>
+            <% else %>
+              <%= insert_space(25) %>
+            <% end %> |<br>
           <% end %>
-        <% end %>
 
-        <%# has_many/oneの記述を行う。%>
-        <%# 当モデルと同名のカラムを持つ=アソシエーションを組んでいるモデルを探し出す %>
-        <%# ただし、AvtiveHashは書かないため除外する。 %>
-        <% @columns.each do |column| %>
-          <% if column.name == model.name  && column.data_type_id != 13 && model.not_only %>
-            - has_many :<%= column.model.name %><br>
-          <% elsif column.name == model.name && column.data_type_id !=13 %>
-            - has_one :<%= column.model.name %><br>
+          <%# Deviseのモデルにはemailとpasswwordを最後に記載 %>
+          <% if model.model_type_id == 5 %>
+            | email <%= insert_space(12) %> | string <%= insert_space(3) %> | null: false, unique: true |<br>
+            | encrypted_password | string <%= insert_space(3) %> | null: false <%= insert_space(13) %> |<br>
+          <% end %><br>
+
+          <%#/テーブル表記 %>
+
+          
+          # Association<br>
+          <br>
+
+          <%# referencesの対象=belongs_toの対象のため、抽出し記載 %>
+          <% model.columns.each do |column| %>
+            <% if column.data_type_id == 12 %>
+              - belongs_to :<%= column.name %><br>
+            <% end %>
           <% end %>
+
+          <%# has_many/oneの記述を行う。%>
+          <%# 当モデルと同名のカラムを持つ=アソシエーションを組んでいるモデルを探し出す %>
+          <%# ただし、AvtiveHashは書かないため除外する。 %>
+          <% @columns.each do |column| %>
+            <% if column.name == model.name  && column.data_type_id != 13 && model.not_only %>
+              - has_many :<%= column.model.name %><br>
+            <% elsif column.name == model.name && column.data_type_id !=13 %>
+              - has_one :<%= column.model.name %><br>
+            <% end %>
+          <% end %>
+          <br>
         <% end %>
-        <br>
       <% end %>
-    <% end %>
+    </div>
   </div>
 </div> <%# /read_me %>
 
 <%# ルーティングに関するHTML %>
 <div class="rooting">
+  <h2><%= @application.name %> ルーティングの編集</h2>
+
+  <%# ターミナル操作 %>
   <div class="terminal-field">
-    <p>ターミナル：対象ファイルへのジャンプ</p>
-    <p>code config/routes.rb</p>
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：対象ファイルへのジャンプ
+      </div>
+    </div>
+    <div class="terminal-contents">
+      code config/routes.rb
+    </div>
   </div>
+
+  <%# コード表示 %>
   <div class="code-field">
-    Rails.application.routes.draw do
-    <%== "<br>#{insert_space(2)}devise_for :#{@devise.name}" if @gemfile.rails_i18n %>
-    <%== make_rooting_html(@app_controllers) %><br>
-    end
+    <div class="code-tab">
+      <%= image_tag "ruby_icon.png", class: "code-icon", size: "16x16", alt: "info_icon" %>
+      routes.rb
+      <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+    </div>
+    <div class="code-route">
+      config > 
+      <%= image_tag "ruby_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+      config.rb
+    </div>
+    <div class="code-contents">
+      Rails.application.routes.draw do
+      <%== "<br>#{insert_space(2)}devise_for :#{@devise.name}" if @gemfile.rails_i18n %>
+      <%== make_rooting_html(@app_controllers) %><br>
+      end
+    </div>
   </div>
 </div>
 
-<div class="japanese">
-  <div class="terminal-field">
-    <p>ターミナル：対象ファイルの作成</p>
-    <p>touch config/locales/ja.yml</p>
-  </div>
-  <div class="terminal-field">
-    <p>ターミナル：対象ファイルへのジャンプ</p>
-    <p>code config/locales/ja.yml</p>
-  </div>
-  <div class="code-field">
-  ja:<br>
-  <%== insert_space(2) %>activerecord:<br>
-  <%== insert_space(4) %>attributes:<br>
+<%# 日本語化ファイルの設定 %>
+<% if @gemfile.rails_i18n %>
+  <div class="japanese">
+    <h2><%= @application.name %> 日本語化ファイルの編集</h2>
 
-  <%# ヘルパーメソッドを使用し、各モデルごとに必要なHTMLを作成 %>
-  <%== make_japanise_html(@models) %>
+    <p>各モデル用の日本語化ファイル</p>
+    <%# ターミナル操作 %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：対象ファイルの作成
+        </div>
+      </div>
+      <div class="terminal-contents">
+        touch config/locales/ja.yml
+      </div>
+    </div>
+    <%# ターミナル操作 %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：対象ファイルの作成
+        </div>
+      </div>
+      <div class="terminal-contents">
+        code config/locales/ja.yml
+      </div>
+    </div>
+
+    <%# コード表示 %>
+    <div class="code-field">
+      <div class="code-tab">
+        <%= image_tag "yml_icon.png", class: "code-icon", size: "16x16", alt: "info_icon" %>
+        ja.yml
+        <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+      </div>
+      <div class="code-route">
+        config > locales
+        <%= image_tag "yml_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+        ja.yml
+      </div>
+      <div class="code-contents">
+        ja:<br>
+        <%== insert_space(2) %>activerecord:<br>
+        <%== insert_space(4) %>attributes:<br>
+
+        <%# ヘルパーメソッドを使用し、各モデルごとに必要なHTMLを作成 %>
+        <%== make_japanise_html(@models) %>
+      </div>
+    </div>
+
   </div>
-</div>
+<% end %>
 
-<%= link_to 'モデル一覧へ', application_models_path %><br>
-<%= link_to 'アプリケーション詳細ページへ戻る', application_path %><br>
-<%= link_to 'トップページに戻る', root_path %>
-
-<%# README実装における現在の課題 %>
-<%# 中間テーブルの表示はどのように行うか %>
-<%# 中間テーブル自体は問題なく表示される。references型によるbelongs_toで %>
-<%# 問題はhas_many :model名, through :中間model名 ここをどう表示するか %>
+<%= render partial: "shared/link_index" %>

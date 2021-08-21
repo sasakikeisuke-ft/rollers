@@ -27,6 +27,8 @@ module GemfilesHelper
   def make_japanise_html(models)
     html = ''
     models.each do |model|
+      next if model.model_type.name == 'Formオブジェクト'
+
       html += "#{insert_space(6)}#{model.name}:"
       html += '<br>'
       model.columns.each do |column|

@@ -1,17 +1,597 @@
-<div>
-記載するべきコード一覧
-まだ未実装
-事前準備に関するコードを記載していきたい。
-</div>
-<div>
-<p>check true表示で@gemfileは取得できている</p>
-<p><%= @gemfile.devise %></p>
-</div>
+<h1>事前準備</h1>
+<p>
+  アプリケーション雛形の作成を作成します。<br>
+  ターミナルを起動し、作成するディレクトリへ移動してから操作を可視してください。
+</p>
+<div class="set-up">
+  <%# ターミナル操作: アプリケーションの雛形の作成 %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：アプリケーションの雛形の作成
+      </div>
+    </div>
+    <div class="terminal-contents">
+      rails _6.0.0_ new <%= @application.name %> -d mysql  
+    </div>
+  </div>
 
-<div>
-コード
-div class="terminal-field"
-div class="code-field"
+  <%# ターミナル操作: VScodeの起動 %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：VScodeの起動
+      </div>
+    </div>
+    <div class="terminal-contents">
+      code <%== @application.name %>
+    </div>
+  </div>
 
-で分類
-</div>
+  <%# ターミナル操作: 対象ファイルへのジャンプ %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：対象ファイルへのジャンプ
+      </div>
+    </div>
+    <div class="terminal-contents">
+      code -g config/database.yml:14:20
+    </div>
+  </div>
+  <%# コード表示%>
+  <div class="code-field">
+    <div class="code-tab">
+      <%= image_tag "yml_icon.png", class: "code-icon", size: "16x16", alt: "info_icon" %>
+      config/database.yml
+      <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+    </div>
+    <div class="code-route">
+      config >
+      <%= image_tag "yml_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+      database.yml
+    </div>
+    <div class="code-contents">
+      encoding: utf8mb4 を変更<br>
+      #=> encoding: utf8
+    </div>
+  </div>
+  <%# ターミナル操作: データベースの作成 %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：データベースの作成
+      </div>
+    </div>
+    <div class="terminal-contents">
+      rails db:create
+    </div>
+  </div>
+  
+  <%# Gemfileの記載 %>
+  <p>Gemfile記載と導入</p>
+  <%# コード表示%>
+  <div class="code-field">
+    <div class="code-tab">
+      <%= image_tag "bar_icon.png", class: "code-icon", size: "16x16", alt: "info_icon" %>
+      Gemfile
+      <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+    </div>
+    <div class="code-route">
+      <%= image_tag "bar_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+      Gemfile
+    </div>
+    <div class="code-contents">
+      source 'https://rubygems.org'<br>
+      git_source(:github) { |repo| "https://github.com/#{repo}.git" }<br>
+      <br>
+      ruby '2.6.5'
+      <br>
+      <span class="comment-out"># Bundle edge Rails instead: gem 'rails', github: 'rails/rails'</span><br>
+      gem 'rails', '~> 6.0.0'<br>
+      <span class="comment-out"># Use mysql as the database for Active Record</span><br>
+      gem 'mysql2', '>= 0.4.4'<br>
+      <span class="comment-out"># Use Puma as the app server</span><br>
+      gem 'puma', '~> 3.11'<br>
+      <span class="comment-out"># Use SCSS for stylesheets</span><br>
+      gem 'sass-rails', '~> 5'<br>
+      <span class="comment-out"># Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker</span><br>
+      gem 'webpacker', '~> 4.0'<br>
+      <span class="comment-out"># Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks</span><br>
+      gem 'turbolinks', '~> 5'<br>
+      <span class="comment-out"># Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder</span><br>
+      gem 'jbuilder', '~> 2.7'<br>
+      <span class="comment-out"># Use Redis adapter to run Action Cable in production</span><br>
+      <span class="comment-out"># gem 'redis', '~> 4.0'</span><br>
+      <span class="comment-out"># Use Active Model has_secure_password</span><br>
+      <span class="comment-out"># gem 'bcrypt', '~> 3.1.7'</span><br>
+      <br>
+      <span class="comment-out"># Use Active Storage variant</span><br>
+      <span class="comment-out"># gem 'image_processing', '~> 1.2'</span><br>
+      <br>
+      <span class="comment-out"># Reduces boot times through caching; required in config/boot.rb</span><br>
+      gem 'bootsnap', '>= 1.4.2', require: false<br>
+      <br>
+      group :development, :test do
+      <%== insert_space(2) %><span class="comment-out"># Call 'byebug' anywhere in the code to stop execution and get a debugger console</span><br>
+      <%== insert_space(2) %>gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]<br>
+      <% if @gemfile.rspec %>
+        <%== insert_space(2) %>gem 'rspec-rails', '~> 4.0.0'<br>
+        <%== insert_space(2) %>gem 'factory_bot_rails'<br>
+        <%== insert_space(2) %>gem 'faker'<br>
+        <%== insert_space(2) %>gem 'gimei'<br>
+      <% end %>
+      <%== "#{insert_space(2)}gem 'payjp'" if @gemfile.payjp %>
+      end<br>
+      <br>
+      group :development do<br>
+      <%== insert_space(2) %><span class="comment-out"># Access an interactive console on exception pages or by calling 'console' anywhere in the code.</span><br>
+      <%== insert_space(2) %>gem 'web-console', '>= 3.3.0'<br>
+      <%== insert_space(2) %>gem 'listen', '>= 3.0.5', '< 3.2'<br>
+      <%== insert_space(2) %><span class="comment-out"># Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring</span><br>
+      <%== insert_space(2) %>gem 'spring'<br>
+      <%== insert_space(2) %>gem 'spring-watcher-listen', '~> 2.0.0'<br>
+      <%== "#{insert_space(2)}gem 'rubocop', require: false<br>" if @gemfile.rubocop %>
+      end<br>
+      <br>
+      group :test do<br>
+      <%== insert_space(2) %><span class="comment-out"># Adds support for Capybara system testing and selenium driver</span><br>
+      <%== insert_space(2) %>gem 'capybara', '>= 2.15'<br>
+      <%== insert_space(2) %>gem 'selenium-webdriver'<br>
+      <%== insert_space(2) %><span class="comment-out"># Easy installation and use of web drivers to run system tests with browsers<br></span><br>
+      <%== insert_space(2) %>gem 'webdrivers'<br>
+      end<br>
+      <br>
+      <span class="comment-out"># Windows does not include zoneinfo files, so bundle the tzinfo-data gem</span><br>
+      gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]<br>
+      <br>
+      <%== "gem 'devise'<br>" if @gemfile.devise %>
+      <%== "gem 'pry-rails'<br>" if @gemfile.pry_rails %>
+      <% if @gemfile.image_magick %>
+        gem 'mini_magick'<br>
+        gem 'image_processing', '~> 1.2'<br>
+      <% end %>
+      <%== "gem 'active_hash'<br>" if @gemfile.active_hash %>
+      <%== "gem 'rails-i18n'<br>" if @gemfile.rails_i18n %>
+      <%== "gem 'ransack'<br>" if @gemfile.ransack %>
+      <%== 'gem "aws-sdk-s3", require: false<br>' if @gemfile.s3 %>
+    </div>
+  </div>
+  <%# ターミナル操作: Gemの導入 %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：Gemの導入
+      </div>
+    </div>
+    <div class="terminal-contents">
+      bundle install
+    </div>
+  </div>
+  <% if @gemfile.image_magick %>
+    <p>ImageMagickの導入</p>
+    <%# ターミナル操作: ImageMagickの導入 %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：ImageMagickの導入
+        </div>
+      </div>
+      <div class="terminal-contents">
+        rails active_storage:install
+      </div>
+    </div>
+    <%# ターミナル操作: マイグレートの実行 %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：マイグレートの実行
+        </div>
+      </div>
+      <div class="terminal-contents">
+        rails db:migrate
+      </div>
+    </div>
+  <% end %>
+
+  <%# 日本語化ファイルの導入 %>
+  <% if @gemfile.rails_i18n %>
+    <p>日本語化ファイル適応準備</p>
+    <%# ターミナル操作: 対象ファイルへのジャンプ %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：対象ファイルへのジャンプ
+        </div>
+      </div>
+      <div class="terminal-contents">
+        code -g config/application.rb:13
+      </div>
+    </div>
+    <%# コード表示: 日本語化導入 %>
+    <div class="code-field">
+      <div class="code-tab">
+        <%= image_tag "ruby_icon.png", class: "code-icon", size: "16x16", alt: "info_icon" %>
+        application.rb
+        <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+      </div>
+      <div class="code-route">
+        config > 
+        <%= image_tag "ruby_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+        application.rb
+      </div>
+      <div class="code-contents">
+        require_relative 'boot'<br>
+        <br>
+        require 'rails/all'<br>
+        <br>
+        <span class="comment-out"># Require the gems listed in Gemfile, including any gems<br></span>
+        <span class="comment-out"># you've limited to :test, :development, or :production.<br></span>
+        Bundler.require(*Rails.groups)<br>
+        <br>
+        module Rollers<br>
+        <%== insert_space(2) %>class Application < Rails::Application<br>
+        <%== insert_space(4) %><span class="comment-out"># Initialize configuration defaults for originally generated Rails version.<br></span>
+        <%== insert_space(4) %>config.load_defaults 6.0<br>
+        <%== insert_space(4) %>config.i18n.default_locale = :ja<br>
+        <%== insert_space(4) %>config.time_zone = 'Tokyo'<br>
+        <%== insert_space(4) %><span class="comment-out"># Settings in config/environments/* take precedence over those specified here.<br></span>
+        <%== insert_space(4) %><span class="comment-out"># Application configuration can go into files in config/initializers<br></span>
+        <%== insert_space(4) %><span class="comment-out"># -- all .rb files in that directory are automatically loaded after loading<br></span>
+        <%== insert_space(4) %><span class="comment-out"># the framework and any gems in your application.<br></span>
+        <%== insert_space(2) %>end<br>
+        end<br>
+      </div>
+    </div>
+  <% end %>
+  <% if @gemfile.devise && @gemfile.rails_i18n %>
+    <p>Devise用の日本語化ファイル作成</p>
+    <%# ターミナル操作: 対象ファイルの作成 %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：対象ファイルの作成
+        </div>
+      </div>
+      <div class="terminal-contents">
+        touch config/locales/devise.en.yml
+      </div>
+    </div>
+    <%# ターミナル操作: 対象ファイルへのジャンプ %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：対象ファイルへのジャンプ
+        </div>
+      </div>
+      <div class="terminal-contents">
+        code config/locales/devise.en.yml
+      </div>
+    </div>
+    <%# コード表示: devise.en.yml %>
+    <div class="code-field">
+      <div class="code-tab">
+        <%= image_tag "yml_icon.png", class: "code-icon", size: "16x16", alt: "info_icon" %>
+        devise.en.yml
+        <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+      </div>
+      <div class="code-route">
+        config > locales
+        <%= image_tag "yml_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+        devise.en.yml
+      </div>
+      <div class="code-contents">
+        以下のサイトのコードを貼り付けてください<br>
+        <%= link_to 'devise用の日本語化コード', "https://github.com/tigrish/devise-i18n/blob/master/rails/locales/ja.yml", class: "links" %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Rubocop導入のための記載 %>
+  <% if @gemfile.rubocop %>
+    <%# ターミナル操作: 対象ファイルの作成 %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：対象ファイルの作成
+        </div>
+      </div>
+      <div class="terminal-contents">
+        touch .rubocop.yml
+      </div>
+    </div>
+    <%# ターミナル操作: 対象ファイルへのジャンプ %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：対象ファイルへのジャンプ
+        </div>
+      </div>
+      <div class="terminal-contents">
+        code .rubocop.yml
+      </div>
+    </div>
+    <%# コード表示: .rubocop.yml %>
+    <div class="code-field">
+      <div class="code-tab">
+        <%= image_tag "yml_icon.png", class: "code-icon", size: "16x16", alt: "info_icon" %>
+        .rubocop.yml
+        <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+      </div>
+      <div class="code-route">
+        <%= image_tag "yml_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+        .rubocop.yml
+      </div>
+      <div class="code-contents">
+        AllCops:<br>
+        <span class="comment-out"># 除外するディレクトリ（自動生成されたファイル）<br></span>
+        <span class="comment-out"># デフォルト設定にある"vendor/**/*"が無効化されないように記述<br></span>
+        <%== insert_space(1) %>Exclude:<br>
+        <%== insert_space(3) %>- "vendor/**/*" # rubocop config/default.yml<br>
+        <%== insert_space(3) %>- "db/**/*"<br>
+        <%== insert_space(3) %>- "config/**/*"<br>
+        <%== insert_space(3) %>- "bin/*"<br>
+        <%== insert_space(3) %>- "node_modules/**/*"<br>
+        <%== insert_space(3) %>- "Gemfile"<br>
+        <br>
+        <br>
+        <span class="comment-out"># 1行あたりの文字数をチェックする<br></span>
+        Layout/LineLength:<br>
+        <%== insert_space(1) %>Max: 130<br>
+        <span class="comment-out"># 下記ファイルはチェックの対象から外す<br></span>
+        <%== insert_space(1) %>Exclude:<br>
+        <%== insert_space(3) %>- "Rakefile"<br>
+        <%== insert_space(3) %>- "spec/rails_helper.rb"<br>
+        <%== insert_space(3) %>- "spec/spec_helper.rb"<br>
+        <br>
+        <span class="comment-out"># RSpecは1つのブロックあたりの行数が多くなるため、チェックの除外から外す<br></span>
+        <span class="comment-out"># ブロック内の行数をチェックする<br></span>
+        Metrics/BlockLength:<br>
+        <%== insert_space(1) %>Exclude:<br>
+        <%== insert_space(3) %>- "spec/**/*"<br>
+        <br>
+        <span class="comment-out"># Assignment: 変数への代入<br></span>
+        <span class="comment-out"># Branch: メソッド呼び出し<br></span>
+        <span class="comment-out"># Condition: 条件文<br></span>
+        <span class="comment-out"># 上記項目をRubocopが計算して基準値を超えると警告を出す（上記頭文字をとって'Abc'）<br></span>
+        Metrics/AbcSize:<br>
+        <%== insert_space(1) %>Max: 50<br>
+        <br>
+        <span class="comment-out"># メソッドの中身が複雑になっていないか、Rubocopが計算して基準値を超えると警告を出す<br></span>
+        Metrics/PerceivedComplexity:<br>
+        <%== insert_space(1) %>Max: 8<br>
+        <br>
+        <span class="comment-out"># 循環的複雑度が高すぎないかをチェック（ifやforなどを1メソッド内で使いすぎている）<br></span>
+        Metrics/CyclomaticComplexity:<br>
+        <%== insert_space(1) %>Max: 10<br>
+        <br>
+        <span class="comment-out"># メソッドの行数が多すぎないかをチェック<br></span>
+        Metrics/MethodLength:<br>
+        <%== insert_space(1) %>Max: 30<br>
+        <br>
+        <span class="comment-out"># ネストが深すぎないかをチェック（if文のネストもチェック）<br></span>
+        Metrics/BlockNesting:<br>
+        <%== insert_space(1) %>Max: 5<br>
+        <br>
+        <span class="comment-out"># クラスの行数をチェック（無効）<br></span>
+        Metrics/ClassLength:<br>
+        <%== insert_space(1) %>Enabled: false<br>
+        <br>
+        <span class="comment-out"># 空メソッドの場合に、1行のスタイルにしない NG例：def style1; end<br></span>
+        Style/EmptyMethod:<br>
+        <%== insert_space(1) %>EnforcedStyle: expanded<br>
+        <br>
+        <span class="comment-out"># クラス内にクラスが定義されていないかチェック（無効）<br></span>
+        Style/ClassAndModuleChildren:<br>
+        <%== insert_space(1) %>Enabled: false<br>
+        <br>
+        <span class="comment-out"># 日本語でのコメントを許可<br></span>
+        Style/AsciiComments:<br>
+        <%== insert_space(1) %>Enabled: false<br>
+        <br>
+        <span class="comment-out"># クラスやモジュール定義前に、それらの説明書きがあるかをチェック（無効）<br></span>
+        Style/Documentation:<br>
+        <%== insert_space(1) %>Enabled: false<br>
+        <br>
+        <span class="comment-out"># ％i（）構文を使用していないシンボルで構成される配列リテラルをチェック（無効）<br></span>
+        Style/SymbolArray:<br>
+        <%== insert_space(1) %>Enabled: false<br>
+        <br>
+        <span class="comment-out"># 文字列に値が代入されて変わっていないかチェック（無効）<br></span>
+        Style/FrozenStringLiteralComment:<br>
+        <%== insert_space(1) %>Enabled: false<br>
+        <br>
+        <span class="comment-out"># メソッドパラメータ名の最小文字数を設定<br></span>
+        Naming/MethodParameterName:<br>
+        <%== insert_space(1) %>MinNameLength: 1<br>
+      </div>
+    </div>
+  <% end %>
+</div><%#/set-up  %>
+
+<%= render partial: "shared/link_index" %>
+
+<p>＜以下おまけの未実装部分＞</p>
+
+<p>Herokuへのデプロイに関する操作</p>
+<p>
+  Herokuへのデプロイの準びを行います。<br>
+  また、stackはHeroku-18、データベースはmySQLを使用することを想定しています。<br>
+  操作の際にはアプリケーションのディレクトリで行ってください。<br>
+  Herokuを使用しない場合、アプリケーション詳細ページへ戻り続きを行なってください。
+</p>
+  <%# ターミナル操作: Herokuへのログイン %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：Herokuへのログイン
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku login --interactive<br>
+      -> Email: <%= current_user.email %><br>
+      -> Password: 大文字小文字記号を含む8文字以上
+    </div>
+  </div>
+  <%# ターミナル操作: Herokuにアプリケーション雛形を作成 %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：Herokuにアプリケーション雛形を作成
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku create <%= @application.name %>
+    </div>
+  </div>
+  <p>
+    すでに同名のアプリケーションが登録されていた場合、<br>
+    <%= link_to 'ここから', edit_application_path(@application) %>
+    アプリケーション名を変更してください。
+
+  </p>
+  <%# ターミナル操作: mySWLの適応 %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：mySQLの適応
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku addons:add cleardb<br>
+      heroku_cleardb=`heroku config:get CLEARDB_DATABASE_URL`<br>
+      heroku config:set DATABASE_URL=mysql2${heroku_cleardb:5}<br>
+      ※ 1行ずつ処理を行なってください。
+    </div>
+  </div>
+
+  <%# ターミナル操作: 環境変数の適応 %>
+  <p>
+    環境変数をHerokuに設定します。<br>
+    環境変数はすでに設定されているものとして記述しています。
+  </p>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：環境変数の適応
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku config:set RAILS_MASTER_KEY=`cat config/master.key`<br>
+      heroku config:set BASIC_AUTH_USER="<span class="changes">Basic認証のID</span>"<br>
+      heroku config:set BASIC_AUTH_PASSWORD="<span class="changes">Basic認証のパスワード</span>"<br>
+      ※ 1行ずつ処理を行なってください。<br>
+      ※ 上記の<span class="changes">赤文字</span>を適切なものへ変更してください。
+    </div>
+  </div>
+
+  <%# ターミナル操作: stackの設定 %>
+  <p>
+    stackをHeroku-18へ変更します。<br>
+    不要な場合は次の処理を行なってください。
+  </p>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：stackの設定
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku stack:set heroku-18 -a <%= @application.name %>
+    </div>
+  </div>
+
+  <%# ターミナル操作: アップロード %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：アップロード
+      </div>
+    </div>
+    <div class="terminal-contents">
+      git push heroku master
+    </div>
+  </div>
+
+  <p>
+    以上でアップロードが完了しました。<br>
+    <%= link_to 'Herokuのアプリケーションへのリンク', "https://#{@application.name}.herokuapp.com/" %><br>
+    <%= link_to "https://#{@application.name}.herokuapp.com/", "https://#{@application.name}.herokuapp.com/" %>
+  </p>
+  <%# ターミナル操作: アップロード状況の確認 %>
+  <p>稼働状況を確認したい場合、以下の処理を行なってください。</p>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku apps:info
+    </div>
+  </div>
+
+  <p>
+    以上でアプリケーション雛形のデプロイは終了しました。<br>
+    現在はまだトップページは見れない状態です。<br>
+    引き続き実装を進めてください。
+  </p>
+
+<%= render partial: "shared/link_index" %>
