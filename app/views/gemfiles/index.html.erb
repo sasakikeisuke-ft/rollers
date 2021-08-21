@@ -510,10 +510,29 @@
     </div>
   </div>
 
+  <%# ターミナル操作: 環境変数の確認 %>
+  <p>
+    Herokuに登録されている環境変数を確認します。<br>
+    未登録の場合、確認が不要の場合は次の処理を行なってください。
+  </p>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：Herokuの環境変数の確認
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku config
+    </div>
+  </div>
+
   <%# ターミナル操作: 環境変数の適応 %>
   <p>
     環境変数をHerokuに設定します。<br>
-    環境変数はすでに設定されているものとして記述しています。
+    環境変数はすでに設定されている場合、以下の処理は不要です。
   </p>
   <div class="terminal-field">
     <div class="terminal-header">
@@ -552,6 +571,7 @@
     </div>
   </div>
 
+  <p>Herokuのアップロード</p>
   <%# ターミナル操作: アップロード %>
   <div class="terminal-field">
     <div class="terminal-header">
