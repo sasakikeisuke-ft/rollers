@@ -52,6 +52,35 @@
     </div>
   </div>
   <br>
+  <h3>Herokuへのデプロイ</h3>
+  <p>Herokuへデプロイを行う場合、以下の操作をしてください。</p>
+  <%# ターミナル操作: アップロード %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：アップロード
+      </div>
+    </div>
+    <div class="terminal-contents">
+      git push heroku master
+    </div>
+  </div>
+  <%# ターミナル操作: アップロード %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：Herokuのマイグレート
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku run rails db:migrate
+    </div>
   </div>
 </div>
 
