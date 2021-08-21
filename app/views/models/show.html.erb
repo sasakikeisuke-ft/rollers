@@ -173,7 +173,7 @@
         <%= insert_space(2) %>devise :database_authenticatable, :registerable,<br>
         <%= insert_space(9) %>:recoverable, :rememberable, :validatable<br>
         <br>
-        <%= insert_space(2) %># パスワードを英数字混合に制限します。不要であれば削除してください。<br>
+        <%= insert_space(2) %><span class="comment-out"># パスワードを英数字混合に制限します。不要であれば削除してください。</span><br>
         <%= insert_space(2) %>PASSWORD_REGEX = /\A(?=.*?[a-z])(?=.*?\d)[a-z\d]+\z/i.freeze<br>
         <%= insert_space(2) %>validates_format_of :password, with: PASSWORD_REGEX, message: 
         <%= "'は英字と数字の両方を含む必要があります'" if @gemfile.rails_i18n %>

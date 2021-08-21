@@ -1,7 +1,10 @@
 <h1>事前準備</h1>
-<p>アプリケーション雛形の作成</p>
+<p>
+  アプリケーション雛形の作成を作成します。<br>
+  ターミナルを起動し、作成するディレクトリへ移動してから操作を可視してください。
+</p>
 <div class="set-up">
-  <%# ターミナル操作 %>
+  <%# ターミナル操作: アプリケーションの雛形の作成 %>
   <div class="terminal-field">
     <div class="terminal-header">
       <div class="terminal-icons">
@@ -15,7 +18,23 @@
       rails _6.0.0_ new <%= @application.name %> -d mysql  
     </div>
   </div>
-  <%# ターミナル操作 %>
+
+  <%# ターミナル操作: VScodeの起動 %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：VScodeの起動
+      </div>
+    </div>
+    <div class="terminal-contents">
+      code <%== @application.name %>
+    </div>
+  </div>
+
+  <%# ターミナル操作: 対象ファイルへのジャンプ %>
   <div class="terminal-field">
     <div class="terminal-header">
       <div class="terminal-icons">
@@ -425,5 +444,154 @@
     </div>
   <% end %>
 </div><%#/set-up  %>
+
+<%= render partial: "shared/link_index" %>
+
+<p>＜以下おまけの未実装部分＞</p>
+
+<p>Herokuへのデプロイに関する操作</p>
+<p>
+  Herokuへのデプロイの準びを行います。<br>
+  また、stackはHeroku-18、データベースはmySQLを使用することを想定しています。<br>
+  操作の際にはアプリケーションのディレクトリで行ってください。<br>
+  Herokuを使用しない場合、アプリケーション詳細ページへ戻り続きを行なってください。
+</p>
+  <%# ターミナル操作: Herokuへのログイン %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：Herokuへのログイン
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku login --interactive<br>
+      -> Email: <%= current_user.email %><br>
+      -> Password: 大文字小文字記号を含む8文字以上
+    </div>
+  </div>
+  <%# ターミナル操作: Herokuにアプリケーション雛形を作成 %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：Herokuにアプリケーション雛形を作成
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku create <%= @application.name %>
+    </div>
+  </div>
+  <p>
+    すでに同名のアプリケーションが登録されていた場合、<br>
+    <%= link_to 'ここから', edit_application_path(@application) %>
+    アプリケーション名を変更してください。
+
+  </p>
+  <%# ターミナル操作: mySWLの適応 %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：mySQLの適応
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku addons:add cleardb<br>
+      heroku_cleardb=`heroku config:get CLEARDB_DATABASE_URL`<br>
+      heroku config:set DATABASE_URL=mysql2${heroku_cleardb:5}<br>
+      ※ 1行ずつ処理を行なってください。
+    </div>
+  </div>
+
+  <%# ターミナル操作: 環境変数の適応 %>
+  <p>
+    環境変数をHerokuに設定します。<br>
+    環境変数はすでに設定されているものとして記述しています。
+  </p>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：環境変数の適応
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku config:set RAILS_MASTER_KEY=`cat config/master.key`<br>
+      heroku config:set BASIC_AUTH_USER="<span class="changes">Basic認証のID</span>"<br>
+      heroku config:set BASIC_AUTH_PASSWORD="<span class="changes">Basic認証のパスワード</span>"<br>
+      ※ 1行ずつ処理を行なってください。<br>
+      ※ 上記の<span class="changes">赤文字</span>を適切なものへ変更してください。
+    </div>
+  </div>
+
+  <%# ターミナル操作: stackの設定 %>
+  <p>
+    stackをHeroku-18へ変更します。<br>
+    不要な場合は次の処理を行なってください。
+  </p>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：stackの設定
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku stack:set heroku-18 -a <%= @application.name %>
+    </div>
+  </div>
+
+  <%# ターミナル操作: アップロード %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：アップロード
+      </div>
+    </div>
+    <div class="terminal-contents">
+      git push heroku master
+    </div>
+  </div>
+
+  <p>
+    以上でアップロードが完了しました。<br>
+    <%= link_to 'Herokuのアプリケーションへのリンク', "https://#{@application.name}.herokuapp.com/" %><br>
+    <%= link_to "https://#{@application.name}.herokuapp.com/", "https://#{@application.name}.herokuapp.com/" %>
+  </p>
+  <%# ターミナル操作: アップロード状況の確認 %>
+  <p>稼働状況を確認したい場合、以下の処理を行なってください。</p>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku apps:info
+    </div>
+  </div>
+
+  <p>
+    以上でアプリケーション雛形のデプロイは終了しました。<br>
+    現在はまだトップページは見れない状態です。<br>
+    引き続き実装を進めてください。
+  </p>
 
 <%= render partial: "shared/link_index" %>
