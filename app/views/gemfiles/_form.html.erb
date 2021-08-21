@@ -1,0 +1,47 @@
+<%= form_with(model: [@application, @gemfile], local: true) do |f| %>
+  <%= render 'shared/error_messages', model: f.object %>
+  
+  <%= f.check_box :devise ,{}, true, false %>
+  <%= f.label :devise %>
+  <br>
+  <%= f.check_box :pry_rails ,{}, true, false %>
+  <%= f.label :pry_rails, 'pry-rails' %>
+  <br>
+  
+  <%= f.check_box :image_magick ,{}, true, false %>
+  <%= f.label :image_magick, 'ImageMagick' %>
+  <br>
+  
+  <%= f.check_box :active_hash ,{}, true, false %>
+  <%= f.label :active_hash, 'ActiveHash' %>
+  <br>
+
+  <%= f.check_box :rails_i18n ,{}, true, false %>
+  <%= f.label :rails_i18n, 'エラー文日本語化' %>
+  <br>
+
+  <% f.hidden_field :ransack, value: "false" %>
+  <%#= f.check_box :ransack ,{}, true, false %>
+  <%#= f.label :ransack %>
+  <%#br%>
+
+  <%= f.check_box :rubocop ,{}, true, false %>
+  <%= f.label :rubocop %>
+  <br>
+
+  <%= f.check_box :rspec ,{}, true, false %>
+  <%= f.label :rspec %>
+  <br>
+
+  <% f.hidden_field :payjp, value: "false" %>
+  <%#= f.check_box :payjp ,{}, true, false %>
+  <%#= f.label :payjp, 'PAYJP' %>
+  <%#br%>
+
+  <% f.hidden_field :s3, value: "false" %>
+  <%#= f.check_box :s3 ,{}, true, false %>
+  <%#= f.label :s3, 'S3' %>
+  <%#br%>
+    
+  <%= f.submit '登録' %>
+<% end %>

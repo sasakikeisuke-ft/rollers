@@ -1,8 +1,4 @@
 <h1><%= @app_controller.name %>コントローラーの編集</h1>
 <%= render partial: "normal_form" %>
 
-<div class="link">
-  <%= link_to 'コントローラー一覧へ', application_app_controllers_path %><br>
-  <%= link_to 'アプリケーション詳細へ戻る', application_path(@application) %><br>
-  <%= link_to 'トップページへ戻る', root_path %>
-</div>
+<%= render partial: "shared/link_index" %>

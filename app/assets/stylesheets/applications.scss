@@ -1,3 +1,30 @@
 // Place all the styles related to the applications controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.flex-contents {
+  display: flex;
+}
+
+.application-index {
+  padding: 20px;
+  margin-right: 60px;
+}
+
+.service-explain {
+  width: 60vw;
+  margin-left: 50px;
+}
+
+.greeting {
+  padding: 30px;
+}
+
+.usage {
+  width: 60vw;
+  padding: 20px;
+}
+
+.model-codes {
+  margin-right: 50px;
+}

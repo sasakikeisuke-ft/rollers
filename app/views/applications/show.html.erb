@@ -19,17 +19,71 @@
     <p>Gemfileが登録されていません。</p>
     <p><%= link_to 'こちらから登録をお願いします。', new_application_gemfile_path(@application.id) %></p>
   <% end %>
+</div>
+<h2>
+  各種登録データの確認/登録
+</h2>
+<div>
+  <%= link_to 'モデル一覧へ', application_models_path(@application) %><br>
+  <%= link_to 'コントローラー一覧へ', application_app_controllers_path(@application) %><br>
+  <%= link_to 'アプリケーション一覧へ戻る', root_path %>
+</div>
 
+<div>
   <div>
-  <h3>コード一覧</h3>
-  <%= link_to '事前準備1 雛形の作成など', application_gemfiles_path(@application) %><br>
-  <%= link_to '事前準備2 README ルーティングなど', application_gemfile_path(@application)%>
+    <h2>コード表示</h2>
+      必要な情報を登録できたら、以下のリンクからアプリケーションの実装を進めてください。
+    <h3>事前準備</h3>
+    <%= link_to '事前準備1 雛形の作成など', application_gemfiles_path(@application) %><br>
+    <%= link_to '事前準備2 README ルーティングなど', application_gemfile_path(@application)%>
+  </div>
+  <div class="flex-contents">
+    <div class="model-codes">
+      <h3>モデルに関するコード</h3>
+      <% @models.each do |model| %>
+        <%= link_to model.name, application_model_path(model), class: link_to %><br>
+      <% end %>
+    </div>
+    <div class="controller-codes">
+      <h3>コントローラーに関するコード</h3>
+      <% @app_controllers.each do |app_controller| %>
+        <%= link_to app_controller.name, application_app_controller_path(app_controller), class: link_to %><br>
+      <% end %>
+    </div>
+  </div>
+  <br>
+  <h3>Herokuへのデプロイ</h3>
+  <p>Herokuへデプロイを行う場合、以下の操作をしてください。</p>
+  <%# ターミナル操作: アップロード %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：アップロード
+      </div>
+    </div>
+    <div class="terminal-contents">
+      git push heroku master
+    </div>
+  </div>
+  <%# ターミナル操作: アップロード %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：Herokuのマイグレート
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku run rails db:migrate
+    </div>
   </div>
 </div>
-<%= link_to 'モデル一覧へ', application_models_path(@application) %>
-<br>
-<%= link_to 'コントローラー一覧へ', application_app_controllers_path(@application) %>
-<br>
-<%= link_to 'アプリケーション一覧へ戻る', root_path %>
 
-引き続き実装予定
+<p>
+  以上でアプリケーション作成補助は終了となります。
+</p>

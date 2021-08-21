@@ -1,31 +1,121 @@
-<h1>アプリケーション一覧</h1>
 
-<%= "#{current_user.id}番がログイン中" %>
+<%= "#{current_user.nickname}さんがログイン中" %>
 <%= link_to 'ログアウト', destroy_user_session_path, method: :delete %>
 <%= link_to 'ユーザー編集', edit_user_registration_path, method: :get %>
 <br>
-<%= link_to 'アプリケーション作成へ', new_application_path %>
 
-
-<% if @applications != nil %>
-  <div>
-    <% @applications.each do |application| %>
-      <div class="application-name">
-      <%= application.name %>
+<div class="flex-contents">
+  <%# 左側: アプリケーション一覧 %>
+  <div class="application-index">
+    <h1>アプリケーション一覧</h1>
+    <%= link_to 'アプリケーション新規作成へ', new_application_path %>
+    <% if @applications != nil %>
+      <div>
+        <% @applications.each do |application| %>
+          <div class="application-name">
+          <%= application.name %>
+          </div>
+          <div class="application-description">
+          <%= application.description %>
+          </div>
+          <%= link_to '編集画面へ', edit_application_path(application) %>
+          <br>
+          <%= link_to '削除', application_path(application), method: :delete %>
+          <br>
+          <%= link_to '詳細設定へ', application_path(application) %>
+          <br>
+        <% end %>
       </div>
-      <div class="application-description">
-      <%= application.description %>
+    <% else %>
+      <div>
+        <p>まだアプリケーションが作成されていません</p>
       </div>
-      <%= link_to '編集画面へ', edit_application_path(application) %>
-      <br>
-      <%= link_to '削除', application_path(application), method: :delete %>
-      <br>
-      <%= link_to '詳細設定へ', application_path(application) %>
-      <br>
     <% end %>
   </div>
-<% else %>
-  <div>
-    <p>まだアプリケーションが作成されていません</p>
+
+  <%# 右側: アプリケーションに関する説明 %>
+  <div class="service-explain">
+    <div class="greeting">
+      <div class="greeting-title">
+        <h1>ご挨拶</h1>
+      </div>
+      <div class="greeting-contents">
+        <h3>
+          当アプリケーションは、<br>
+          <span>Ruby on Rails の制作補助アプリです。</span><br>
+        </h3>
+        <h3>
+          これから作成したいアプリケーションの情報を登録していただくと、<br>
+          登録内容をもとに記載するコードを自動で作成し、表示します。
+        </h3>
+        <h3>
+          当アプリの最大の目的は、アプリケーションの骨組みを短時間で作成するとともに、<br>
+          作業の抜け落ちや記入ミスを防ぐことにあります。
+        </h3>
+        <h3>
+          皆様のアプリ開発の潤滑剤になれば幸いです。
+        </h3>
+      </div>
+    </div>
+    <div class="usage">
+      <div class="usage-title">
+        <h1>当サービスの使い方</h1>
+      </div>
+      <h3>ターミナルに関する操作</h3>
+      <div class="display-field">
+        <div class="terminal-field">
+          <div class="terminal-header">
+            <div class="terminal-icons">
+              <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+            </div>
+            <div class="terminal-title">
+              ターミナル：操作の目的
+            </div>
+          </div>
+          <div class="terminal-contents">
+            ターミナルに記入するコード
+          </div>
+        </div>
+      </div>
+      <div class="usage-description">
+        <h3>
+          上記はターミナルを操作に関するコードが表示されます。<br>
+          そのままコピー＆ペーストが可能な場合と、1行ずつ操作する場合などがあります。<br>
+          必要に応じ注意書きを記載しておりますので、指示の通りに操作をお願いします。
+        </h3>
+      </div>
+      <div class="display-field">
+        <div class="code-field">
+          <div class="code-tab">
+            <%= image_tag "ruby_icon.png", class: "code-icon", size: "16x16", alt: "Ruby" %>
+            ファイル名
+            <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "close" %>
+          </div>
+          <div class="code-route">
+            app > models > 
+            <%= image_tag "ruby_icon.png", class: "code-icon", size: "12x12", alt: "Ruby" %>
+            ファイル名
+          </div>
+          <div class="code-contents">
+            コード内容
+          </div>
+        </div>
+      </div>
+      <div class="usage-description">
+        <h3>
+          上記はファイルに記載するコードが表示されます。<br>
+          ほとんどの場合で、コピー＆ペーストが可能となっています。<br>
+          内容が不十分な場合もあります。内容を確認し、必要に応じて加筆修正をお願いします。
+        </h3>
+      </div>
+      <div class="usage-description">
+        <h3>
+          本アプリケーションは開発段階にあります。<br>
+          作成したコードに問題が生じる場合もあります。<br>
+          内容を確認しつつ、実装を進めてください。
+        </h3>
+      </div>
+      
+    </div>
   </div>
-<% end %>
+</div>
