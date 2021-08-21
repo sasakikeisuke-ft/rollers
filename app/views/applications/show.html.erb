@@ -26,10 +26,5 @@
   <%= link_to '事前準備2 README ルーティングなど', application_gemfile_path(@application)%>
   </div>
 </div>
-<%= link_to 'モデル一覧へ', application_models_path(@application) %>
-<br>
-<%= link_to 'コントローラー一覧へ', application_app_controllers_path(@application) %>
-<br>
-<%= link_to 'アプリケーション一覧へ戻る', root_path %>
 
-引き続き実装予定
+<%= render partial: "shared/link_index" %>

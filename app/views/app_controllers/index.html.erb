@@ -15,8 +15,4 @@
   <% end %>
 </div>
 <br>
-<div>
-<%= link_to 'コントローラー作成へ', new_application_app_controller_path %><br>
-<%= link_to 'アプリケーション詳細へ戻る', application_path(params[:application_id]) %><br>
-<%= link_to 'トップページへ戻る', root_path %>
-</div>
+<%= render partial: "shared/link_index" %>
