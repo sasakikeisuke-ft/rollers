@@ -1,12 +1,8 @@
 class ApplicationsController < ApplicationController
-  before_action :find_application, only: [:edit, :update, :destroy]
+  before_action :find_application, only: [:edit, :update, :destroy, :show]
 
   def index
     @applications = Application.where(user_id: current_user.id)
-  end
-
-  def show
-    @application = Application.find(params[:id])
   end
 
   def new
@@ -36,6 +32,11 @@ class ApplicationsController < ApplicationController
   def destroy
     @application.destroy
     redirect_to root_path
+  end
+
+  def show
+    @models = @application.models
+    @app_controllers = @application.app_controllers
   end
 
   private
