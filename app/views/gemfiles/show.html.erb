@@ -1,19 +1,17 @@
 
 <%# READMEのDB設計に関するコード %>
 <div class="read_me">
-  <h1>README</h1>
+  <h1>事前準備2</h1>
   <h2><%= @application.name  %></h2>
-  <p>READMEに関するの記載内容です。</p>
-  <div>
-    念の為、ご自身でも記載内容を確認するようお願いします。<br>
-    また、現在の仕様では枠がずれているように見えますが、<br>
-    ペーストすれとちょうど良い位置になるように調整されています。
-  </div>
-  <br>
+  
   <%= link_to 'アプリケーション詳細ページへ戻る', application_path(@application) %><br><br>
 
   <h2><%= @application.name %> READMEの編集</h2>
-
+  <div>
+    念の為、ご自身でも記載内容を確認するようお願いします。<br>
+    また、現在の仕様では枠がずれているように見えますが、<br>
+    ペーストするとちょうど良い位置になるように調整されています。
+  </div>
   <%# ターミナル操作 %>
   <div class="terminal-field">
     <div class="terminal-header">
@@ -48,7 +46,6 @@
 
       <%# モデルごとのテーブル表記。対象は通常モデルのみ %>
       <% @models.each do |model| %>
-        
         <% if [1, 3, 5].include?(model.model_type_id) %>
           <%# 最も長いカラム名の文字数＝longestを決定する%>
           <% longest = the_longest(model) %>
@@ -167,7 +164,7 @@
     <h2><%= @application.name %> 日本語化ファイルの編集</h2>
 
     <p>各モデル用の日本語化ファイル</p>
-    <%# ターミナル操作 %>
+    <%# ターミナル操作: 対象ファイルの作成 %>
     <div class="terminal-field">
       <div class="terminal-header">
         <div class="terminal-icons">
@@ -181,14 +178,14 @@
         touch config/locales/ja.yml
       </div>
     </div>
-    <%# ターミナル操作 %>
+    <%# ターミナル操作: 対象ファイルへのジャンプ %>
     <div class="terminal-field">
       <div class="terminal-header">
         <div class="terminal-icons">
           <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
         </div>
         <div class="terminal-title">
-          ターミナル：対象ファイルの作成
+          ターミナル：対象ファイルへのジャンプ
         </div>
       </div>
       <div class="terminal-contents">
@@ -220,5 +217,120 @@
 
   </div>
 <% end %>
+
+<p>Basic認証とログイン機能に関する記述</p>
+<%# ターミナル操作: 対象ファイルへのジャンプ %>
+<div class="terminal-field">
+  <div class="terminal-header">
+    <div class="terminal-icons">
+      <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+    </div>
+    <div class="terminal-title">
+      ターミナル：対象ファイルへのジャンプ
+    </div>
+  </div>
+  <div class="terminal-contents">
+    code app/controllers/application_controller.rb
+  </div>
+</div>
+<%# コード表示 %>
+<% if @gemfile.devise %>
+  <div>
+    本アプリケーション全体でログインしているユーザーに限定する場合、<br>
+    下記のbefore_action :authenticate_user!を有効にしてください。
+  </div>
+<% end %>
+<div class="code-field">
+  <div class="code-tab">
+    <%= image_tag "ruby_icon.png", class: "code-icon", size: "16x16", alt: "ruby_icon" %>
+    application_controller.rb
+    <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+  </div>
+  <div class="code-route">
+    app > controllers
+    <%= image_tag "ruby_icon.png", class: "code-icon", size: "16x16", alt: "ruby_icon" %>
+    application_controller.rb
+  </div>
+  <div class="code-contents">
+    class ApplicationController < ActionController::Base<br>
+    <% if @gemfile.devise %>
+      <%== insert_space(2) %>before_action :configure_permitted_parameters, if: :devise_controller?<br>
+      <%== insert_space(2) %># before_action :authenticate_user!<br>
+    <% end %>
+    <%== insert_space(2) %>before_action :basic_auth<br>
+    <br>
+    <%== insert_space(2) %>private<br>
+    <br>
+    <% if @gemfile.devise %>
+      <% @models.each do |model| %>
+        <% next unless model.model_type.name == 'devise' %>
+
+        <%== insert_space(2) %>def configure_permitted_parameters<br>
+        <%== insert_space(4) %>devise_parameter_sanitizer.permit(:sign_up, keys: [
+        <% first = true %>
+        <% model.columns.each do |column| %>
+          <%= ', ' unless first %>
+          <%= ":#{column.name}" %>
+        <% end %>])<br>
+        <%== insert_space(2) %>end<br>
+      <% end %>
+    <% end %>
+    <%== insert_space(2) %>def basic_auth<br>
+    <%== insert_space(4) %>authenticate_or_request_with_http_basic do |username, password|<br>
+    <%== insert_space(6) %>username == ENV["BASIC_AUTH_USER"] && password == ENV["BASIC_AUTH_PASSWORD"]<br>
+    <%== insert_space(4) %>end<br>
+    <%== insert_space(2) %>end<br>
+    end
+  </div>
+</div>
+
+<p>環境変数の設定</p>
+<div>
+  MacOSの場合を想定しています。<br>
+  またMacOS: Mojave以前かCatalina以降かで一部処理が異なります。
+</div>
+<%# ターミナル操作: 対象ファイルへのジャンプ %>
+<div class="terminal-field">
+  <div class="terminal-header">
+    <div class="terminal-icons">
+      <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+    </div>
+    <div class="terminal-title">
+      ターミナル：環境変数を設定する（MacOS: Catalina以降）
+    </div>
+  </div>
+  <div class="terminal-contents">
+    vim ~/.zshrc<br>
+    -> i キーで編集モードへ<br>
+    <span class="comment-out">以下の内容を登録</span><br>
+    export BASIC_AUTH_USER='<span class="changes">Basic認証のID</span>'<br>
+    export BASIC_AUTH_PASSWORD='<span class="changes">Basic認証のパスワード</span>'<br>
+    esc キー -> :pw で登録（:qで内容を保存せず終了する)<br>
+    <span class="comment-out">下のコードで環境変数を適応</span><br>
+    source ~/.zshrc
+  </div>
+</div>
+<%# ターミナル操作: 対象ファイルへのジャンプ %>
+<div class="terminal-field">
+  <div class="terminal-header">
+    <div class="terminal-icons">
+      <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+    </div>
+    <div class="terminal-title">
+      ターミナル：環境変数を設定する（MacOS: Mojave以前）
+    </div>
+  </div>
+  <div class="terminal-contents">
+    vim ~/.bash_profile<br>
+    -> i キーで編集モードへ<br>
+    <span class="comment-out">以下の内容を登録</span><br>
+    export BASIC_AUTH_USER='<span class="changes">Basic認証のID</span>'<br>
+    export BASIC_AUTH_PASSWORD='<span class="changes">Basic認証のパスワード</span>'<br>
+    esc キー -> :pw で登録（:qで内容を保存せず終了する)<br>
+    <span class="comment-out">下のコードで環境変数を適応</span><br>
+    source ~/.bash_profile
+  </div>
+</div>
+
 
 <%= render partial: "shared/link_index" %>
