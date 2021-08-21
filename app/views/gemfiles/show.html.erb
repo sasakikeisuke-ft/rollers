@@ -165,53 +165,6 @@
 <% if @gemfile.rails_i18n %>
   <div class="japanese">
     <h2><%= @application.name %> 日本語化ファイルの編集</h2>
-    <p>Devise用の日本語化ファイル</p>
-    <%# ターミナル操作 %>
-    <div class="terminal-field">
-      <div class="terminal-header">
-        <div class="terminal-icons">
-          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
-        </div>
-        <div class="terminal-title">
-          ターミナル：対象ファイルの作成
-        </div>
-      </div>
-      <div class="terminal-contents">
-        touch config/locales/devise.en.yml
-      </div>
-    </div>
-    <%# ターミナル操作 %>
-    <div class="terminal-field">
-      <div class="terminal-header">
-        <div class="terminal-icons">
-          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
-        </div>
-        <div class="terminal-title">
-          ターミナル：対象ファイルの作成
-        </div>
-      </div>
-      <div class="terminal-contents">
-        code config/locales/devise.en.yml
-      </div>
-    </div>
-
-    <%# コード表示 %>
-    <div class="code-field">
-      <div class="code-tab">
-        <%= image_tag "yml_icon.png", class: "code-icon", size: "16x16", alt: "info_icon" %>
-        devise.en.yml
-        <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
-      </div>
-      <div class="code-route">
-        config > locales
-        <%= image_tag "yml_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
-        devise.en.yml
-      </div>
-      <div class="code-contents">
-        以下のサイトのコードを貼り付けてください<br>
-        <%= link_to 'devise用の日本語化コード', "https://github.com/tigrish/devise-i18n/blob/master/rails/locales/ja.yml", class: "links" %>
-      </div>
-    </div>
 
     <p>各モデル用の日本語化ファイル</p>
     <%# ターミナル操作 %>
