@@ -284,4 +284,53 @@
   </div>
 </div>
 
+<p>環境変数の設定</p>
+<div>
+  MacOSの場合を想定しています。<br>
+  またMacOS: Mojave以前かCatalina以降かで一部処理が異なります。
+</div>
+<%# ターミナル操作: 対象ファイルへのジャンプ %>
+<div class="terminal-field">
+  <div class="terminal-header">
+    <div class="terminal-icons">
+      <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+    </div>
+    <div class="terminal-title">
+      ターミナル：環境変数を設定する（MacOS: Catalina以降）
+    </div>
+  </div>
+  <div class="terminal-contents">
+    vim ~/.zshrc<br>
+    -> i キーで編集モードへ<br>
+    <span class="comment-out">以下の内容を登録</span><br>
+    export BASIC_AUTH_USER='<span class="changes">Basic認証のID</span>'<br>
+    export BASIC_AUTH_PASSWORD='<span class="changes">Basic認証のパスワード</span>'<br>
+    esc キー -> :pw で登録（:qで内容を保存せず終了する)<br>
+    <span class="comment-out">下のコードで環境変数を適応</span><br>
+    source ~/.zshrc
+  </div>
+</div>
+<%# ターミナル操作: 対象ファイルへのジャンプ %>
+<div class="terminal-field">
+  <div class="terminal-header">
+    <div class="terminal-icons">
+      <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+    </div>
+    <div class="terminal-title">
+      ターミナル：環境変数を設定する（MacOS: Mojave以前）
+    </div>
+  </div>
+  <div class="terminal-contents">
+    vim ~/.bash_profile<br>
+    -> i キーで編集モードへ<br>
+    <span class="comment-out">以下の内容を登録</span><br>
+    export BASIC_AUTH_USER='<span class="changes">Basic認証のID</span>'<br>
+    export BASIC_AUTH_PASSWORD='<span class="changes">Basic認証のパスワード</span>'<br>
+    esc キー -> :pw で登録（:qで内容を保存せず終了する)<br>
+    <span class="comment-out">下のコードで環境変数を適応</span><br>
+    source ~/.bash_profile
+  </div>
+</div>
+
+
 <%= render partial: "shared/link_index" %>
