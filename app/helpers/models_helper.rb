@@ -84,7 +84,7 @@ module ModelsHelper
   end
 
   # モデルファイルのバリデーションに関する記載を作成するメソッド
-  def make_varidation(contents, japanese)
+  def make_validation(contents, japanese)
     result = ''
     space = 2
     after = "#{insert_space(space)}end<br>"
@@ -96,7 +96,7 @@ module ModelsHelper
     # 空欄を禁止せずoptionのみ設定されたgroupの処理を行う。
     result += make_with_options(contents[:presence_false], space, japanese)
 
-    # boolean型のグループに関するvaridationを記載する。
+    # boolean型のグループに関するvalidationを記載する。
     option = 'inclusion:{in: [true, false]}'
     result += use_with_option?(contents[:boolean_group], space, japanese, option)
 
@@ -112,7 +112,7 @@ module ModelsHelper
       html += make_with_options(group, space + 2, japanese)
       html += "#{insert_space(space)}end<br>"
     elsif group.length == 1
-      html += "#{insert_space(space)}varidates :#{group[0].name}, #{option}"
+      html += "#{insert_space(space)}validates :#{group[0].name}, #{option}"
       group[0].options.each do |option|
         html += make_options(option, japanese)
       end
@@ -175,7 +175,7 @@ module ModelsHelper
         content["option_type_#{id}".to_sym].each do |column|
           name = column.name
           name = "#{column.name}_id" if column.data_type.type = 'ActiveHash'
-          during += "#{insert_space(space + 2)}varidates :#{name}"
+          during += "#{insert_space(space + 2)}validates :#{name}"
           column.options.each do |option|
             next if grouping_ids.include?(option.option_type_id)
 
@@ -192,7 +192,7 @@ module ModelsHelper
     # formatを使用していないカラムのバリデーションを記載する。
     content[:single] += content[:else]
     content[:single].each do |column|
-      result += "#{insert_space(space)}varidates :#{column.name}"
+      result += "#{insert_space(space)}validates :#{column.name}"
       column.options.each do |option|
         result += make_options(option, japanese)
       end

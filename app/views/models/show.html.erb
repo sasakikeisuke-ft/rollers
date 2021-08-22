@@ -183,7 +183,7 @@
       <%#/ Deviseのみ対象の専用記述 %>
 
       <%# ヘルパーメソッドによりバリデーションに関するHTMLを作成 %>
-      <%== make_varidation(contents, @gemfile.rails_i18n) %>
+      <%== make_validation(contents, @gemfile.rails_i18n) %>
 
       <%# ヘルパーメソッドによりアソシエーションに関するHTMLを作成 %>
       <%== make_association(contents, @columns, @model, @model.attached_image) %>
@@ -239,7 +239,7 @@
       class <%= @model.name.classify %><br>
       <%== insert_space(2) %>include ActiveModel::Model<br>
       <%== contents[:attr_accessor] %>
-      <%== make_varidation(contents, @gemfile.rails_i18n) %>
+      <%== make_validation(contents, @gemfile.rails_i18n) %>
       <%== contents[:save] %>
       end<br>
     </div>
