@@ -525,7 +525,7 @@ module ModelsHelper
       result += "#{insert_space(4)}#{column.name}"
       case column.data_type_id
       when 1 # 'string'
-        if column.options.length != 0
+        if !column.options.empty?
           done = false
           column.options.each do |option|
             case option.option_type.info
@@ -562,7 +562,7 @@ module ModelsHelper
       when 2 # 'text'
         result += ' { Faker::Lorem.sentence }'
       when 3 # 'integer'
-        if column.options.length != 0
+        if !column.options.empty?
           column.options.each do |option|
             case option.option_type.info
             when '上限下限を設定する'
@@ -630,7 +630,7 @@ module ModelsHelper
     6.times do |i|
       result += ', <br>' unless first
       sample = base.gsub(/数値/, i.to_s)
-      sample = sample.gsub(/内容/, "'----'") if i == 0
+      sample = sample.gsub(/内容/, "'----'") if i.zero?
       sample = sample.gsub(/内容/, "'最後'") if i == 5
       result += sample
       first = false
