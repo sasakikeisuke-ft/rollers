@@ -87,38 +87,37 @@ module ModelsHelper
   def make_validation(contents, japanese)
     result = ''
     space = 2
-    after = "#{insert_space(space)}end<br>"
 
     # 空欄禁止を設定されたものから処理を行う。
-    option = 'presence: true'
-    result += use_with_option?(contents[:presence_true], space, japanese, option)
+    option_code = 'presence: true'
+    result += use_with_option?(contents[:presence_true], space, japanese, option_code)
 
     # 空欄を禁止せずoptionのみ設定されたgroupの処理を行う。
     result += make_with_options(contents[:presence_false], space, japanese)
 
     # boolean型のグループに関するvalidationを記載する。
-    option = 'inclusion:{in: [true, false]}'
-    result += use_with_option?(contents[:boolean_group], space, japanese, option)
+    option_code = 'inclusion:{in: [true, false]}'
+    result += use_with_option?(contents[:boolean_group], space, japanese, option_code)
 
     # 最終的なHTMLを返却する
     result
   end
 
   # with_optionを使用するかどうかを判断し、必要に応じてメソッドを使用するメソッド
-  def use_with_option?(group, space, japanese, option)
-    html = ''
+  def use_with_option?(group, space, japanese, option_code)
+    result = ''
     if group.length >= 2
-      html += "#{insert_space(space)}with_options #{option} do<br>"
-      html += make_with_options(group, space + 2, japanese)
-      html += "#{insert_space(space)}end<br>"
+      result += "#{insert_space(space)}with_options #{option_code} do<br>"
+      result += make_with_options(group, space + 2, japanese)
+      result += "#{insert_space(space)}end<br>"
     elsif group.length == 1
-      html += "#{insert_space(space)}validates :#{group[0].name}, #{option}"
+      result += "#{insert_space(space)}validates :#{group[0].name}, #{option_code}"
       group[0].options.each do |option|
-        html += make_options(option, japanese)
+        result += make_options(option, japanese)
       end
-      html += '<br>'
+      result += '<br>'
     end
-    html
+    result
   end
 
   # optionに関する記載を行うメソッド。そのカラムのオプションのみ追加していく。
@@ -173,8 +172,11 @@ module ModelsHelper
         after = "#{insert_space(space)}end<br>"
         during = ''
         content["option_type_#{id}".to_sym].each do |column|
-          name = column.name
-          name = "#{column.name}_id" if column.data_type.type = 'ActiveHash'
+          if column.data_type.type == 'ActiveHash'
+            name = "#{column.name}_id" 
+          else
+            name = column.name
+          end
           during += "#{insert_space(space + 2)}validates :#{name}"
           column.options.each do |option|
             next if grouping_ids.include?(option.option_type_id)
@@ -203,12 +205,12 @@ module ModelsHelper
 
   # アソシエーションに関する記述を作成するメソッド
   def make_association(contents, columns, model, attached_image)
-    html = ''
+    result = ''
     space = 2
 
     # belongs_toに関する記述を作成する。
     contents[:references_group].each do |column|
-      html += "#{insert_space(2)}belongs_to :#{column.name}<br>"
+      result += "#{insert_space(2)}belongs_to :#{column.name}<br>"
     end
 
     # has_many/has_oneに関する記述を作成する。ここでのcolumnsはアプリに関連する全てのカラムが対象となっている。
@@ -222,30 +224,30 @@ module ModelsHelper
               'has_one :'
             end
       target_model = column.model
-      html += "#{insert_space(space)}#{has}#{target_model.name.tableize}, dependent: :destroy<br>"
+      result += "#{insert_space(space)}#{has}#{target_model.name.tableize}, dependent: :destroy<br>"
 
       # target_modelが中間テーブルの場合、追加処理を行う。
       next unless target_model.model_type_id == 3
 
       target_columns = target_model.columns.where.not(name: model.name)
       target_columns.each do |target_column|
-        html += "#{insert_space(space)}has_many :#{target_column.name}"
-        html += ", through: :#{target_model.name}<br>"
+        result += "#{insert_space(space)}has_many :#{target_column.name}"
+        result += ", through: :#{target_model.name}<br>"
       end
     end
 
     # ImageMagickを使用する場合のアソシエーションを記載
-    html += "#{insert_space(2)}has_one_attached :image<br>" if attached_image
+    result += "#{insert_space(2)}has_one_attached :image<br>" if attached_image
 
     # ActiveHashに関する記述を作成するメソッド。
     if !contents[:activehash_group].empty?
-      html += "<br>#{insert_space(2)}# ActiveHash<br>"
-      html += "#{insert_space(2)}extend ActiveHash::Associations::ActiveRecordExtensions<br>"
+      result += "<br>#{insert_space(2)}# ActiveHash<br>"
+      result += "#{insert_space(2)}extend ActiveHash::Associations::ActiveRecordExtensions<br>"
       contents[:activehash_group].each do |column|
-        html += "#{insert_space(2)}belongs_to :#{column.name}<br>"
+        result += "#{insert_space(2)}belongs_to :#{column.name}<br>"
       end
     end
-    html
+    result
   end
 
   # Formオブジェクトパターンに必要な処理を行うメソッド。追加するハッシュは以下
