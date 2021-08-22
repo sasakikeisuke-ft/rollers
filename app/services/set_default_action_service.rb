@@ -2,8 +2,6 @@ class SetDefaultActionService
   # コントローラー登録時に初期設定となるアクション＝デフォルトアクションを登録するメソッド。
   def self.set(app_controller)
     target_model = Model.where(application_id: app_controller.application_id).find_by(name: app_controller.name)
-    puts target_model.name
-    puts app_controller.name
     return unless target_model.name == app_controller.name
 
     # app_controllerの登録内容により、初期設定とするアクションの情報を配列に格納する。
