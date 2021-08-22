@@ -19,10 +19,9 @@ class OptionsController < ApplicationController
   private
 
   def option_params
-    unless params[:option].nil?
-      params.require(:option).permit(:option_type_id, :input1,
-                                     :input2).merge(column_id: params[:column_id])
-    end
+    return if params[:option].nil?
+
+    params.require(:option).permit(:option_type_id, :input1, :input2).merge(column_id: params[:column_id])
   end
 
   def column_index
