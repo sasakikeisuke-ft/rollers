@@ -46,7 +46,7 @@ module ModelsHelper
       if column.data_type_id <= 10
         if column.must_exist
           contents[:presence_true] << column
-        elsif column.options.length != 0
+        elsif !column.options.empty?
           contents[:presence_false] << column
           contents[:normal_example_group] << column
         else # 空欄可能であり、かつオプションの設定がされていない場合
@@ -238,7 +238,7 @@ module ModelsHelper
     html += "#{insert_space(2)}has_one_attached :image<br>" if attached_image
 
     # ActiveHashに関する記述を作成するメソッド。
-    if contents[:activehash_group].length != 0
+    if !contents[:activehash_group].empty?
       html += "<br>#{insert_space(2)}# ActiveHash<br>"
       html += "#{insert_space(2)}extend ActiveHash::Associations::ActiveRecordExtensions<br>"
       contents[:activehash_group].each do |column|
