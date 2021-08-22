@@ -172,11 +172,11 @@ module ModelsHelper
         after = "#{insert_space(space)}end<br>"
         during = ''
         content["option_type_#{id}".to_sym].each do |column|
-          if column.data_type.type == 'ActiveHash'
-            name = "#{column.name}_id" 
-          else
-            name = column.name
-          end
+          name = if column.data_type.type == 'ActiveHash'
+                   "#{column.name}_id"
+                 else
+                   column.name
+                 end
           during += "#{insert_space(space + 2)}validates :#{name}"
           column.options.each do |option|
             next if grouping_ids.include?(option.option_type_id)
@@ -240,7 +240,7 @@ module ModelsHelper
     result += "#{insert_space(2)}has_one_attached :image<br>" if attached_image
 
     # ActiveHashに関する記述を作成するメソッド。
-    if !contents[:activehash_group].empty?
+    unless contents[:activehash_group].empty?
       result += "<br>#{insert_space(2)}# ActiveHash<br>"
       result += "#{insert_space(2)}extend ActiveHash::Associations::ActiveRecordExtensions<br>"
       contents[:activehash_group].each do |column|

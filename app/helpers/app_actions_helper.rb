@@ -170,7 +170,7 @@ module AppActionsHelper
         html += ":#{column}_id"
         first = false
       end
-      if !references_columns.empty?
+      unless references_columns.empty?
         first = true
         html += ').merge('
         references_columns.each do |column|
