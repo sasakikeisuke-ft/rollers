@@ -55,8 +55,9 @@ class AppControllersController < ApplicationController
   end
 
   def app_controller_params
-    params.require(:app_controller).permit(:name, :parent, :index_select, :new_select, :create_select, :edit_select, :update_select,
-                                           :destroy_select, :show_select).merge(application_id: params[:application_id])
+    params.require(:app_controller).permit(
+      :name, :parent, :index_select, :new_select, :create_select, :edit_select, :update_select, :destroy_select, :show_select
+    ).merge(application_id: params[:application_id])
   end
 
   def find_app_controller
