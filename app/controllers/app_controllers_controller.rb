@@ -1,5 +1,5 @@
 class AppControllersController < ApplicationController
-  before_action :get_common_matter, only: [:new, :edit]
+  before_action :app_controller_form_variable, only: [:new, :edit]
   before_action :find_app_controller, only: [:edit, :update, :destroy, :show]
 
   def index
@@ -8,7 +8,7 @@ class AppControllersController < ApplicationController
   end
 
   def new
-    get_common_matter
+    app_controller_form_variable
     @app_controller = AppController.new
   end
 
@@ -18,7 +18,7 @@ class AppControllersController < ApplicationController
       SetDefaultActionService.set(@app_controller)
       redirect_to application_app_controller_app_actions_path(app_controller_id: @app_controller)
     else
-      get_common_matter
+      app_controller_form_variable
       render :new
     end
   end
@@ -30,7 +30,7 @@ class AppControllersController < ApplicationController
     if @app_controller.update(app_controller_params)
       redirect_to application_app_controllers_path
     else
-      get_common_matter
+      app_controller_form_variable
       render :edit
     end
   end
@@ -48,7 +48,7 @@ class AppControllersController < ApplicationController
 
   private
 
-  def get_common_matter
+  def app_controller_form_variable
     @application = Application.find(params[:application_id])
     @models = @application.models
     @app_controllers = @application.app_controllers

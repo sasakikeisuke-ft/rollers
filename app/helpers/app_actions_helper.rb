@@ -6,7 +6,7 @@ module AppActionsHelper
     # 基本の７つのアクション
     seven_actions = %w[index new create edit update destroy show]
     # 共通する内容を登録するプライベートアクション
-    common_actions = %w[get_common_variable1 get_common_variable2 get_common_variable3]
+    common_actions = %w[common_variable1 common_variable2 common_variable3]
     selects = []
     targets = []
     array = {}
@@ -77,7 +77,7 @@ module AppActionsHelper
             contents["#{app_action.target}_form_actions".to_sym] << 'edit'
           end
         end
-      else # app_action.action_code_id >= 97 -> get_common_variableを使用するアクション
+      else # app_action.action_code_id >= 97 -> common_variableを使用するアクション
         sample = app_action.action_code.sample
         contents["#{sample}_targets".to_sym] = [] if contents["#{sample}_targets".to_sym].nil?
         contents["#{sample}_targets".to_sym] << app_action
@@ -222,9 +222,9 @@ module AppActionsHelper
   end
 
   # before_action: get_comon_variableを作成するメソッド
-  def make_before_action_get_common_variable(contents)
+  def make_before_action_common_variable(contents)
     html = ''
-    common_actions = %w[get_common_variable1 get_common_variable2 get_common_variable3]
+    common_actions = %w[common_variable1 common_variable2 common_variable3]
     common_actions.each do |action|
       next if contents[action.to_sym].nil?
 

@@ -23,12 +23,12 @@ class SetDefaultActionService
       end
       find_actions << 'show' if app_controller.edit_select >= 2
 
-      # get_common_variableが必要かどうかで処理を変更する。
+      # common_variableが必要かどうかで処理を変更する。
       if find_actions.length >= 2
         find_actions.each do |action|
           default_actions << base.merge(action_select: action, action_code_id: 97)
         end
-        default_actions << base.merge(action_select: 'get_common_variable1', action_code_id: 11)
+        default_actions << base.merge(action_select: 'common_variable1', action_code_id: 11)
       elsif find_actions.length == 1
         default_actions << base.merge(action_select: find_actions[0], action_code_id: 11)
       end

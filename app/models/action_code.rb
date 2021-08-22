@@ -76,10 +76,10 @@ class ActionCode < ActiveHash::Base
     { id: 95, keyword: '内容', sample: 'redirect_to 条件式1_path(条件式2_id: params[条件式2_id])' },
     { id: 96, keyword: '内容', sample: 'render 条件式1' },
 
-    # get_common_variableの使用
-    { id: 97, keyword: '内容', sample: 'get_common_variable1' },
-    { id: 98, keyword: '内容', sample: 'get_common_variable2' },
-    { id: 99, keyword: '内容', sample: 'get_common_variable3' }
+    # common_variableの使用
+    { id: 97, keyword: '内容', sample: 'common_variable1' },
+    { id: 98, keyword: '内容', sample: 'common_variable2' },
+    { id: 99, keyword: '内容', sample: 'common_variable3' }
   ]
   include ActiveHash::Associations
   has_many :app_actions
