@@ -23,7 +23,8 @@ class OptionType < ActiveHash::Base
 
     { id: 21, type: 'numericality', info: '入力のみで登録する', code: 'numericality: { only_integer: true }, message: エラーメッセージ }',
       message_ja: 'は半角数字を入力してください', message_en: ' is invalid. Input harf-width numbers' },
-    { id: 22, type: 'numericality', info: '上限下限を設定する', code: 'numericality: { greater_than_or_equal_to: 入力1, less_than_or_equal_to: 入力2, message: エラーメッセージ }',
+    { id: 22, type: 'numericality', info: '上限下限を設定する',
+      code: 'numericality: { greater_than_or_equal_to: 入力1, less_than_or_equal_to: 入力2, message: エラーメッセージ }',
       message_ja: 'は入力が範囲外です。', message_en: ' is out of setting range' },
     { id: 23, type: 'numericality', info: '上限のみを設定する', code: 'numericality: { less_than_or_equal_to: 入力2, message: エラーメッセージ }',
       message_ja: 'は入力が範囲外です。', message_en: ' is out of setting range' },
@@ -32,10 +33,15 @@ class OptionType < ActiveHash::Base
     { id: 25, type: 'numericality', info: '未選択状態での禁止', code: 'numericality: { other_than: 0, message: エラーメッセージ }',
       message_ja: 'を選択してください', message_en: "can't be blank" },
 
-    # {id: 31, type: 'length', info: '上限下限を設定する', code: ', length: { in: ',      message_ja: '',          message_en: 'is invalid.'},
-    # {id: 32, type: 'length', info: '上限のみを設定する', code: ', length: { maximum: ', message_ja: '',          message_en: 'is invalid.'},
-    # {id: 33, type: 'length', info: '下限のみを設定する', code: ', length: { minimum: ', message_ja: '',          message_en: 'is invalid.'},
-    # {id: 34, type: 'length', info: '値の長さを限定する', code: ', length: { is: ',      message_ja: '',          message_en: 'is invalid.'},
+    # lengthオプションに関するコード。今後、追加実装の可能性があるため残しておく。
+    # {id: 31, type: 'length', info: '上限下限を設定する', code: 'length: { in: 入力1..入力2 }',
+    #   message_ja: '',          message_en: 'is invalid.'},
+    # {id: 32, type: 'length', info: '上限のみを設定する', code: 'length: { maximum: 入力2' },
+    #   message_ja: '',          message_en: 'is invalid.'},
+    # {id: 33, type: 'length', info: '下限のみを設定する', code: 'length: { minimum: 入力1 }',
+    #   message_ja: '',          message_en: 'is invalid.'},
+    # {id: 34, type: 'length', info: '値の長さを限定する', code: 'length: { is: 入力1 }',
+    #   message_ja: '',          message_en: 'is invalid.'},
 
     { id: 41, type: 'uniqueness', info: '当テーブル内での重複禁止', code: 'uniqueness: { case_sensitive: false }',
       message_ja: 'はすでに存在します', message_en: ' has already been taken' },
