@@ -58,5 +58,4 @@ class GemfilesController < ApplicationController
   def gemfile_form_variable
     @application = Application.find(params[:application_id])
   end
-
 end
