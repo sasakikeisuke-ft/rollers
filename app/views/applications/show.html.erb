@@ -41,13 +41,13 @@
     <div class="model-codes">
       <h3>モデルに関するコード</h3>
       <% @models.each do |model| %>
-        <%= link_to model.name, application_model_path(model), class: link_to %><br>
+        <%= link_to model.name, application_model_path(application_id: params[:id], id: model), class: link_to %><br>
       <% end %>
     </div>
     <div class="controller-codes">
       <h3>コントローラーに関するコード</h3>
       <% @app_controllers.each do |app_controller| %>
-        <%= link_to app_controller.name, application_app_controller_path(app_controller), class: link_to %><br>
+        <%= link_to app_controller.name, application_app_controller_path(application_id: params[:id], id: app_controller), class: link_to %><br>
       <% end %>
     </div>
   </div>
