@@ -5,7 +5,7 @@ class SetDefaultActionService
     puts target_model.name
     puts app_controller.name
     return unless target_model.name == app_controller.name
-    
+
     # app_controllerの登録内容により、初期設定とするアクションの情報を配列に格納する。
     default_actions = []
     find_actions = []
