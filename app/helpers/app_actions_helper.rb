@@ -265,7 +265,7 @@ module AppActionsHelper
     when 0
       html = ''
     else
-      html += action_html + ']<br>'
+      html += "#{action_html}]<br>"
     end
     html
   end
