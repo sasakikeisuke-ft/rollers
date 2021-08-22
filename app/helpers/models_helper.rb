@@ -528,31 +528,28 @@ module ModelsHelper
         if !column.options.empty?
           done = false
           column.options.each do |option|
+            next unless option.option_type.type == 'format'
+
+            done = true
             case option.option_type.info
             when '漢字かなカナで登録可'
               result += ' { Gimei.kanji }'
-              done = true
             when 'ひらがなのみで登録可'
               result += ' { Gimei.hiragana }'
-              done = true
             when 'カタカナのみで登録可'
               result += ' { Gimei.katakana }'
-              done = true
             when '数字のみ限定で登録可'
               result += ' { 12345678 }'
-              done = true
+            when '英字のみ限定で登録可'
+              result += " { 'abcdEFGH' }"
             when '英字小文字のみ登録可'
               result += " { 'abcdefgh' }"
-              done = true
             when '英字大文字のみ登録可'
               result += " { 'ABCDEFGH }"
-              done = true
             when '英字数字のみで登録可'
               result += " { '1234ABcd'}"
-              done = true
             when '郵便番号形式で登録可'
               result += " { '123-4567'}"
-              done = true
             end
           end
           result += ' { Faker::Lorem.characters(number: 8) }' unless done
