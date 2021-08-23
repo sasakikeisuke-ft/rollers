@@ -70,7 +70,8 @@ module AppActionsHelper
           contents[:form_targets] << app_action.target unless contents[:form_targets].include?(app_action.target)
 
           contents["#{app_action.target}_form_actions".to_sym] = [] if contents["#{app_action.target}_form_actions".to_sym].nil?
-          if app_action.action_code_id == 1 && !contents["#{app_action.target}_form_actions".to_sym].include?(app_action.action_select)
+          if app_action.action_code_id == 1 &&
+             !contents["#{app_action.target}_form_actions".to_sym].include?(app_action.action_select)
             contents["#{app_action.target}_form_actions".to_sym] << app_action.action_select
           end
           if app_action.action_select == 'update' && !contents["#{app_action.target}_form_actions".to_sym].include?('edit')
