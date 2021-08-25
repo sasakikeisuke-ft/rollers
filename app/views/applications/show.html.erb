@@ -101,3 +101,8 @@
 <p>
   以上でアプリケーション作成補助は終了となります。
 </p>
+<div>
+  <%= link_to 'モデル一覧へ', application_models_path(@application) %><br>
+  <%= link_to 'コントローラー一覧へ', application_app_controllers_path(@application) %><br>
+  <%= link_to 'アプリケーション一覧へ戻る', root_path %>
+</div>
