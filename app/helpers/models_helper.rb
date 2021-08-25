@@ -204,7 +204,7 @@ module ModelsHelper
   end
 
   # アソシエーションに関する記述を作成するメソッド
-  def make_association(contents, columns, model, attached_image)
+  def make_association(contents, model, attached_image)
     result = ''
     space = 2
 
@@ -214,25 +214,22 @@ module ModelsHelper
     end
 
     # has_many/has_oneに関する記述を作成する。ここでのcolumnsはアプリに関連する全てのカラムが対象となっている。
-    columns.each do |column|
-      # このモデル名と同じカラム名である -> references型で対象がこのモデル -> 対象モデルではbelongs_toが記載されている。
-      next unless column.name == model.name
+    # このモデル名と同じカラム名である -> references型で対象がこのモデル -> 対象モデルではbelongs_toが記載されている。 -> hasの対象
+    target_columns = Column.where(application_id: params[:application_id], name: model.name).select(:model_id)
+    target_models = Model.includes(:columns).where(application_id: params[:application_id], id: target_columns)
+    target_models.each do |target_model|
+      if target_model.not_only
+        result += "#{insert_space(space)}has_many :#{target_model.name.tableize}, dependent: :destroy<br>"
+      else
+        result += "#{insert_space(space)}has_one :#{target_model.name}, dependent: :destroy<br>"
+      end
+      next unless target_model.model_type.name == '中間テーブル'
 
-      has = if model.not_only
-              'has_many :'
-            else
-              'has_one :'
-            end
-      target_model = column.model
-      result += "#{insert_space(space)}#{has}#{target_model.name.tableize}, dependent: :destroy<br>"
+      target_model.columns.each do |column|
+        next if column.name == model.name
 
-      # target_modelが中間テーブルの場合、追加処理を行う。
-      next unless target_model.model_type_id == 3
-
-      target_columns = target_model.columns.where.not(name: model.name)
-      target_columns.each do |target_column|
-        result += "#{insert_space(space)}has_many :#{target_column.name}"
-        result += ", through: :#{target_model.name}<br>"
+       result += "#{insert_space(space)}has_many :#{column.name}"
+       result += ", through: :#{target_model.name}<br>"
       end
     end
 
