@@ -391,7 +391,7 @@ module ModelsHelper
     base = "#{insert_space(6)}it '#{column_name}条件' do<br>"
     base += "#{insert_space(8)}@#{model_name}.#{column_name} = 変更点<br>"
     base += "#{insert_space(8)}@#{model_name}.valid?<br>"
-    base += "#{insert_space(8)}expect(@#{model_name}.errors.full_message).to include("
+    base += "#{insert_space(8)}expect(@#{model_name}.errors.full_messages).to include("
     base += '"表示名メッセージ")<br>'.sub(/表示名/, display_name)
     base += "#{insert_space(6)}end<br>"
     base
@@ -492,7 +492,7 @@ module ModelsHelper
         sample += "#{insert_space(8)}another_#{model_name} = FactoryBot.build(:#{model_name}, "
         sample += "#{column_name}: @#{model_name}.#{column_name}変更点)<br>"
         sample += "#{insert_space(8)}another_#{model_name}.valid?<br>"
-        sample += "#{insert_space(8)}expect(@#{model_name}.errors.full_message).to include("
+        sample += "#{insert_space(8)}expect(@#{model_name}.errors.full_messages).to include("
         sample += '"表示名メッセージ")<br>'.sub(/表示名/, display_name)
         sample += "#{insert_space(6)}end<br>"
         case option.option_type_id
