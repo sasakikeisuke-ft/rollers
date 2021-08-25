@@ -357,7 +357,11 @@ module ModelsHelper
       base = make_abnormal_example_template(column, model.name, japanese)
       sample = base.gsub(/条件/, 'が紐づけられていないと登録できない')
       sample = sample.gsub(/変更点/, 'nil')
-      sample = sample.gsub(/メッセージ/, ' must exist')
+      sample = if japanese
+                 sample.gsub(/メッセージ/, 'を入力してください')
+               else
+                 sample.gsub(/メッセージ/, ' must exist')
+               end
       result += sample
       result += make_option_example(column, model.name, japanese, base)
     end
@@ -375,13 +379,15 @@ module ModelsHelper
 
   # 異常系テストコードの原型を作成するメソッド
   def make_abnormal_example_template(column, model_name, japanese)
-    column_name = if %w[references ActiveHash].include?(column.data_type.type)
+    column_name = if ActiveHash == column.data_type.type
                     "#{column.name}_id"
                   else
                     column.name
                   end
     display_name = if japanese && column.name_ja != ''
                      column.name_ja
+                   elsif japanese
+                     column.name
                    else
                      column.name.titleize
                    end
@@ -481,6 +487,8 @@ module ModelsHelper
                       end
         display_name = if japanese && column.name_ja != ''
                          column.name_ja
+                       elsif japanese
+                         column.name
                        else
                          column.name.titleize
                        end
