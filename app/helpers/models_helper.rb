@@ -218,18 +218,18 @@ module ModelsHelper
     target_columns = Column.where(application_id: params[:application_id], name: model.name).select(:model_id)
     target_models = Model.includes(:columns).where(application_id: params[:application_id], id: target_columns)
     target_models.each do |target_model|
-      if target_model.not_only
-        result += "#{insert_space(space)}has_many :#{target_model.name.tableize}, dependent: :destroy<br>"
-      else
-        result += "#{insert_space(space)}has_one :#{target_model.name}, dependent: :destroy<br>"
-      end
+      result += if target_model.not_only
+                  "#{insert_space(space)}has_many :#{target_model.name.tableize}, dependent: :destroy<br>"
+                else
+                  "#{insert_space(space)}has_one :#{target_model.name}, dependent: :destroy<br>"
+                end
       next unless target_model.model_type.name == '中間テーブル'
 
       target_model.columns.each do |column|
         next if column.name == model.name
 
-       result += "#{insert_space(space)}has_many :#{column.name}"
-       result += ", through: :#{target_model.name}<br>"
+        result += "#{insert_space(space)}has_many :#{column.name}"
+        result += ", through: :#{target_model.name}<br>"
       end
     end
 
