@@ -2,7 +2,7 @@ ja:
   activerecord:
     attributes:
       user:
-        nickname: 名前
+        nickname: ニックネーム
       app_controller:
         name: コントローラー名
         parent: 親コントローラー名
