@@ -96,7 +96,7 @@ module ModelsHelper
     result += make_with_options(contents[:presence_false], space, japanese)
 
     # boolean型のグループに関するvalidationを記載する。
-    option_code = 'inclusion:{in: [true, false]}'
+    option_code = 'inclusion:{ in: [true, false] }'
     result += use_with_option?(contents[:boolean_group], space, japanese, option_code)
 
     # 最終的なHTMLを返却する
