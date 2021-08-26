@@ -135,7 +135,7 @@ module ModelsHelper
 
   def make_with_options(group, space, japanese)
     result = ''
-    content = { else: [], single: [] }
+    content = { else: [] }
     grouping_ids = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25]
     # 引数となるcontents[:presence_true]とcontents[:presence_false]をグループ化できるoptionごとに再分配。
     # ただし、通常と異なる登録方法を行うActiveHashについては、option_type_id: 25として扱う。
@@ -161,23 +161,19 @@ module ModelsHelper
     grouping_ids.each do |id|
       next if content["option_type_#{id}".to_sym].nil?
 
+      option_type = OptionType.find(id)
+      code = if japanese
+               option_type.code.gsub(/エラーメッセージ/, option_type.message_ja)
+             else
+               option_type.code.gsub(/エラーメッセージ/, option_type.message_en)
+             end
       if content["option_type_#{id}".to_sym].length >= 2
-        option_type = OptionType.find(id)
-        code = if japanese
-                 option_type.code.gsub(/エラーメッセージ/, option_type.message_ja)
-               else
-                 option_type.code.gsub(/エラーメッセージ/, option_type.message_en)
-               end
         before = "#{insert_space(space)}with_options #{code} do<br>"
         after = "#{insert_space(space)}end<br>"
         during = ''
         content["option_type_#{id}".to_sym].each do |column|
-          name = if column.data_type.type == 'ActiveHash'
-                   "#{column.name}_id"
-                 else
-                   column.name
-                 end
-          during += "#{insert_space(space + 2)}validates :#{name}"
+          during += "#{insert_space(space + 2)}validates :#{column.name}"
+          during += '_id' if column.data_type.type == 'ActiveHash'
           column.options.each do |option|
             next if grouping_ids.include?(option.option_type_id)
 
@@ -187,13 +183,15 @@ module ModelsHelper
         end
         result += before + during + after
       else # if content["option_type_#{id}".to_sym].length == 1
-        content[:single] += content["option_type_#{id}".to_sym]
+        column = content["option_type_#{id}".to_sym][0]
+        result += "#{insert_space(space)}validates :#{column.name}"
+        result += '_id' if column.data_type.type == 'ActiveHash'
+        result += ", #{code}<br>"
       end
     end
 
     # formatを使用していないカラムのバリデーションを記載する。
-    content[:single] += content[:else]
-    content[:single].each do |column|
+    content[:else].each do |column|
       result += "#{insert_space(space)}validates :#{column.name}"
       column.options.each do |option|
         result += make_options(option, japanese)
