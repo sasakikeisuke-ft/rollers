@@ -1,6 +1,6 @@
 class AppAction < ApplicationRecord
   with_options presence: true do
-    validates :action_code_id, numericality: { other_than: 0, message: "を選択してください" }
+    validates :action_code_id, numericality: { other_than: 0, message: 'を選択してください' }
     validates :action_select
     validates :target
   end

@@ -29,32 +29,32 @@ RSpec.describe AppAction, type: :model do
       it 'action_selectが空欄だと登録できない' do
         @app_action.action_select = ''
         @app_action.valid?
-        expect(@app_action.errors.full_messages).to include("対象アクションを入力してください")
+        expect(@app_action.errors.full_messages).to include('対象アクションを入力してください')
       end
       it 'targetが空欄だと登録できない' do
         @app_action.target = ''
         @app_action.valid?
-        expect(@app_action.errors.full_messages).to include("対象モデル名を入力してください")
+        expect(@app_action.errors.full_messages).to include('対象モデル名を入力してください')
       end
       it 'action_code_idが空欄だと登録できない' do
         @app_action.action_code_id = ''
         @app_action.valid?
-        expect(@app_action.errors.full_messages).to include("Action codeを入力してください")
+        expect(@app_action.errors.full_messages).to include('Action codeを入力してください')
       end
       it 'app_controllerが紐づけられていないと登録できない' do
         @app_action.app_controller = nil
         @app_action.valid?
-        expect(@app_action.errors.full_messages).to include("App controllerを入力してください")
+        expect(@app_action.errors.full_messages).to include('App controllerを入力してください')
       end
       it 'applicationが紐づけられていないと登録できない' do
         @app_action.application = nil
         @app_action.valid?
-        expect(@app_action.errors.full_messages).to include("Applicationを入力してください")
+        expect(@app_action.errors.full_messages).to include('Applicationを入力してください')
       end
       it 'action_code_idが未選択だと登録できない' do
         @app_action.action_code_id = 0
         @app_action.valid?
-        expect(@app_action.errors.full_messages).to include("Action codeを選択してください")
+        expect(@app_action.errors.full_messages).to include('Action codeを選択してください')
       end
     end
   end
