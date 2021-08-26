@@ -15,6 +15,7 @@
     <%== before_action_authenticate_user(@app_controller) %>
     <%== make_before_action_model_form_variable(contents) %>
     <%== make_before_action_common_variable(contents) %>
+    <%== "#{insert_space(2)}※ 上記のbefore_actionは自動生成<br>" if links %>
     <br>
 
     <%# 基本の７つのアクションに関する記載を行う。 %>
