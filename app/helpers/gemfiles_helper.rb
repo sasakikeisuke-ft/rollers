@@ -32,12 +32,7 @@ module GemfilesHelper
       html += "#{insert_space(6)}#{model.name}:"
       html += '<br>'
       model.columns.each do |column|
-        html += if column.name_ja != ''
-                  "#{insert_space(8)}#{column.name}: #{column.name_ja}"
-                else
-                  "#{insert_space(8)}#{column.name}: #{column.name}"
-                end
-        html += '<br>'
+        html += "#{insert_space(8)}#{column.name}: #{column.name_ja}<br>"
       end
     end
     html

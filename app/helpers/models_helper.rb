@@ -369,7 +369,11 @@ module ModelsHelper
       base = make_abnormal_example_template(column, model.name, japanese)
       sample = base.gsub(/条件/, 'が未選択だと登録できない')
       sample = sample.gsub(/変更点/, '0')
-      sample = sample.gsub(/メッセージ/, " can't be blank")
+      sample = if japanese
+                 sample.gsub(/メッセージ/, 'を選択してください')
+               else
+                 sample.gsub(/メッセージ/, " can't be blank")
+               end
       result += sample
     end
     result
@@ -377,18 +381,14 @@ module ModelsHelper
 
   # 異常系テストコードの原型を作成するメソッド
   def make_abnormal_example_template(column, model_name, japanese)
-    column_name = if ActiveHash == column.data_type.type
-                    "#{column.name}_id"
-                  else
-                    column.name
-                  end
-    display_name = if japanese && column.name_ja != ''
-                     column.name_ja
-                   elsif japanese
-                     column.name
-                   else
-                     column.name.titleize
-                   end
+    column_name = column.name
+    column_name += '_id' if column.data_type.type == 'ActiveHash'
+    if japanese && column.name_ja != ''
+      display_name = column.name_ja
+    else
+      display_name = column.name.capitalize
+      display_name = display_name.gsub(/_/, ' ')
+    end
     base = "#{insert_space(6)}it '#{column_name}条件' do<br>"
     base += "#{insert_space(8)}@#{model_name}.#{column_name} = 変更点<br>"
     base += "#{insert_space(8)}@#{model_name}.valid?<br>"
@@ -478,24 +478,20 @@ module ModelsHelper
         end
       when 'uniqueness'
         # 重複確認のテストコードではbaseの形が異なるため、専用のbaseを作成する
-        column_name = if %w[references ActiveHash].include?(column.data_type.type)
-                        "#{column.name}_id"
-                      else
-                        column.name
-                      end
-        display_name = if japanese && column.name_ja != ''
-                         column.name_ja
-                       elsif japanese
-                         column.name
-                       else
-                         column.name.titleize
-                       end
+        column_name = column.name
+        column_name += '_id' if %w[references ActiveHash].include?(column.data_type.type)
+        if japanese && column.name_ja != ''
+          display_name = column.name_ja
+        else
+          display_name = column.name.capitalize
+          display_name = display_name.gsub(/_/, ' ')
+        end
         sample = "#{insert_space(6)}it '#{column_name}の重複があり登録できない' do<br>"
         sample += "#{insert_space(8)}@#{model_name}.save<br>"
         sample += "#{insert_space(8)}another_#{model_name} = FactoryBot.build(:#{model_name}, "
         sample += "#{column_name}: @#{model_name}.#{column_name}変更点)<br>"
         sample += "#{insert_space(8)}another_#{model_name}.valid?<br>"
-        sample += "#{insert_space(8)}expect(@#{model_name}.errors.full_messages).to include("
+        sample += "#{insert_space(8)}expect(another_#{model_name}.errors.full_messages).to include("
         sample += '"表示名メッセージ")<br>'.sub(/表示名/, display_name)
         sample += "#{insert_space(6)}end<br>"
         case option.option_type_id
