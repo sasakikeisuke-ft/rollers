@@ -111,7 +111,9 @@ module ModelsHelper
       result += make_with_options(group, space + 2, japanese)
       result += "#{insert_space(space)}end<br>"
     elsif group.length == 1
-      result += "#{insert_space(space)}validates :#{group[0].name}, #{option_code}"
+      result += "#{insert_space(space)}validates :#{group[0].name}"
+      result += '_id' if group[0].data_type.type == 'ActiveHash'
+      result += ", #{option_code}"
       group[0].options.each do |option|
         result += make_options(option, japanese)
       end
