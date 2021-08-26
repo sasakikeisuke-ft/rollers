@@ -22,18 +22,19 @@ class ActionCode < ActiveHash::Base
 
     # 複数のレコードを取得
     { id: 21, keyword: '内容', sample: '@models = Model.all' },
-    { id: 22, keyword: '内容', sample: '@models = Model.where(条件式1_id: params[条件式1_id])' },
-    { id: 23, keyword: '内容', sample: '@models = Model.where(条件式1)' },
-    { id: 24, keyword: '内容', sample: '@models = Model.where(条件式1: [条件式2])' },
-    { id: 25, keyword: '内容', sample: '@models = Model.where(条件式1, 条件式2)' },
-    { id: 26, keyword: '内容', sample: '@models = Model.where(条件式1, 条件式2, 条件式3)' },
-    { id: 27, keyword: '内容', sample: '@models = Model.where.not(条件式1)' },
-    { id: 28, keyword: '内容', sample: '@models = Model.where.not(条件式1: [条件式2])' },
-    { id: 29, keyword: '内容', sample: '@models = Model.where.not(条件式1, 条件式2)' },
-    { id: 30, keyword: '内容', sample: '@models = Model.where.not(条件式1, 条件式2, 条件式3)' },
-    { id: 31, keyword: '内容', sample: '@models = Model.where.(条件式1).where.not(条件式2)' },
-    { id: 32, keyword: '内容', sample: '@models = Model.where.(条件式1, 条件式2).where.not(条件式3)' },
-    { id: 33, keyword: '内容', sample: '@models = Model.where.(条件式1).where.not(条件式2,条件式3)' },
+    { id: 22, keyword: '内容', sample: '@models = Model.where(user_id: current_user.id)' },
+    { id: 23, keyword: '内容', sample: '@models = Model.where(条件式1_id: params[:条件式1_id])' },
+    { id: 24, keyword: '内容', sample: '@models = Model.where(条件式1)' },
+    { id: 25, keyword: '内容', sample: '@models = Model.where(条件式1: [条件式2])' },
+    { id: 26, keyword: '内容', sample: '@models = Model.where(条件式1, 条件式2)' },
+    { id: 27, keyword: '内容', sample: '@models = Model.where(条件式1, 条件式2, 条件式3)' },
+    { id: 28, keyword: '内容', sample: '@models = Model.where.not(条件式1)' },
+    { id: 29, keyword: '内容', sample: '@models = Model.where.not(条件式1: [条件式2])' },
+    { id: 30, keyword: '内容', sample: '@models = Model.where.not(条件式1, 条件式2)' },
+    { id: 31, keyword: '内容', sample: '@models = Model.where.not(条件式1, 条件式2, 条件式3)' },
+    { id: 32, keyword: '内容', sample: '@models = Model.where.(条件式1).where.not(条件式2)' },
+    { id: 33, keyword: '内容', sample: '@models = Model.where.(条件式1, 条件式2).where.not(条件式3)' },
+    { id: 34, keyword: '内容', sample: '@models = Model.where.(条件式1).where.not(条件式2,条件式3)' },
 
     # 複数のレコードと関連するテーブルを取得
     { id: 41, keyword: '内容', sample: '@models = Model.includes(:条件式1)' },
@@ -76,10 +77,10 @@ class ActionCode < ActiveHash::Base
     { id: 95, keyword: '内容', sample: 'redirect_to 条件式1_path(条件式2_id: params[条件式2_id])' },
     { id: 96, keyword: '内容', sample: 'render 条件式1' },
 
-    # get_common_variableの使用
-    { id: 97, keyword: '内容', sample: 'get_common_variable1' },
-    { id: 98, keyword: '内容', sample: 'get_common_variable2' },
-    { id: 99, keyword: '内容', sample: 'get_common_variable3' }
+    # common_variableの使用
+    { id: 97, keyword: '内容', sample: 'common_variable1' },
+    { id: 98, keyword: '内容', sample: 'common_variable2' },
+    { id: 99, keyword: '内容', sample: 'common_variable3' }
   ]
   include ActiveHash::Associations
   has_many :app_actions

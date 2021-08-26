@@ -24,9 +24,7 @@ class ColumnsController < ApplicationController
 
   def update
     if @column.update(column_params)
-      @column.options.each do |option|
-        option.destroy
-      end
+      @column.options.each(&:destroy)
       redirect_to new_application_model_column_option_path(column_id: @column)
     else
       show_index

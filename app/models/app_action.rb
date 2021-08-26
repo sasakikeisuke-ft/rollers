@@ -1,14 +1,13 @@
 class AppAction < ApplicationRecord
   with_options presence: true do
-    validates :target
+    validates :action_code_id, numericality: { other_than: 0, message: 'を選択してください' }
     validates :action_select
+    validates :target
   end
-
-  validates :action_code_id, numericality: { other_than: 0, message: " can't be blank" }
-
-  belongs_to :application
   belongs_to :app_controller
+  belongs_to :application
 
+  # ActiveHash
   extend ActiveHash::Associations::ActiveRecordExtensions
   belongs_to :action_code
 end

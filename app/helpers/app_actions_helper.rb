@@ -6,7 +6,7 @@ module AppActionsHelper
     # 基本の７つのアクション
     seven_actions = %w[index new create edit update destroy show]
     # 共通する内容を登録するプライベートアクション
-    common_actions = %w[get_common_variable1 get_common_variable2 get_common_variable3]
+    common_actions = %w[common_variable1 common_variable2 common_variable3]
     selects = []
     targets = []
     array = {}
@@ -70,14 +70,15 @@ module AppActionsHelper
           contents[:form_targets] << app_action.target unless contents[:form_targets].include?(app_action.target)
 
           contents["#{app_action.target}_form_actions".to_sym] = [] if contents["#{app_action.target}_form_actions".to_sym].nil?
-          if app_action.action_code_id == 1 && !contents["#{app_action.target}_form_actions".to_sym].include?(app_action.action_select)
+          if app_action.action_code_id == 1 &&
+             !contents["#{app_action.target}_form_actions".to_sym].include?(app_action.action_select)
             contents["#{app_action.target}_form_actions".to_sym] << app_action.action_select
           end
           if app_action.action_select == 'update' && !contents["#{app_action.target}_form_actions".to_sym].include?('edit')
             contents["#{app_action.target}_form_actions".to_sym] << 'edit'
           end
         end
-      else # app_action.action_code_id >= 97 -> get_common_variableを使用するアクション
+      else # app_action.action_code_id >= 97 -> common_variableを使用するアクション
         sample = app_action.action_code.sample
         contents["#{sample}_targets".to_sym] = [] if contents["#{sample}_targets".to_sym].nil?
         contents["#{sample}_targets".to_sym] << app_action
@@ -170,7 +171,7 @@ module AppActionsHelper
         html += ":#{column}_id"
         first = false
       end
-      if references_columns.length != 0
+      unless references_columns.empty?
         first = true
         html += ').merge('
         references_columns.each do |column|
@@ -222,9 +223,9 @@ module AppActionsHelper
   end
 
   # before_action: get_comon_variableを作成するメソッド
-  def make_before_action_get_common_variable(contents)
+  def make_before_action_common_variable(contents)
     html = ''
-    common_actions = %w[get_common_variable1 get_common_variable2 get_common_variable3]
+    common_actions = %w[common_variable1 common_variable2 common_variable3]
     common_actions.each do |action|
       next if contents[action.to_sym].nil?
 
@@ -265,7 +266,7 @@ module AppActionsHelper
     when 0
       html = ''
     else
-      html += action_html + ']<br>'
+      html += "#{action_html}]<br>"
     end
     html
   end

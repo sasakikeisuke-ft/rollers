@@ -14,7 +14,8 @@
     class <%= @app_controller.name.pluralize.camelize %>Controller < ApplicationController<br>
     <%== before_action_authenticate_user(@app_controller) %>
     <%== make_before_action_model_form_variable(contents) %>
-    <%== make_before_action_get_common_variable(contents) %>
+    <%== make_before_action_common_variable(contents) %>
+    <%== "#{insert_space(2)}※ 上記のbefore_actionは自動生成<br>" if links %>
     <br>
 
     <%# 基本の７つのアクションに関する記載を行う。 %>
@@ -60,8 +61,8 @@
     <%# model_params: ストロングパラメーター取得メソッド %>
     <%== make_strong_parameter(contents) %>
     
-    <%# get_common_variable1-3: 各アクションの共通となるインスタンス変数を取得するメソッド %>
-    <% common_actions = %w[get_common_variable1 get_common_variable2 get_common_variable3] %>
+    <%# common_variable1-3: 各アクションの共通となるインスタンス変数を取得するメソッド %>
+    <% common_actions = %w[common_variable1 common_variable2 common_variable3] %>
     <% common_actions.each do |action| %>
       <% unless contents[action.to_sym].nil? %>
         <%== "#{insert_space(2)}def #{action}<br>"  %>

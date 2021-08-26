@@ -1,4 +1,5 @@
 require 'rails_helper'
+
 RSpec.describe AppController, type: :model do
   before do
     @app_controller = FactoryBot.build(:app_controller)
@@ -14,10 +15,6 @@ RSpec.describe AppController, type: :model do
         @app_controller.parent = ''
         expect(@app_controller).to be_valid
       end
-      it 'targetが空欄でも登録できる' do
-        @app_controller.target = ''
-        expect(@app_controller).to be_valid
-      end
     end
 
     context '不適切な内容があり登録できない' do
@@ -26,52 +23,52 @@ RSpec.describe AppController, type: :model do
         @app_controller.valid?
         expect(@app_controller.errors.full_messages).to include('コントローラー名を入力してください')
       end
+      it 'nameの重複があり登録できない' do
+        @app_controller.save
+        another_app_controller = FactoryBot.build(:app_controller, name: @app_controller.name,
+                                                                   application: @app_controller.application)
+        another_app_controller.valid?
+        expect(another_app_controller.errors.full_messages).to include('コントローラー名はすでに存在します')
+      end
       it 'index_selectが空欄だと登録できない' do
         @app_controller.index_select = ''
         @app_controller.valid?
-        expect(@app_controller.errors.full_messages).to include('indexを入力してください')
+        expect(@app_controller.errors.full_messages).to include('Index selectを入力してください')
       end
       it 'new_selectが空欄だと登録できない' do
         @app_controller.new_select = ''
         @app_controller.valid?
-        expect(@app_controller.errors.full_messages).to include('newを入力してください')
+        expect(@app_controller.errors.full_messages).to include('New selectを入力してください')
       end
       it 'create_selectが空欄だと登録できない' do
         @app_controller.create_select = ''
         @app_controller.valid?
-        expect(@app_controller.errors.full_messages).to include('createを入力してください')
+        expect(@app_controller.errors.full_messages).to include('Create selectを入力してください')
       end
       it 'edit_selectが空欄だと登録できない' do
         @app_controller.edit_select = ''
         @app_controller.valid?
-        expect(@app_controller.errors.full_messages).to include('editを入力してください')
+        expect(@app_controller.errors.full_messages).to include('Edit selectを入力してください')
       end
       it 'update_selectが空欄だと登録できない' do
         @app_controller.update_select = ''
         @app_controller.valid?
-        expect(@app_controller.errors.full_messages).to include('updateを入力してください')
+        expect(@app_controller.errors.full_messages).to include('Update selectを入力してください')
       end
       it 'destroy_selectが空欄だと登録できない' do
         @app_controller.destroy_select = ''
         @app_controller.valid?
-        expect(@app_controller.errors.full_messages).to include('destroyを入力してください')
+        expect(@app_controller.errors.full_messages).to include('Destroy selectを入力してください')
       end
       it 'show_selectが空欄だと登録できない' do
         @app_controller.show_select = ''
         @app_controller.valid?
-        expect(@app_controller.errors.full_messages).to include('showを入力してください')
+        expect(@app_controller.errors.full_messages).to include('Show selectを入力してください')
       end
       it 'applicationが紐づけられていないと登録できない' do
         @app_controller.application = nil
         @app_controller.valid?
-        expect(@app_controller.errors.full_messages).to include('applicationを入力してください')
-      end
-      it 'nameの重複があり登録できない' do
-        @app_controller.save
-        another_app_controller = FactoryBot.build(:app_controller, name: @app_controller.name,
-                                                                   application_id: @app_controller.application_id)
-        another_app_controller.valid?
-        expect(@app_controller.errors.full_messages).to include('コントローラー名はすでに存在します')
+        expect(@app_controller.errors.full_messages).to include('Applicationを入力してください')
       end
     end
   end

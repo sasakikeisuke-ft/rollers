@@ -2,43 +2,69 @@ ja:
   activerecord:
     attributes:
       user:
-        nickname: 名前
+        nickname: ニックネーム
+      application:
+        name: アプリケーション名
+        description: アプリケーション説明文
+        user:
+      gemfile:
+        devise: devise
+        pry_rails: pry_rails
+        image_magick: image_magick
+        active_hash: active_hash
+        rails_i18n: rails_i18n
+        ransack: ransack
+        rubocop: rubocop
+        rspec: rspec
+        payjp: payjp
+        s3: s3
+        application:
+      model_type:
+        name:
+      model:
+        name: モデル名
+        not_only: not_only
+        attached_image:
+        model_type:
+        application:
+      data_type:
+        type:
+        space:
+      column:
+        name: カラム名
+        name_ja: カラム日本語表記
+        data_type:
+        must_exist: must_exist
+        unique: unique
+        model:
+        application:
+      option_type:
+        type:
+        info:
+        code:
+        message_ja:
+        message_en:
+      option:
+        option_type:
+        input1: 入力1
+        input2: 入力2
+        column:
       app_controller:
         name: コントローラー名
         parent: 親コントローラー名
-        application: application
-        target: 編集対象モデル
-        index_select: index
-        new_select: new
-        create_select: create
-        edit_select: edit
-        update_select: update
-        destroy_select: destroy
-        show_select: show
-      application:
-        name: アプリケーション名
-        description: 説明文
-        user: user
-      action_type:
-        name: name
+        application:
+        index_select:
+        new_select:
+        create_select:
+        edit_select:
+        update_select:
+        destroy_select:
+        show_:
+      action_code:
+        sample:
       app_action:
-        action_type: action_type
+        action_select: 対象アクション
         target: 対象モデル名
-        code_type: code_type
-        app_controller: app_controller
-        input1: 条件式1
-        input2: 条件式2
-        input3: 条件式3
-      code_type:
-        info: info
-        sample: sample
-      model:
-        name: 名前
-        application: application
-      column:
-        name: カラム名
-        application: application
-        model: model
-      option:
-        model: model
-        column: column
+        action_code:
+        app_controller:
+        application:

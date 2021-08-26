@@ -2,6 +2,7 @@
 <p>
 コントローラーのコードを表示します。<br>
 一部アクションは初期設定として登録されています。必要に応じ編集または削除してください。<br>
+また、編集及び削除へのリンクなどはコード表示画面では非表示となります。
 </p>
 <h5>自動で作成されるメソッドについての補足説明</h5>
 <div>
@@ -17,24 +18,32 @@
   実際には、'model'部分が対象のモデル名へ差し替えられます。
 </div><br>
 <div>
-  <b>＜get_common_variable1-3＞</b><br>
+  <b>＜common_variable1-3＞</b><br>
   複数のアクションで共通する内容をbefore_actionで取得するメソッドです。<br>
   対象モデルが異なる場合に備え、三種類まで登録することが可能です。<br>
-  初期設定では全てのアクションを対象にbefore_actionがで既往されています。<br>
+  初期設定では全てのアクションを対象にbefore_actionがで適応されています。<br>
   アクション登録時に、対象アクションと当メソッド名を選ぶことで、onlyにより適応アクションを限定できます。<br>
 </div><br>
 <div>
   <b>＜model_form_variable＞</b><br>
   登録されたコントローラーのネスト構造から、フォームに必要なインスタンス変数を取得するメソッドです。<br>
   登録内容から自動で生成されますが、このメソッドに任意のアクションを登録することもできます。<br>
+  フォームに必要なインスタンス変数があれば、このメソッドにアクションを登録してください。
 </div>
 <br>
 <%= link_to 'アクション新規作成へ',  new_application_app_controller_app_action_path %><br>
+<%= link_to 'コード表示画面へ', application_app_controller_path(id: params[:app_controller_id]) %>
 <br>
 
 <h3><%= @app_controller.name %>コントローラーの内容</h3>
 <%# 部分テンプレートを使用し、コントローラーのコードを表示します。また編集削除のリンクは表示されます。 %>
 <%= render partial: "shared/controller", locals: {links: true} %>
+<div>
+  <b>※注意</b><br>
+  初期設定の場合、redirect_toはroot_pathへ遷移する設定となっています。<br>
+  必要に応じ、実装時に変更、またはレイアウト(編集)へ設定を変更してください。
+</div>
 <br>
 <%= link_to 'アクション新規作成へ',  new_application_app_controller_app_action_path %><br>
+<%= link_to 'コード表示画面へ', application_app_controller_path(id: params[:app_controller_id]) %>
 <%= render partial: "shared/link_index" %>

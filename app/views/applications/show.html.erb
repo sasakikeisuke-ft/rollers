@@ -41,13 +41,13 @@
     <div class="model-codes">
       <h3>モデルに関するコード</h3>
       <% @models.each do |model| %>
-        <%= link_to model.name, application_model_path(model), class: link_to %><br>
+        <%= link_to model.name, application_model_path(application_id: params[:id], id: model), class: link_to %><br>
       <% end %>
     </div>
     <div class="controller-codes">
       <h3>コントローラーに関するコード</h3>
       <% @app_controllers.each do |app_controller| %>
-        <%= link_to app_controller.name, application_app_controller_path(app_controller), class: link_to %><br>
+        <%= link_to app_controller.name, application_app_controller_path(application_id: params[:id], id: app_controller), class: link_to %><br>
       <% end %>
     </div>
   </div>
@@ -82,8 +82,27 @@
       heroku run rails db:migrate
     </div>
   </div>
+  <%# ターミナル操作: エラーログの確認 %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：エラーログの確認
+      </div>
+    </div>
+    <div class="terminal-contents">
+      heroku logs --tail --app 
+    </div>
+  </div>
 </div>
 
 <p>
   以上でアプリケーション作成補助は終了となります。
 </p>
+<div>
+  <%= link_to 'モデル一覧へ', application_models_path(@application) %><br>
+  <%= link_to 'コントローラー一覧へ', application_app_controllers_path(@application) %><br>
+  <%= link_to 'アプリケーション一覧へ戻る', root_path %>
+</div>

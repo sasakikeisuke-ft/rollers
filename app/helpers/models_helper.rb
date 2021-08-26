@@ -46,7 +46,7 @@ module ModelsHelper
       if column.data_type_id <= 10
         if column.must_exist
           contents[:presence_true] << column
-        elsif column.options.length != 0
+        elsif !column.options.empty?
           contents[:presence_false] << column
           contents[:normal_example_group] << column
         else # 空欄可能であり、かつオプションの設定がされていない場合
@@ -84,41 +84,51 @@ module ModelsHelper
   end
 
   # モデルファイルのバリデーションに関する記載を作成するメソッド
-  def make_varidation(contents, japanese)
+  def make_validation(contents, japanese)
     result = ''
     space = 2
-    after = "#{insert_space(space)}end<br>"
 
     # 空欄禁止を設定されたものから処理を行う。
-    option = 'presence: true'
-    result += use_with_option?(contents[:presence_true], space, japanese, option)
+    option_code = 'presence: true'
+    result += use_with_option?(contents[:presence_true], space, japanese, option_code)
 
     # 空欄を禁止せずoptionのみ設定されたgroupの処理を行う。
     result += make_with_options(contents[:presence_false], space, japanese)
 
-    # boolean型のグループに関するvaridationを記載する。
-    option = 'inclusion:{in: [true, false]}'
-    result += use_with_option?(contents[:boolean_group], space, japanese, option)
+    # boolean型のグループに関するvalidationを記載する。
+    option_code = 'inclusion: { in: [true, false] }'
+    result += use_with_option?(contents[:boolean_group], space, japanese, option_code)
 
     # 最終的なHTMLを返却する
     result
   end
 
   # with_optionを使用するかどうかを判断し、必要に応じてメソッドを使用するメソッド
-  def use_with_option?(group, space, japanese, option)
-    html = ''
+  def use_with_option?(group, space, japanese, option_code)
+    result = ''
     if group.length >= 2
-      html += "#{insert_space(space)}with_options #{option} do<br>"
-      html += make_with_options(group, space + 2, japanese)
-      html += "#{insert_space(space)}end<br>"
+      result += "#{insert_space(space)}with_options #{option_code} do<br>"
+      result += make_with_options(group, space + 2, japanese)
+      result += "#{insert_space(space)}end<br>"
     elsif group.length == 1
-      html += "#{insert_space(space)}varidates :#{group[0].name}, #{option}"
+      result += "#{insert_space(space)}validates :#{group[0].name}"
+      result += '_id' if group[0].data_type.type == 'ActiveHash'
+      result += ", #{option_code}"
       group[0].options.each do |option|
-        html += make_options(option, japanese)
+        result += make_options(option, japanese)
       end
-      html += '<br>'
+      if group[0].data_type.type == 'ActiveHash'
+        option_type = OptionType.find(25)
+        code = if japanese
+                 option_type.code.gsub(/エラーメッセージ/, option_type.message_ja)
+               else
+                 option_type.code.gsub(/エラーメッセージ/, option_type.message_en)
+               end
+        result += ", #{code}"
+      end
+      result += '<br>'
     end
-    html
+    result
   end
 
   # optionに関する記載を行うメソッド。そのカラムのオプションのみ追加していく。
@@ -136,7 +146,7 @@ module ModelsHelper
 
   def make_with_options(group, space, japanese)
     result = ''
-    content = { else: [], single: [] }
+    content = { else: [] }
     grouping_ids = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25]
     # 引数となるcontents[:presence_true]とcontents[:presence_false]をグループ化できるoptionごとに再分配。
     # ただし、通常と異なる登録方法を行うActiveHashについては、option_type_id: 25として扱う。
@@ -162,20 +172,19 @@ module ModelsHelper
     grouping_ids.each do |id|
       next if content["option_type_#{id}".to_sym].nil?
 
+      option_type = OptionType.find(id)
+      code = if japanese
+               option_type.code.gsub(/エラーメッセージ/, option_type.message_ja)
+             else
+               option_type.code.gsub(/エラーメッセージ/, option_type.message_en)
+             end
       if content["option_type_#{id}".to_sym].length >= 2
-        option_type = OptionType.find(id)
-        code = if japanese
-                 option_type.code.gsub(/エラーメッセージ/, option_type.message_ja)
-               else
-                 option_type.code.gsub(/エラーメッセージ/, option_type.message_en)
-               end
         before = "#{insert_space(space)}with_options #{code} do<br>"
         after = "#{insert_space(space)}end<br>"
         during = ''
         content["option_type_#{id}".to_sym].each do |column|
-          name = column.name
-          name = "#{column.name}_id" if column.data_type.type = 'ActiveHash'
-          during += "#{insert_space(space + 2)}varidates :#{name}"
+          during += "#{insert_space(space + 2)}validates :#{column.name}"
+          during += '_id' if column.data_type.type == 'ActiveHash'
           column.options.each do |option|
             next if grouping_ids.include?(option.option_type_id)
 
@@ -185,14 +194,16 @@ module ModelsHelper
         end
         result += before + during + after
       else # if content["option_type_#{id}".to_sym].length == 1
-        content[:single] += content["option_type_#{id}".to_sym]
+        column = content["option_type_#{id}".to_sym][0]
+        result += "#{insert_space(space)}validates :#{column.name}"
+        result += '_id' if column.data_type.type == 'ActiveHash'
+        result += ", #{code}<br>"
       end
     end
 
     # formatを使用していないカラムのバリデーションを記載する。
-    content[:single] += content[:else]
-    content[:single].each do |column|
-      result += "#{insert_space(space)}varidates :#{column.name}"
+    content[:else].each do |column|
+      result += "#{insert_space(space)}validates :#{column.name}"
       column.options.each do |option|
         result += make_options(option, japanese)
       end
@@ -202,50 +213,47 @@ module ModelsHelper
   end
 
   # アソシエーションに関する記述を作成するメソッド
-  def make_association(contents, columns, model, attached_image)
-    html = ''
+  def make_association(contents, model, attached_image)
+    result = ''
     space = 2
 
     # belongs_toに関する記述を作成する。
     contents[:references_group].each do |column|
-      html += "#{insert_space(2)}belongs_to :#{column.name}<br>"
+      result += "#{insert_space(2)}belongs_to :#{column.name}<br>"
     end
 
     # has_many/has_oneに関する記述を作成する。ここでのcolumnsはアプリに関連する全てのカラムが対象となっている。
-    columns.each do |column|
-      # このモデル名と同じカラム名である -> references型で対象がこのモデル -> 対象モデルではbelongs_toが記載されている。
-      next unless column.name == model.name
+    # このモデル名と同じカラム名である -> references型で対象がこのモデル -> 対象モデルではbelongs_toが記載されている。 -> hasの対象
+    target_columns = Column.where(application_id: params[:application_id], name: model.name).select(:model_id)
+    target_models = Model.includes(:columns).where(application_id: params[:application_id], id: target_columns)
+    target_models.each do |target_model|
+      result += if target_model.not_only
+                  "#{insert_space(space)}has_many :#{target_model.name.tableize}, dependent: :destroy<br>"
+                else
+                  "#{insert_space(space)}has_one :#{target_model.name}, dependent: :destroy<br>"
+                end
+      next unless target_model.model_type.name == '中間テーブル'
 
-      has = if model.not_only
-              'has_many :'
-            else
-              'has_one :'
-            end
-      target_model = column.model
-      html += "#{insert_space(space)}#{has}#{target_model.name.tableize}, dependent: :destroy<br>"
+      target_model.columns.each do |column|
+        next if column.name == model.name
 
-      # target_modelが中間テーブルの場合、追加処理を行う。
-      next unless target_model.model_type_id == 3
-
-      target_columns = target_model.columns.where.not(name: model.name)
-      target_columns.each do |target_column|
-        html += "#{insert_space(space)}has_many :#{target_column.name}"
-        html += ", through: :#{target_model.name}<br>"
+        result += "#{insert_space(space)}has_many :#{column.name.pluralize}"
+        result += ", through: :#{target_model.name.pluralize}<br>"
       end
     end
 
     # ImageMagickを使用する場合のアソシエーションを記載
-    html += "#{insert_space(2)}has_one_attached :image<br>" if attached_image
+    result += "#{insert_space(2)}has_one_attached :image<br>" if attached_image
 
     # ActiveHashに関する記述を作成するメソッド。
-    if contents[:activehash_group].length != 0
-      html += "<br>#{insert_space(2)}# ActiveHash<br>"
-      html += "#{insert_space(2)}extend ActiveHash::Associations::ActiveRecordExtensions<br>"
+    unless contents[:activehash_group].empty?
+      result += "<br>#{insert_space(2)}# ActiveHash<br>"
+      result += "#{insert_space(2)}extend ActiveHash::Associations::ActiveRecordExtensions<br>"
       contents[:activehash_group].each do |column|
-        html += "#{insert_space(2)}belongs_to :#{column.name}<br>"
+        result += "#{insert_space(2)}belongs_to :#{column.name}<br>"
       end
     end
-    html
+    result
   end
 
   # Formオブジェクトパターンに必要な処理を行うメソッド。追加するハッシュは以下
@@ -358,7 +366,11 @@ module ModelsHelper
       base = make_abnormal_example_template(column, model.name, japanese)
       sample = base.gsub(/条件/, 'が紐づけられていないと登録できない')
       sample = sample.gsub(/変更点/, 'nil')
-      sample = sample.gsub(/メッセージ/, ' must exist')
+      sample = if japanese
+                 sample.gsub(/メッセージ/, 'を入力してください')
+               else
+                 sample.gsub(/メッセージ/, ' must exist')
+               end
       result += sample
       result += make_option_example(column, model.name, japanese, base)
     end
@@ -368,7 +380,11 @@ module ModelsHelper
       base = make_abnormal_example_template(column, model.name, japanese)
       sample = base.gsub(/条件/, 'が未選択だと登録できない')
       sample = sample.gsub(/変更点/, '0')
-      sample = sample.gsub(/メッセージ/, " can't be blank")
+      sample = if japanese
+                 sample.gsub(/メッセージ/, 'を選択してください')
+               else
+                 sample.gsub(/メッセージ/, " can't be blank")
+               end
       result += sample
     end
     result
@@ -376,20 +392,18 @@ module ModelsHelper
 
   # 異常系テストコードの原型を作成するメソッド
   def make_abnormal_example_template(column, model_name, japanese)
-    column_name = if %w[references ActiveHash].include?(column.data_type.type)
-                    "#{column.name}_id"
-                  else
-                    column.name
-                  end
-    display_name = if japanese && column.name_ja != ''
-                     column.name_ja
-                   else
-                     column.name.titleize
-                   end
+    column_name = column.name
+    column_name += '_id' if column.data_type.type == 'ActiveHash'
+    if japanese && column.name_ja != ''
+      display_name = column.name_ja
+    else
+      display_name = column.name.capitalize
+      display_name = display_name.gsub(/_/, ' ')
+    end
     base = "#{insert_space(6)}it '#{column_name}条件' do<br>"
     base += "#{insert_space(8)}@#{model_name}.#{column_name} = 変更点<br>"
     base += "#{insert_space(8)}@#{model_name}.valid?<br>"
-    base += "#{insert_space(8)}expect(@#{model_name}.errors.full_message).to include("
+    base += "#{insert_space(8)}expect(@#{model_name}.errors.full_messages).to include("
     base += '"表示名メッセージ")<br>'.sub(/表示名/, display_name)
     base += "#{insert_space(6)}end<br>"
     base
@@ -475,22 +489,20 @@ module ModelsHelper
         end
       when 'uniqueness'
         # 重複確認のテストコードではbaseの形が異なるため、専用のbaseを作成する
-        column_name = if %w[references ActiveHash].include?(column.data_type.type)
-                        "#{column.name}_id"
-                      else
-                        column.name
-                      end
-        display_name = if japanese && column.name_ja != ''
-                         column.name_ja
-                       else
-                         column.name.titleize
-                       end
+        column_name = column.name
+        column_name += '_id' if %w[references ActiveHash].include?(column.data_type.type)
+        if japanese && column.name_ja != ''
+          display_name = column.name_ja
+        else
+          display_name = column.name.capitalize
+          display_name = display_name.gsub(/_/, ' ')
+        end
         sample = "#{insert_space(6)}it '#{column_name}の重複があり登録できない' do<br>"
         sample += "#{insert_space(8)}@#{model_name}.save<br>"
         sample += "#{insert_space(8)}another_#{model_name} = FactoryBot.build(:#{model_name}, "
         sample += "#{column_name}: @#{model_name}.#{column_name}変更点)<br>"
         sample += "#{insert_space(8)}another_#{model_name}.valid?<br>"
-        sample += "#{insert_space(8)}expect(@#{model_name}.errors.full_message).to include("
+        sample += "#{insert_space(8)}expect(another_#{model_name}.errors.full_messages).to include("
         sample += '"表示名メッセージ")<br>'.sub(/表示名/, display_name)
         sample += "#{insert_space(6)}end<br>"
         case option.option_type_id
@@ -525,34 +537,31 @@ module ModelsHelper
       result += "#{insert_space(4)}#{column.name}"
       case column.data_type_id
       when 1 # 'string'
-        if column.options.length != 0
+        if !column.options.empty?
           done = false
           column.options.each do |option|
+            next unless option.option_type.type == 'format'
+
+            done = true
             case option.option_type.info
             when '漢字かなカナで登録可'
               result += ' { Gimei.kanji }'
-              done = true
             when 'ひらがなのみで登録可'
               result += ' { Gimei.hiragana }'
-              done = true
             when 'カタカナのみで登録可'
               result += ' { Gimei.katakana }'
-              done = true
             when '数字のみ限定で登録可'
               result += ' { 12345678 }'
-              done = true
+            when '英字のみ限定で登録可'
+              result += " { 'abcdEFGH' }"
             when '英字小文字のみ登録可'
               result += " { 'abcdefgh' }"
-              done = true
             when '英字大文字のみ登録可'
               result += " { 'ABCDEFGH }"
-              done = true
             when '英字数字のみで登録可'
               result += " { '1234ABcd'}"
-              done = true
             when '郵便番号形式で登録可'
               result += " { '123-4567'}"
-              done = true
             end
           end
           result += ' { Faker::Lorem.characters(number: 8) }' unless done
@@ -562,7 +571,7 @@ module ModelsHelper
       when 2 # 'text'
         result += ' { Faker::Lorem.sentence }'
       when 3 # 'integer'
-        if column.options.length != 0
+        if !column.options.empty?
           column.options.each do |option|
             case option.option_type.info
             when '上限下限を設定する'
@@ -630,7 +639,7 @@ module ModelsHelper
     6.times do |i|
       result += ', <br>' unless first
       sample = base.gsub(/数値/, i.to_s)
-      sample = sample.gsub(/内容/, "'----'") if i == 0
+      sample = sample.gsub(/内容/, "'----'") if i.zero?
       sample = sample.gsub(/内容/, "'最後'") if i == 5
       result += sample
       first = false

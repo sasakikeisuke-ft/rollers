@@ -183,10 +183,10 @@
       <%#/ Deviseのみ対象の専用記述 %>
 
       <%# ヘルパーメソッドによりバリデーションに関するHTMLを作成 %>
-      <%== make_varidation(contents, @gemfile.rails_i18n) %>
+      <%== make_validation(contents, @gemfile.rails_i18n) %>
 
       <%# ヘルパーメソッドによりアソシエーションに関するHTMLを作成 %>
-      <%== make_association(contents, @columns, @model, @model.attached_image) %>
+      <%== make_association(contents, @model, @model.attached_image) %>
 
       end<br>
     </div><%#/ code-field モデルファイルの記載の終了 %>
@@ -239,13 +239,15 @@
       class <%= @model.name.classify %><br>
       <%== insert_space(2) %>include ActiveModel::Model<br>
       <%== contents[:attr_accessor] %>
-      <%== make_varidation(contents, @gemfile.rails_i18n) %>
+      <%== make_validation(contents, @gemfile.rails_i18n) %>
       <%== contents[:save] %>
       end<br>
     </div>
   </div>
 <% end %>
-
+<div>
+  <%= link_to '編集はこちらから、モデル一覧へ', application_models_path %>
+</div>
 <%# RSpecに関する記載 %>
 <% if @model.model_type.name != 'ActiveHash' && @gemfile.rspec %>
   <h2><%= @model.name.classify %>モデルのRSpecの編集</h2>
@@ -349,7 +351,7 @@
         <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
         <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
         <% if @gemfile.rails_i18n %>
-          Eメール is invalid')
+          include('Eメールは不正な値です')
         <% else %>
           include('Email is invalid')
         <% end %><br>
@@ -363,7 +365,7 @@
           include('Eメールはすでに存在します')
         <% else %>
           include('Email has already been taken')
-        <% end %>')<br>
+        <% end %><br>
         <%== insert_space(6) %>end<br>
         <%== insert_space(6) %>it 'passwordが空欄だと登録できない' do<br>
         <%== insert_space(8) %>@<%= @model.name %>.password = ''<br>
@@ -373,7 +375,7 @@
           include("パスワードを入力してください")
         <% else %>
           include("password can't be blank")
-        <% end %>')<br>
+        <% end %><br>
         <%== insert_space(6) %>end<br>
         <%== insert_space(6) %>it 'passwordとpassword_confirmationが不一致では登録できない' do<br>
         <%== insert_space(8) %>@<%= @model.name %>.password = 'abcdef'<br>
@@ -392,7 +394,7 @@
         <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
         <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
         <% if @gemfile.rails_i18n %>
-          include(include('パスワードは6文字以上で入力してください')
+          include('パスワードは6文字以上で入力してください')
         <% else %>
           include('password is too short (minimum is 6 characters)')
         <% end %><br>
@@ -403,7 +405,7 @@
         <%== insert_space(8) %>@<%= @model.name %>.valid?<br>
         <%== insert_space(8) %>expect(@<%= @model.name %>.errors.full_messages).to
         <% if @gemfile.rails_i18n %>
-          include('パスワード is invalid. Include both letters and numbers')
+          include('パスワードは英字と数字の両方を含む必要があります')
         <% else %>
           include('password is invalid. Include both letters and numbers')
         <% end %><br>

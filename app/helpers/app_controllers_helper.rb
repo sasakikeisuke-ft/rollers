@@ -1,3 +1,3 @@
 module AppControllersHelper
-  # shared/controllerの部分テンプレートに使用しているメソッドは、app_actions_controllers_helper.rbに記載
+  # shared/controllerの部分テンプレートに使用しているメソッドは、app_actions_helper.rbに記載
 end

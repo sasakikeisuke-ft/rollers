@@ -1,5 +1,6 @@
 class GemfilesController < ApplicationController
   before_action :find_gemfile, only: [:index, :edit, :update]
+  before_action :gemfile_form_variable, only: [:new, :edit]
 
   def index
     @application = Application.find(params[:application_id])
@@ -14,6 +15,7 @@ class GemfilesController < ApplicationController
     if @gemfile.save
       redirect_to new_application_model_path(params[:application_id])
     else
+      gemfile_form_variable
       render :new
     end
   end
@@ -25,6 +27,7 @@ class GemfilesController < ApplicationController
     if @gemfile.update(gemfile_params)
       redirect_to root_path
     else
+      gemfile_form_variable
       render :edit
     end
   end
@@ -50,5 +53,9 @@ class GemfilesController < ApplicationController
     @gemfile = @application.gemfile
     redirect_to root_path if current_user.id != @application.user_id
     redirect_to new_application_gemfile_path(@application.id) if @gemfile.nil?
+  end
+
+  def gemfile_form_variable
+    @application = Application.find(params[:application_id])
   end
 end
