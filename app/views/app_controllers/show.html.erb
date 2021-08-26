@@ -31,8 +31,11 @@
 
 <%# 部分テンプレートを使用し、コントローラーのコードを表示します。また編集削除のリンクは表示されません。 %>
 <%= render partial: "shared/controller", locals: {links: false} %>
+<p>
+  redirect_toの行き先はroot_pathになっています。<br>
+  また自動生成されたメソッドなどに不要なものがあれば、削除をお願いします。
+</p>
 
-<br>
 <% if @gemfile.rubocop %>
   <div class="terminal-field">
     <div class="terminal-header">
