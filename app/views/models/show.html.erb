@@ -245,7 +245,9 @@
     </div>
   </div>
 <% end %>
-
+<div>
+  <%= link_to '編集はこちらから、モデル一覧へ', application_models_path %>
+</div>
 <%# RSpecに関する記載 %>
 <% if @model.model_type.name != 'ActiveHash' && @gemfile.rspec %>
   <h2><%= @model.name.classify %>モデルのRSpecの編集</h2>
