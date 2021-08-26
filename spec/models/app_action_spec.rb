@@ -26,35 +26,35 @@ RSpec.describe AppAction, type: :model do
     end
 
     context '不適切な内容があり登録できない' do
+      it 'action_selectが空欄だと登録できない' do
+        @app_action.action_select = ''
+        @app_action.valid?
+        expect(@app_action.errors.full_messages).to include("対象アクションを入力してください")
+      end
       it 'targetが空欄だと登録できない' do
         @app_action.target = ''
         @app_action.valid?
-        expect(@app_action.errors.full_messages).to include('対象モデル名を入力してください')
+        expect(@app_action.errors.full_messages).to include("対象モデル名を入力してください")
+      end
+      it 'action_code_idが空欄だと登録できない' do
+        @app_action.action_code_id = ''
+        @app_action.valid?
+        expect(@app_action.errors.full_messages).to include("Action codeを入力してください")
       end
       it 'app_controllerが紐づけられていないと登録できない' do
         @app_action.app_controller = nil
         @app_action.valid?
-        expect(@app_action.errors.full_messages).to include('app_controllerを入力してください')
+        expect(@app_action.errors.full_messages).to include("App controllerを入力してください")
       end
-      it 'action_type_idが空欄だと登録できない' do
-        @app_action.action_type_id = ''
+      it 'applicationが紐づけられていないと登録できない' do
+        @app_action.application = nil
         @app_action.valid?
-        expect(@app_action.errors.full_messages).to include("Action type can't be blank")
+        expect(@app_action.errors.full_messages).to include("Applicationを入力してください")
       end
-      it 'action_type_idが未選択だと登録できない' do
-        @app_action.action_type_id = 0
+      it 'action_code_idが未選択だと登録できない' do
+        @app_action.action_code_id = 0
         @app_action.valid?
-        expect(@app_action.errors.full_messages).to include("Action type can't be blank")
-      end
-      it 'code_type_idが空欄だと登録できない' do
-        @app_action.code_type_id = ''
-        @app_action.valid?
-        expect(@app_action.errors.full_messages).to include("Code type can't be blank")
-      end
-      it 'code_type_idが未選択だと登録できない' do
-        @app_action.code_type_id = 0
-        @app_action.valid?
-        expect(@app_action.errors.full_messages).to include("Code type can't be blank")
+        expect(@app_action.errors.full_messages).to include("Action codeを選択してください")
       end
     end
   end
