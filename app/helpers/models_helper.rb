@@ -117,6 +117,15 @@ module ModelsHelper
       group[0].options.each do |option|
         result += make_options(option, japanese)
       end
+      if group[0].data_type.type == 'ActiveHash'
+        option_type = OptionType.find(25)
+        code = if japanese
+                 option_type.code.gsub(/エラーメッセージ/, option_type.message_ja)
+               else
+                 option_type.code.gsub(/エラーメッセージ/, option_type.message_en)
+               end
+        result += ", #{code}" 
+      end
       result += '<br>'
     end
     result
