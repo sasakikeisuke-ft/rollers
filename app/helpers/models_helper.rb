@@ -237,8 +237,8 @@ module ModelsHelper
       target_model.columns.each do |column|
         next if column.name == model.name
 
-        result += "#{insert_space(space)}has_many :#{column.name}"
-        result += ", through: :#{target_model.name}<br>"
+        result += "#{insert_space(space)}has_many :#{column.name.pluralize}"
+        result += ", through: :#{target_model.name.pluralize}<br>"
       end
     end
 

@@ -101,16 +101,9 @@
             <% end %>
           <% end %>
 
-          <%# has_many/oneの記述を行う。%>
-          <%# 当モデルと同名のカラムを持つ=アソシエーションを組んでいるモデルを探し出す %>
-          <%# ただし、AvtiveHashは書かないため除外する。 %>
-          <% @columns.each do |column| %>
-            <% if column.name == model.name  && column.data_type_id != 13 && model.not_only %>
-              - has_many :<%= column.model.name %><br>
-            <% elsif column.name == model.name && column.data_type_id !=13 %>
-              - has_one :<%= column.model.name %><br>
-            <% end %>
-          <% end %>
+          <%# hasに関する記述を作成する。 %>
+          <%== readme_association(model, @models, @columns) %>
+
           <br>
         <% end %>
       <% end %>

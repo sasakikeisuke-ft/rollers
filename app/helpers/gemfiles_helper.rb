@@ -23,6 +23,33 @@ module GemfilesHelper
     raw(bar)
   end
 
+  # README専用のhasに関するアソシエーションを作成するメソッド
+  def readme_association(model, models, columns)
+    result = ''
+    columns.each do |column|
+      next unless column.name == model.name
+      
+      models.each do |target_model|
+        next unless target_model.id == column.model_id
+
+        if target_model.not_only
+          result += "- has_many :#{target_model.name.pluralize}<br>"
+        else
+          result += "- has_one :#{target_model.name}<br>"
+        end
+        if target_model.model_type.name == '中間テーブル'
+          target_model.columns.each do |target_column|
+            next if target_column.name == model.name
+
+            result += "- has_many :#{target_column.name.pluralize}"
+            result += ", through: :#{target_model.name.pluralize}<br>"
+          end
+        end
+      end
+    end
+    result
+  end
+
   # 日本語化ファイルのHTMLを作成するメソッド
   def make_japanise_html(models)
     html = ''
