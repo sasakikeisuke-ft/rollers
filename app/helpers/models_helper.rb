@@ -124,7 +124,7 @@ module ModelsHelper
                else
                  option_type.code.gsub(/エラーメッセージ/, option_type.message_en)
                end
-        result += ", #{code}" 
+        result += ", #{code}"
       end
       result += '<br>'
     end

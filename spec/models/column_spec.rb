@@ -21,33 +21,33 @@ RSpec.describe Column, type: :model do
       it 'nameが空欄だと登録できない' do
         @column.name = ''
         @column.valid?
-        expect(@column.errors.full_messages).to include("カラム名を入力してください")
+        expect(@column.errors.full_messages).to include('カラム名を入力してください')
       end
       it 'nameの重複があり登録できない' do
         @column.save
         another_column = FactoryBot.build(:column, name: @column.name, model: @column.model)
         another_column.valid?
-        expect(another_column.errors.full_messages).to include("カラム名はすでに存在します")
+        expect(another_column.errors.full_messages).to include('カラム名はすでに存在します')
       end
       it 'data_type_idが空欄だと登録できない' do
         @column.data_type_id = ''
         @column.valid?
-        expect(@column.errors.full_messages).to include("Data typeを入力してください")
+        expect(@column.errors.full_messages).to include('Data typeを入力してください')
       end
       it 'modelが紐づけられていないと登録できない' do
         @column.model = nil
         @column.valid?
-        expect(@column.errors.full_messages).to include("Modelを入力してください")
+        expect(@column.errors.full_messages).to include('Modelを入力してください')
       end
       it 'applicationが紐づけられていないと登録できない' do
         @column.application = nil
         @column.valid?
-        expect(@column.errors.full_messages).to include("Applicationを入力してください")
+        expect(@column.errors.full_messages).to include('Applicationを入力してください')
       end
       it 'data_type_idが未選択だと登録できない' do
         @column.data_type_id = 0
         @column.valid?
-        expect(@column.errors.full_messages).to include("Data typeを選択してください")
+        expect(@column.errors.full_messages).to include('Data typeを選択してください')
       end
     end
   end

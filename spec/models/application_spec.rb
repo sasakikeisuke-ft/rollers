@@ -21,12 +21,12 @@ RSpec.describe Application, type: :model do
       it 'nameが空欄だと登録できない' do
         @application.name = ''
         @application.valid?
-        expect(@application.errors.full_messages).to include("アプリケーション名を入力してください")
+        expect(@application.errors.full_messages).to include('アプリケーション名を入力してください')
       end
       it 'userが紐づけられていないと登録できない' do
         @application.user = nil
         @application.valid?
-        expect(@application.errors.full_messages).to include("userを入力してください")
+        expect(@application.errors.full_messages).to include('userを入力してください')
       end
     end
   end

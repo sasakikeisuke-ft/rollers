@@ -25,17 +25,17 @@ RSpec.describe Option, type: :model do
       it 'option_type_idが空欄だと登録できない' do
         @option.option_type_id = ''
         @option.valid?
-        expect(@option.errors.full_messages).to include("Option typeを入力してください")
+        expect(@option.errors.full_messages).to include('Option typeを入力してください')
       end
       it 'columnが紐づけられていないと登録できない' do
         @option.column = nil
         @option.valid?
-        expect(@option.errors.full_messages).to include("Columnを入力してください")
+        expect(@option.errors.full_messages).to include('Columnを入力してください')
       end
       it 'option_type_idが未選択だと登録できない' do
         @option.option_type_id = 0
         @option.valid?
-        expect(@option.errors.full_messages).to include("Option typeを選択してください")
+        expect(@option.errors.full_messages).to include('Option typeを選択してください')
       end
     end
   end

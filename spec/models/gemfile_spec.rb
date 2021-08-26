@@ -17,7 +17,7 @@ RSpec.describe Gemfile, type: :model do
       it 'applicationが紐づけられていないと登録できない' do
         @gemfile.application = nil
         @gemfile.valid?
-        expect(@gemfile.errors.full_messages).to include("Applicationを入力してください")
+        expect(@gemfile.errors.full_messages).to include('Applicationを入力してください')
       end
     end
   end

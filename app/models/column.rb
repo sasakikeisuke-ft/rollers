@@ -1,9 +1,9 @@
 class Column < ApplicationRecord
   with_options presence: true do
-    validates :data_type_id, numericality: { other_than: 0, message: "を選択してください" }
+    validates :data_type_id, numericality: { other_than: 0, message: 'を選択してください' }
     validates :name, uniqueness: { case_sensitive: false, scope: :model_id }
   end
-  with_options inclusion:{ in: [true, false] } do
+  with_options inclusion: { in: [true, false] } do
     validates :must_exist
     validates :unique
   end

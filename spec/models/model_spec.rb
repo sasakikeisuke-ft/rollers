@@ -17,28 +17,28 @@ RSpec.describe Model, type: :model do
       it 'nameが空欄だと登録できない' do
         @model.name = ''
         @model.valid?
-        expect(@model.errors.full_messages).to include("モデル名を入力してください")
+        expect(@model.errors.full_messages).to include('モデル名を入力してください')
       end
       it 'nameの重複があり登録できない' do
         @model.save
         another_model = FactoryBot.build(:model, name: @model.name, application: @model.application)
         another_model.valid?
-        expect(another_model.errors.full_messages).to include("モデル名はすでに存在します")
+        expect(another_model.errors.full_messages).to include('モデル名はすでに存在します')
       end
       it 'model_type_idが空欄だと登録できない' do
         @model.model_type_id = ''
         @model.valid?
-        expect(@model.errors.full_messages).to include("Model typeを入力してください")
+        expect(@model.errors.full_messages).to include('Model typeを入力してください')
       end
       it 'applicationが紐づけられていないと登録できない' do
         @model.application = nil
         @model.valid?
-        expect(@model.errors.full_messages).to include("Applicationを入力してください")
+        expect(@model.errors.full_messages).to include('Applicationを入力してください')
       end
       it 'model_type_idが未選択だと登録できない' do
         @model.model_type_id = 0
         @model.valid?
-        expect(@model.errors.full_messages).to include("Model typeを選択してください")
+        expect(@model.errors.full_messages).to include('Model typeを選択してください')
       end
     end
   end
