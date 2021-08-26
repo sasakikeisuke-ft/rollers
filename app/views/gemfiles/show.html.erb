@@ -50,7 +50,7 @@
           <%# 最も長いカラム名の文字数＝longestを決定する%>
           <% longest = the_longest(model) %>
           
-          # <%= model.name.pluralize %>テーブル<br>
+          ## <%= model.name.pluralize %>テーブル<br>
           <br>
           <%# マークダウン方式の表のタイトルと間仕切りを作成 %>
           | column<%= insert_space(longest - 6) %> | Type<%= insert_space(6) %>  | Options<%= insert_space(18) %> |<br>
@@ -91,7 +91,7 @@
           <%#/テーブル表記 %>
 
           
-          # Association<br>
+          ### Association<br>
           <br>
 
           <%# referencesの対象=belongs_toの対象のため、抽出し記載 %>
