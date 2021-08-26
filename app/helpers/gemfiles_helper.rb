@@ -28,22 +28,22 @@ module GemfilesHelper
     result = ''
     columns.each do |column|
       next unless column.name == model.name
-      
+
       models.each do |target_model|
         next unless target_model.id == column.model_id
 
-        if target_model.not_only
-          result += "- has_many :#{target_model.name.pluralize}<br>"
-        else
-          result += "- has_one :#{target_model.name}<br>"
-        end
-        if target_model.model_type.name == '中間テーブル'
-          target_model.columns.each do |target_column|
-            next if target_column.name == model.name
+        result += if target_model.not_only
+                    "- has_many :#{target_model.name.pluralize}<br>"
+                  else
+                    "- has_one :#{target_model.name}<br>"
+                  end
+        next unless target_model.model_type.name == '中間テーブル'
 
-            result += "- has_many :#{target_column.name.pluralize}"
-            result += ", through: :#{target_model.name.pluralize}<br>"
-          end
+        target_model.columns.each do |target_column|
+          next if target_column.name == model.name
+
+          result += "- has_many :#{target_column.name.pluralize}"
+          result += ", through: :#{target_model.name.pluralize}<br>"
         end
       end
     end
