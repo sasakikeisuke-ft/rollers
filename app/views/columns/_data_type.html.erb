@@ -1,0 +1,5 @@
+<% if data_type.id >= 1 && data_type.id <= 11 %>
+  <p>
+    <%= f.radio_button :data_type_id, data_type.id %><%= data_type.type %>型: <%= data_type.info %> 
+  </p>
+<% end %>
