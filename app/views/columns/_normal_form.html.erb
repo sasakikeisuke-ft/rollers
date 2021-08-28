@@ -20,24 +20,8 @@
     <div class="info">
       以下よりカラムのデータ型を選択してください
     </div>
-    <div class="letter-field">
-      <p><%= f.radio_button :data_type_id, 1 %><%= DataType.find(1)[:type] %>型</p>  
-      <p><%= f.radio_button :data_type_id, 2 %><%= DataType.find(2)[:type] %>型</p>
-    </div>
-    <div class="number-field">
-      <p><%= f.radio_button :data_type_id, 3 %><%= DataType.find(3)[:type] %>型</p>  
-      <p><%= f.radio_button :data_type_id, 4 %><%= DataType.find(4)[:type] %>型</p>
-      <p><%= f.radio_button :data_type_id, 5 %><%= DataType.find(5)[:type] %>型</p>
-    </div>
-    <div class="date-field">
-      <p><%= f.radio_button :data_type_id, 6 %><%= DataType.find(6)[:type] %>型</p>  
-      <p><%= f.radio_button :data_type_id, 7 %><%= DataType.find(7)[:type] %>型</p>
-      <p><%= f.radio_button :data_type_id, 8 %><%= DataType.find(8)[:type] %>型</p>
-    </div>
-    <div class="boolean-field">
-      <p><%= f.radio_button :data_type_id, 11 %><%= DataType.find(11)[:type] %>型</p>  
-    </div>
-  </div>
+    
+    <%= render partial: "data_type", collection: DataType.all,  locals: {f: f} %>
 
   <div class="field">
     <%= f.check_box :must_exist ,{checked: true}, 1, 0 %>

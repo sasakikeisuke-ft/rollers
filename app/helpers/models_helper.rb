@@ -649,8 +649,9 @@ module ModelsHelper
   end
 
   # ActiveHashにおけるアソシエーションを作成する専用メソッド
-  def make_activehash_has(columns, model_name)
+  def make_activehash_has(model_name)
     result = ''
+    columns = Column.where(application_id: params[:application_id])
     columns.each do |column|
       # このモデル名と同じカラム名である -> references型で対象がこのモデル -> 対象モデルではbelongs_toが記載されている。
       next unless column.name == model_name

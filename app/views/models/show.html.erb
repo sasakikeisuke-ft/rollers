@@ -537,7 +537,7 @@
       <%== "#{insert_space(2)}self.data = [<br>" %>
       <%== make_activehash_code(@model) %>
       <%== "#{insert_space(2)}include ActiveHash::Associations<br>" %>
-      <%== make_activehash_has(@columns, @model.name) %>
+      <%== make_activehash_has(@model.name) %>
       end<br>
     </div>
   </div>
