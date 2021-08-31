@@ -65,9 +65,7 @@ class ActionCode < ActiveHash::Base
 
     # アソシエーションを利用してレコードを取得
     { id: 81, keyword: '内容', sample: '@A_model = @B_model.A_model' },
-    { id: 82, keyword: '内容', sample: '@A_model = @B_models.A_model' },
-    { id: 83, keyword: '内容', sample: '@A_models = @B_model.A_models' },
-    { id: 84, keyword: '内容', sample: '@A_models = @B_model.A_models' },
+    { id: 82, keyword: '内容', sample: '@A_models = @B_model.A_models' },
 
     # redirect_toの設定
     { id: 91, keyword: '内容', sample: 'redirect_to root_path' },
