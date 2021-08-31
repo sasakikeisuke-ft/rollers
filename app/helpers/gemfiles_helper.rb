@@ -52,17 +52,22 @@ module GemfilesHelper
 
   # 日本語化ファイルのHTMLを作成するメソッド
   def make_japanise_html(models)
-    html = ''
+    result = ''
     models.each do |model|
       next if model.model_type.name == 'Formオブジェクト'
 
-      html += "#{insert_space(6)}#{model.name}:"
-      html += '<br>'
+      name_ja_exist = false
+      html = "#{insert_space(6)}#{model.name}:<br>"
       model.columns.each do |column|
+        next if column.name_ja == ''
+
         html += "#{insert_space(8)}#{column.name}: #{column.name_ja}<br>"
+        name_ja_exist = true
       end
+      html = '' unless name_ja_exist
+      result += html
     end
-    html
+    result
   end
 
   # ルーティングのHTMLを作成するメソッド
