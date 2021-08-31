@@ -183,6 +183,10 @@
       <%== "gem 'rails-i18n'<br>" if @gemfile.rails_i18n %>
       <%== "gem 'ransack'<br>" if @gemfile.ransack %>
       <%== 'gem "aws-sdk-s3", require: false<br>' if @gemfile.s3 %>
+      <% if false %><%# if @gemfile.bootstrap %>
+        gem 'bootstrap', '~> 4.3.1'<br>
+        gem 'jquery-rails'<br>
+      <% end %>
     </div>
   </div>
   <%# ターミナル操作: Gemの導入 %>
