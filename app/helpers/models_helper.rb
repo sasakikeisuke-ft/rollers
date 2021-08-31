@@ -99,6 +99,17 @@ module ModelsHelper
     option_code = 'inclusion: { in: [true, false] }'
     result += use_with_option?(contents[:boolean_group], space, japanese, option_code)
 
+    # references型の重複禁止に関する処理を行う。
+    contents[:references_group].each do |column|
+      next if column.options.nil?
+
+      result += "#{insert_space(space)}validates :#{column.name}"
+      column.options.each do |option|
+        result += make_options(option, japanese)
+      end
+      result += '<br>'
+    end
+
     # 最終的なHTMLを返却する
     result
   end
