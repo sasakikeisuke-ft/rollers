@@ -273,7 +273,7 @@
         <span class="comment-out"># you've limited to :test, :development, or :production.<br></span>
         Bundler.require(*Rails.groups)<br>
         <br>
-        module Rollers<br>
+        module <%= @application.name.classify %><br>
         <%== insert_space(2) %>class Application < Rails::Application<br>
         <%== insert_space(4) %><span class="comment-out"># Initialize configuration defaults for originally generated Rails version.<br></span>
         <%== insert_space(4) %>config.load_defaults 6.0<br>
