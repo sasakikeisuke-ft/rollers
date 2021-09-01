@@ -219,6 +219,22 @@
       </div>
     </div>
   <% end %>
+  <%# ターミナル操作: RSpecの導入 %>
+  <% if @gemfile.rspec %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：RSpecの導入
+        </div>
+      </div>
+      <div class="terminal-contents">
+        rails g rspec:install
+      </div>
+    </div>
+  <% end %>
   <% if @gemfile.image_magick %>
     <p>ImageMagickの導入</p>
     <%# ターミナル操作: ImageMagickの導入 %>
