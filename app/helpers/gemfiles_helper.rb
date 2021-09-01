@@ -87,7 +87,7 @@ module GemfilesHelper
       next unless app_controller.parent == parent
 
       content = {
-        child: app_controller.name,
+        child: app_controller.name.tableize,
         parent: parent,
         deep: deep + 2,
         index_select: app_controller.index_select,
