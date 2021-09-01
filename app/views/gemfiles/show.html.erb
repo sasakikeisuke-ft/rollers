@@ -144,12 +144,14 @@
     </div>
     <div class="code-contents">
       Rails.application.routes.draw do<br>
-      <%== "#{insert_space(2)}devise_for :#{@devise.name}" if @gemfile.rails_i18n %>
+      <%#== "#{insert_space(2)}devise_for :#{@devise.name.tableize}" if @gemfile.rails_i18n %>
       <%== "#{insert_space(2)}root to: 'tests#index'" %>
       <%== make_rooting_html(@app_controllers) %><br>
       end
     </div>
   </div>
+  deviseに関するルーティングは、導入に伴い自動で作成されます。<br>
+  また導入に先行して記載すると、deviseの導入に支障が出ます。
 </div>
 
 <%# 日本語化ファイルの設定 %>
