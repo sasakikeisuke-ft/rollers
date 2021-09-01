@@ -203,6 +203,22 @@
       bundle install
     </div>
   </div>
+  <%# ターミナル操作: deviseの導入 %>
+  <% if @gemfile.devise %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：deviseの導入
+        </div>
+      </div>
+      <div class="terminal-contents">
+        rails g devise:install
+      </div>
+    </div>
+  <% end %>
   <% if @gemfile.image_magick %>
     <p>ImageMagickの導入</p>
     <%# ターミナル操作: ImageMagickの導入 %>
