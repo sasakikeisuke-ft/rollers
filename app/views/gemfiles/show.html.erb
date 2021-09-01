@@ -258,22 +258,11 @@
     <%== insert_space(2) %>private<br>
     <br>
     <% if @gemfile.devise %>
-      <% @models.each do |model| %>
-        <% next unless model.model_type.name == 'devise' %>
-
-        <%== insert_space(2) %>def configure_permitted_parameters<br>
-        <%== insert_space(4) %>devise_parameter_sanitizer.permit(:sign_up, keys: [
-        <% first = true %>
-        <% model.columns.each do |column| %>
-          <%= ', ' unless first %>
-          <%= ":#{column.name}" %>
-        <% end %>])<br>
-        <%== insert_space(2) %>end<br><br>
-      <% end %>
+      <%== make_devise_parameter(@models) %>
     <% end %>
     <%== insert_space(2) %>def basic_auth<br>
     <%== insert_space(4) %>authenticate_or_request_with_http_basic do |username, password|<br>
-    <%== insert_space(6) %>username == ENV["BASIC_AUTH_USER"] && password == ENV["BASIC_AUTH_PASSWORD"]<br>
+    <%== insert_space(6) %>username == ENV['BASIC_AUTH_USER'] && password == ENV['BASIC_AUTH_PASSWORD']<br>
     <%== insert_space(4) %>end<br>
     <%== insert_space(2) %>end<br>
     end

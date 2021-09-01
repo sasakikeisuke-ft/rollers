@@ -146,4 +146,24 @@ module GemfilesHelper
     end
     action_html
   end
+
+  def make_devise_parameter(models)
+    models.each do |model|
+      next unless model.model_type.name == 'devise'
+      break if model.columns.empty?
+
+      first = true
+      code = ''
+      model.columns.each do |column|
+        code += ', ' unless first
+        code += ":#{column.name}"
+        first = false
+      end
+      result = "#{insert_space(2)}def configure_permitted_parameters<br>"
+      result += "#{insert_space(4)}devise_parameter_sanitizer.permit(:sign_up, keys: ["
+      result += "#{code}])<br>#{insert_space(2)}end<br><br>"
+      return result
+    end
+  end
+  
 end
