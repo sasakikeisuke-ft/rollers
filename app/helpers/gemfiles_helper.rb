@@ -52,17 +52,22 @@ module GemfilesHelper
 
   # 日本語化ファイルのHTMLを作成するメソッド
   def make_japanise_html(models)
-    html = ''
+    result = ''
     models.each do |model|
       next if model.model_type.name == 'Formオブジェクト'
 
-      html += "#{insert_space(6)}#{model.name}:"
-      html += '<br>'
+      name_ja_exist = false
+      html = "#{insert_space(6)}#{model.name}:<br>"
       model.columns.each do |column|
+        next if column.name_ja == ''
+
         html += "#{insert_space(8)}#{column.name}: #{column.name_ja}<br>"
+        name_ja_exist = true
       end
+      html = '' unless name_ja_exist
+      result += html
     end
-    html
+    result
   end
 
   # ルーティングのHTMLを作成するメソッド
@@ -82,7 +87,7 @@ module GemfilesHelper
       next unless app_controller.parent == parent
 
       content = {
-        child: app_controller.name,
+        child: app_controller.name.tableize,
         parent: parent,
         deep: deep + 2,
         index_select: app_controller.index_select,
@@ -141,4 +146,24 @@ module GemfilesHelper
     end
     action_html
   end
+
+  def make_devise_parameter(models)
+    models.each do |model|
+      next unless model.model_type.name == 'devise'
+      break if model.columns.empty?
+
+      first = true
+      code = ''
+      model.columns.each do |column|
+        code += ', ' unless first
+        code += ":#{column.name}"
+        first = false
+      end
+      result = "#{insert_space(2)}def configure_permitted_parameters<br>"
+      result += "#{insert_space(4)}devise_parameter_sanitizer.permit(:sign_up, keys: ["
+      result += "#{code}])<br>#{insert_space(2)}end<br><br>"
+      return result
+    end
+  end
+  
 end

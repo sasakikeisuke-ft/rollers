@@ -62,7 +62,7 @@
     </div>
     <div class="code-contents">
       encoding: utf8mb4 を変更<br>
-      #=> encoding: utf8
+      #=> encoding: utf8 (mb4を削除)
     </div>
   </div>
   <%# ターミナル操作: データベースの作成 %>
@@ -82,6 +82,22 @@
   
   <%# Gemfileの記載 %>
   <p>Gemfile記載と導入</p>
+
+  <%# ターミナル操作: 対象ファイルへのジャンプ %>
+  <div class="terminal-field">
+    <div class="terminal-header">
+      <div class="terminal-icons">
+        <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+      </div>
+      <div class="terminal-title">
+        ターミナル：対象ファイルへのジャンプ
+      </div>
+    </div>
+    <div class="terminal-contents">
+      rails db:create
+    </div>
+  </div>
+
   <%# コード表示%>
   <div class="code-field">
     <div class="code-tab">
@@ -98,7 +114,7 @@
       git_source(:github) { |repo| "https://github.com/#{repo}.git" }<br>
       <br>
       ruby '2.6.5'
-      <br>
+      <br><br>
       <span class="comment-out"># Bundle edge Rails instead: gem 'rails', github: 'rails/rails'</span><br>
       gem 'rails', '~> 6.0.0'<br>
       <span class="comment-out"># Use mysql as the database for Active Record</span><br>
@@ -124,7 +140,7 @@
       <span class="comment-out"># Reduces boot times through caching; required in config/boot.rb</span><br>
       gem 'bootsnap', '>= 1.4.2', require: false<br>
       <br>
-      group :development, :test do
+      group :development, :test do<br>
       <%== insert_space(2) %><span class="comment-out"># Call 'byebug' anywhere in the code to stop execution and get a debugger console</span><br>
       <%== insert_space(2) %>gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]<br>
       <% if @gemfile.rspec %>
@@ -150,7 +166,7 @@
       <%== insert_space(2) %><span class="comment-out"># Adds support for Capybara system testing and selenium driver</span><br>
       <%== insert_space(2) %>gem 'capybara', '>= 2.15'<br>
       <%== insert_space(2) %>gem 'selenium-webdriver'<br>
-      <%== insert_space(2) %><span class="comment-out"># Easy installation and use of web drivers to run system tests with browsers<br></span><br>
+      <%== insert_space(2) %><span class="comment-out"># Easy installation and use of web drivers to run system tests with browsers</span><br>
       <%== insert_space(2) %>gem 'webdrivers'<br>
       end<br>
       <br>
@@ -167,6 +183,10 @@
       <%== "gem 'rails-i18n'<br>" if @gemfile.rails_i18n %>
       <%== "gem 'ransack'<br>" if @gemfile.ransack %>
       <%== 'gem "aws-sdk-s3", require: false<br>' if @gemfile.s3 %>
+      <% if true %><%# if @gemfile.bootstrap %>
+        gem 'bootstrap', '~> 4.5.0'<br>
+        gem 'jquery-rails'<br>
+      <% end %>
     </div>
   </div>
   <%# ターミナル操作: Gemの導入 %>
@@ -183,6 +203,38 @@
       bundle install
     </div>
   </div>
+  <%# ターミナル操作: deviseの導入 %>
+  <% if @gemfile.devise %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：deviseの導入
+        </div>
+      </div>
+      <div class="terminal-contents">
+        rails g devise:install
+      </div>
+    </div>
+  <% end %>
+  <%# ターミナル操作: RSpecの導入 %>
+  <% if @gemfile.rspec %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：RSpecの導入
+        </div>
+      </div>
+      <div class="terminal-contents">
+        rails g rspec:install
+      </div>
+    </div>
+  <% end %>
   <% if @gemfile.image_magick %>
     <p>ImageMagickの導入</p>
     <%# ターミナル操作: ImageMagickの導入 %>
@@ -211,6 +263,57 @@
       </div>
       <div class="terminal-contents">
         rails db:migrate
+      </div>
+    </div>
+  <% end %>
+
+  <%# ターミナル操作: Bootstrapの導入 %>
+  <% if true %><%# if @gemfile.bootstrap %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：対象ファイルの名称変更
+        </div>
+      </div>
+      <div class="terminal-contents">
+        mv app/assets/stylesheets/application.css app/assets/stylesheets/application.scss
+      </div>
+    </div>
+    <%# ターミナル操作: 対象ファイルへのジャンプ %>
+    <div class="terminal-field">
+      <div class="terminal-header">
+        <div class="terminal-icons">
+          <span class="close">●</span><span class="minimum">●</span><span class="fullscreen">●</span>
+        </div>
+        <div class="terminal-title">
+          ターミナル：対象ファイルへのジャンプ
+        </div>
+      </div>
+      <div class="terminal-contents">
+        code app/assets/stylesheets/application.scss
+      </div>
+    </div>
+    <%# コード表示%>
+    <div class="code-field">
+      <div class="code-tab">
+        <%= image_tag "scss_icon.png", class: "code-icon", size: "16x16", alt: "info_icon" %>
+        app/assets/stylesheets/application.scss
+        <%= image_tag "cross_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+      </div>
+      <div class="code-route">
+        app > assets > stylesheets >
+        <%= image_tag "scss_icon.png", class: "code-icon", size: "16x16", alt: "close_icon" %>
+        application.scss
+      </div>
+      <div class="code-contents">
+        @import 'bootstrap';<br>
+        <% @app_controller_names.each do |app_controller_name| %>
+          <%== "@import '#{app_controller_name.name}.scss';<br>" %>
+        <% end %>
+        ※ 本ファイルの記載内容を全て削除し、上記コードのみ入力
       </div>
     </div>
   <% end %>
@@ -253,7 +356,7 @@
         <span class="comment-out"># you've limited to :test, :development, or :production.<br></span>
         Bundler.require(*Rails.groups)<br>
         <br>
-        module Rollers<br>
+        module <%= @application.name.classify %><br>
         <%== insert_space(2) %>class Application < Rails::Application<br>
         <%== insert_space(4) %><span class="comment-out"># Initialize configuration defaults for originally generated Rails version.<br></span>
         <%== insert_space(4) %>config.load_defaults 6.0<br>
