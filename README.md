@@ -10,31 +10,31 @@ RollersはRubyのフレームワークであるRailsの作成を補助するこ�
 ![トップページ画像](https://i.gyazo.com/18506c0254fa4e90e0576819f8721301.jpg)
 
 ### アプリケーション登録画面
-![アプリケーション登録画面](https://gyazo.com/369ae3daa54cd7ddb9634d06e5062c11)
+![アプリケーション登録画面](https://i.gyazo.com/369ae3daa54cd7ddb9634d06e5062c11.png)
 
 ### モデル関連の登録画面
-![モデル登録画面](https://gyazo.com/45292ca16825a0901af560357f7638b3)
-![カラム登録画面](https://gyazo.com/65706823986006cb2e204360eb1202c7)
+![モデル登録画面](https://i.gyazo.com/45292ca16825a0901af560357f7638b3.png)
+![カラム登録画面](https://i.gyazo.com/65706823986006cb2e204360eb1202c7.png)
 
 ### コントローラー関連の登録画面
-![コントローラー登録画面](https://gyazo.com/7b0d1f35a6340a5b31587b62c65d9348)
-![アクション登録画面](https://gyazo.com/7fc13c11f065ec62375fe5c39d0927d2)
+![コントローラー登録画面](https://i.gyazo.com/7b0d1f35a6340a5b31587b62c65d9348.png)
+![アクション登録画面](https://i.gyazo.com/7fc13c11f065ec62375fe5c39d0927d2.png)
 
 ### 操作指示画面
-![操作指示及びコード表示](https://gyazo.com/21664ca82cab86455ecb81a1840e030d)
+![操作指示及びコード表示](https://i.gyazo.com/21664ca82cab86455ecb81a1840e030d.png)
 
 
 ### 自動生成されたREADMEと、そのコピー＆ペーストした場合
-![READMEのコピー＆ペースト](https://gyazo.com/d895cd83211464a5664a5eb1fdb39f28)
+![READMEのコピー＆ペースト](https://i.gyazo.com/d895cd83211464a5664a5eb1fdb39f28.gif)
 
 
 ### 自動作成されたモデル関連ファイルのコード
-![マイグレーションファイル](https://gyazo.com/8f11622c9e7b65940bb275310a9729c7)
-![モデルファイル](https://gyazo.com/a30a6d7478f5919f78faf195efa89f22)
+![マイグレーションファイル](https://i.gyazo.com/8f11622c9e7b65940bb275310a9729c7.png)
+![モデルファイル](https://i.gyazo.com/a30a6d7478f5919f78faf195efa89f22.png)
 
 
 ### 自動作成されたコントローラーファイルのコード
-![コントローラー](https://gyazo.com/8d551f2b4c7186dd6062787334792f44)
+![コントローラー](https://i.gyazo.com/8d551f2b4c7186dd6062787334792f44.png)
 
 
 ## 🌐 URL
