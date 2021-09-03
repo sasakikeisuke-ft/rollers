@@ -655,7 +655,7 @@ module ModelsHelper
       result += sample
       first = false
     end
-    result += '<br>'
+    result += "<br>#{insert_space(2)}]<br>"
     result
   end
 
