@@ -261,7 +261,7 @@ module ModelsHelper
       result += "<br>#{insert_space(2)}# ActiveHash<br>"
       result += "#{insert_space(2)}extend ActiveHash::Associations::ActiveRecordExtensions<br>"
       contents[:activehash_group].each do |column|
-        result += "#{insert_space(2)}belongs_to :#{column.name}<br>"
+        result += "#{insert_space(2)}belongs_to_active_hash :#{column.name}<br>"
       end
     end
     result
