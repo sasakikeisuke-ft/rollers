@@ -650,8 +650,8 @@ module ModelsHelper
     6.times do |i|
       result += ', <br>' unless first
       sample = base.gsub(/数値/, i.to_s)
-      sample = sample.gsub(/内容/, "'----'") if i.zero?
-      sample = sample.gsub(/内容/, "'最後'") if i == 5
+      sample = sample.gsub(/内容/, '----') if i.zero?
+      sample = sample.gsub(/内容/, '最後') if i == 5
       result += sample
       first = false
     end
