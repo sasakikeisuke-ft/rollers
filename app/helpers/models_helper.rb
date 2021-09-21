@@ -261,7 +261,7 @@ module ModelsHelper
       result += "<br>#{insert_space(2)}# ActiveHash<br>"
       result += "#{insert_space(2)}extend ActiveHash::Associations::ActiveRecordExtensions<br>"
       contents[:activehash_group].each do |column|
-        result += "#{insert_space(2)}belongs_to :#{column.name}<br>"
+        result += "#{insert_space(2)}belongs_to_active_hash :#{column.name}<br>"
       end
     end
     result
@@ -650,12 +650,12 @@ module ModelsHelper
     6.times do |i|
       result += ', <br>' unless first
       sample = base.gsub(/数値/, i.to_s)
-      sample = sample.gsub(/内容/, "'----'") if i.zero?
-      sample = sample.gsub(/内容/, "'最後'") if i == 5
+      sample = sample.gsub(/内容/, '----') if i.zero?
+      sample = sample.gsub(/内容/, '最後') if i == 5
       result += sample
       first = false
     end
-    result += '<br>'
+    result += "<br>#{insert_space(2)}]<br>"
     result
   end
 
