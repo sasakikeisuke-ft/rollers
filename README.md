@@ -42,8 +42,8 @@ ID: admin<br>
 Password: 2222<br>
 
 ### テスト用アカウント
-メールアドレス: sample@sample<br>
-Password: a1234567<br>
+メールアドレス: sample@sample.jp<br>
+Password: a12345<br>
 
 
 ## 利用方法
