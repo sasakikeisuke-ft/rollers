@@ -4,7 +4,7 @@ class GemfilesController < ApplicationController
 
   def index
     @application = Application.find(params[:application_id])
-    @app_controller_names = AppController.where(params[:application_id]).select(:name)
+    @app_controller_names = AppController.where(id: params[:application_id]).select(:name)
   end
 
   def new
