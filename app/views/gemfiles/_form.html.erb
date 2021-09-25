@@ -1,9 +1,11 @@
 <%= form_with(model: [@application, @gemfile], local: true) do |f| %>
   <%= render 'shared/error_messages', model: f.object %>
   
+  <%= f.hidden_field :devise, value: "false" %>
   <%= f.check_box :devise ,{}, true, false %>
   <%= f.label :devise %>
   <br>
+  <%= f.hidden_field :pry_rails, value: "false" %>
   <%= f.check_box :pry_rails ,{}, true, false %>
   <%= f.label :pry_rails, 'pry-rails' %>
   <br>
