@@ -33,7 +33,9 @@
       code <%== @application.name %>
     </div>
   </div>
+  <hr>
 
+  <h2>データベースに関する設定</h2>
   <%# ターミナル操作: 対象ファイルへのジャンプ %>
   <div class="terminal-field">
     <div class="terminal-header">
@@ -79,9 +81,10 @@
       rails db:create
     </div>
   </div>
-  
+  <hr>
+
   <%# Gemfileの記載 %>
-  <p>Gemfile記載と導入</p>
+  <h3>Gemfile記載と導入</h3>
 
   <%# ターミナル操作: 対象ファイルへのジャンプ %>
   <div class="terminal-field">
@@ -203,6 +206,9 @@
       bundle install
     </div>
   </div>
+  <hr>
+
+  <h3>Gemのインストール</h3>
   <%# ターミナル操作: deviseの導入 %>
   <% if @gemfile.devise %>
     <div class="terminal-field">
@@ -266,7 +272,9 @@
       </div>
     </div>
   <% end %>
+  <hr>
 
+  <h3>Bootstrapの導入</h3>
   <%# ターミナル操作: Bootstrapの導入 %>
   <% if true %><%# if @gemfile.bootstrap %>
     <div class="terminal-field">
@@ -317,7 +325,9 @@
       </div>
     </div>
   <% end %>
+  <hr>
 
+  <h3>日本語化ファイルの導入</h3>
   <%# 日本語化ファイルの導入 %>
   <% if @gemfile.rails_i18n %>
     <p>日本語化ファイル適応準備</p>
@@ -419,6 +429,7 @@
       </div>
     </div>
   <% end %>
+  <hr>
 
   <%# Rubocop導入のための記載 %>
   <% if @gemfile.rubocop %>
